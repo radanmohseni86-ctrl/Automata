@@ -4,3 +4,4 @@ src/*.out
 src/*.toc
 web/node_modules/
 web/build/
+src/*.pdf
