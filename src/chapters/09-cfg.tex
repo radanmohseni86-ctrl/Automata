@@ -1,0 +1,239 @@
+\chapter{گرامرهای مستقل از متن}
+
+دیدیم که زبان‌هایی مثل $\{0^n1^n\}$ منظم نیستند. در این بخش ابزار قوی‌تری معرفی می‌کنیم: \term{گرامرهای مستقل از متن}{Context-Free Grammars}. این گرامرها \term{زبان‌های مستقل از متن}{Context-Free Languages} را تولید می‌کنند که شامل همه زبان‌های منظم و زبان‌های دیگری مثل $\{0^n1^n\}$ هستند. کاربرد مهم آن‌ها در طراحی زبان‌های برنامه‌نویسی و ساخت \textbf{تجزیه‌گر} (\lr{parser}) کامپایلرهاست: ابزارهای ساخت تجزیه‌گر، گرامر مستقل از متن زبان را می‌گیرند. در فصل‌های بعد ماشین معادل این گرامرها، یعنی \textbf{ماشین پشته‌ای}، را هم می‌بینیم.
+
+\begin{ltrfig}
+\begin{tikzpicture}
+  \draw[thick,draw=jzMain,fill=jzMain!6] (0,0) ellipse (3.1 and 1.6);
+  \draw[thick,draw=jzAccent,fill=jzAccent!10] (0,-0.45) ellipse (1.7 and 0.85);
+  \node at (0,1.05) {Context-free languages};
+  \node at (0,-0.45) {Regular languages};
+\end{tikzpicture}
+\end{ltrfig}
+
+\section{گرامر و اشتقاق}
+
+یک گرامر از این بخش‌ها تشکیل شده است:
+\begin{itemize}
+\item مجموعه‌ای از \textbf{قاعده‌ها} (قواعد جایگزینی). هر قاعده یک خط است: یک متغیر، یک پیکان و یک رشته از متغیرها و پایانه‌ها.
+\item \textbf{متغیرها}، که معمولاً با حروف بزرگ نشان داده می‌شوند.
+\item \textbf{پایانه‌ها}، که شبیه الفبا هستند و معمولاً با حروف کوچک، اعداد یا نمادهای خاص نشان داده می‌شوند.
+\item یک \textbf{متغیر شروع}، که معمولاً سمت چپ اولین قاعده است.
+\end{itemize}
+
+\begin{example}[گرامر $G_1$]
+\[A\to0A1,\qquad A\to B,\qquad B\to\#.\]
+متغیرها $A$ و $B$، پایانه‌ها $0$، $1$ و $\#$ و متغیر شروع $A$ است.
+\end{example}
+
+گرامر همه رشته‌های زبانش را با \term{اشتقاق}{Derivation} تولید می‌کند:
+\begin{enumerate}
+\item متغیر شروع را بنویسید.
+\item یک متغیر از رشته فعلی و قاعده‌ای که با آن متغیر شروع می‌شود را انتخاب کنید و متغیر را با سمت راست قاعده جایگزین کنید.
+\item تا وقتی متغیری باقی مانده، به گام ۲ برگردید.
+\end{enumerate}
+
+مثلاً اشتقاق رشته $000\#111$ در $G_1$:
+\[A\Rightarrow0A1\Rightarrow00A11\Rightarrow000A111\Rightarrow000B111\Rightarrow000\#111.\]
+همین اطلاعات را می‌توان با یک \term{درخت تجزیه}{Parse Tree} نشان داد. ریشه متغیر شروع است، هر متغیر فرزندانی دارد که سمت راست قاعده به‌کاررفته هستند و برگ‌ها، اگر از چپ به راست خوانده شوند، رشته مشتق‌شده را می‌سازند:
+\begin{ltrfig}
+\begin{tikzpicture}[level distance=8.5mm,sibling distance=11mm,every node/.style={font=\small},edge from parent/.style={draw,jzMain!80}]
+\node {$A$}
+  child {node {$0$}}
+  child {node {$A$}
+    child {node {$0$}}
+    child {node {$A$}
+      child {node {$0$}}
+      child {node {$A$} child {node {$B$} child {node {$\#$}}}}
+      child {node {$1$}}}
+    child {node {$1$}}}
+  child {node {$1$}};
+\end{tikzpicture}
+\end{ltrfig}
+
+مجموعه همه رشته‌هایی که یک گرامر تولید می‌کند، \textbf{زبان گرامر} است. مثلاً $L(G_1)=\{0^n\#1^n\st n\ge0\}$. چند قاعده با سمت چپ یکسان را با $\mid$ («یا») خلاصه می‌کنیم: $A\to0A1\mid B$.
+
+\begin{example}[بخشی از زبان انگلیسی]
+گرامر $G_2$ بخش کوچکی از زبان انگلیسی را توصیف می‌کند (متغیرها را بین $\langle\ \rangle$ می‌نویسیم):
+\begin{ltrfig}
+\small$\begin{array}{rcl}
+\langle\text{SENTENCE}\rangle&\to&\langle\text{NOUN-PHRASE}\rangle\langle\text{VERB-PHRASE}\rangle\\
+\langle\text{NOUN-PHRASE}\rangle&\to&\langle\text{CMPLX-NOUN}\rangle\mid\langle\text{CMPLX-NOUN}\rangle\langle\text{PREP-PHRASE}\rangle\\
+\langle\text{VERB-PHRASE}\rangle&\to&\langle\text{CMPLX-VERB}\rangle\mid\langle\text{CMPLX-VERB}\rangle\langle\text{PREP-PHRASE}\rangle\\
+\langle\text{PREP-PHRASE}\rangle&\to&\langle\text{PREP}\rangle\langle\text{CMPLX-NOUN}\rangle\\
+\langle\text{CMPLX-NOUN}\rangle&\to&\langle\text{ARTICLE}\rangle\langle\text{NOUN}\rangle\\
+\langle\text{CMPLX-VERB}\rangle&\to&\langle\text{VERB}\rangle\mid\langle\text{VERB}\rangle\langle\text{NOUN-PHRASE}\rangle\\
+\langle\text{ARTICLE}\rangle&\to&\text{a}\mid\text{the}\\
+\langle\text{NOUN}\rangle&\to&\text{boy}\mid\text{girl}\mid\text{flower}\\
+\langle\text{VERB}\rangle&\to&\text{touches}\mid\text{likes}\mid\text{sees}\\
+\langle\text{PREP}\rangle&\to&\text{with}
+\end{array}$
+\end{ltrfig}
+یک اشتقاق برای جمله «\lr{a boy sees}»:
+\begin{ltrfig}
+\small$\begin{array}{rl}
+\langle\text{SENTENCE}\rangle&\Rightarrow\langle\text{NOUN-PHRASE}\rangle\langle\text{VERB-PHRASE}\rangle
+\Rightarrow\langle\text{CMPLX-NOUN}\rangle\langle\text{VERB-PHRASE}\rangle\\
+&\Rightarrow\langle\text{ARTICLE}\rangle\langle\text{NOUN}\rangle\langle\text{VERB-PHRASE}\rangle
+\Rightarrow\text{a }\langle\text{NOUN}\rangle\langle\text{VERB-PHRASE}\rangle\\
+&\Rightarrow\text{a boy }\langle\text{VERB-PHRASE}\rangle\Rightarrow\text{a boy }\langle\text{CMPLX-VERB}\rangle
+\Rightarrow\text{a boy }\langle\text{VERB}\rangle\Rightarrow\text{a boy sees}
+\end{array}$
+\end{ltrfig}
+\end{example}
+
+\section{تعریف صوری}
+
+\begin{definition}[گرامر مستقل از متن]
+یک \textbf{گرامر مستقل از متن} (\lr{CFG}) یک چهارتایی $(V,\Sigma,R,S)$ است که در آن
+\begin{enumerate}
+\item $V$ مجموعه‌ای متناهی از \textbf{متغیرها}،
+\item $\Sigma$ مجموعه‌ای متناهی از \textbf{پایانه‌ها} است و $V\cap\Sigma=\emptyset$،
+\item $R$ مجموعه‌ای متناهی از \textbf{قاعده‌ها} است؛ هر قاعده یک متغیر و یک رشته از متغیرها و پایانه‌هاست، یعنی $R\subseteq V\times(V\cup\Sigma)^*$،
+\item $S\in V$ \textbf{متغیر شروع} است.
+\end{enumerate}
+\end{definition}
+
+«مستقل از متن» یعنی سمت چپ هر قاعده \textbf{فقط یک متغیر} است. پس هر وقت متغیر $A$ را ببینیم، می‌توانیم آن را بدون توجه به اطرافش (متنی که در آن قرار دارد) جایگزین کنیم.
+
+\begin{definition}[اشتقاق و زبان]
+اگر $u,v,w$ رشته‌هایی از متغیرها و پایانه‌ها باشند و $A\to w$ یک قاعده باشد، می‌گوییم $uAv$ \textbf{نتیجه می‌دهد} $uwv$ و می‌نویسیم $uAv\Rightarrow uwv$. اگر $u=v$ یا دنباله‌ای $u\Rightarrow u_1\Rightarrow\cdots\Rightarrow u_k\Rightarrow v$ وجود داشته باشد، می‌گوییم $u$ \textbf{مشتق می‌کند} $v$ و می‌نویسیم $u\der v$. زبان گرامر:
+\[L(G)=\{w\in\Sigma^*\st S\der w\}.\]
+\end{definition}
+
+\begin{example}
+گرامر $S\to aSb\mid\eps$ را در نظر بگیرید. اجزای آن: $V=\{S\}$، $\Sigma=\{a,b\}$، $R=\{S\to aSb,\ S\to\eps\}$ و متغیر شروع $S$. این گرامر زبان $\{a^nb^n\st n\ge0\}$ را تولید می‌کند که منظم نیست. پس \textbf{زبان‌های مستقل از متن از زبان‌های منظم بیشترند}.
+\end{example}
+
+\begin{note}
+هر گرامر خطی راست (فصل ۷) یک گرامر مستقل از متن است، چون سمت چپ قاعده‌هایش یک متغیر است. پس \textbf{هر زبان منظم مستقل از متن است}.
+\end{note}
+
+\begin{example}[پرانتزهای متوازن]
+$S\to aSb\mid SS\mid\eps$ زبان همه رشته‌های پرانتزهای درست تودرتو را تولید می‌کند، اگر $a$ را «$($» و $b$ را «$)$» بخوانیم: $S\to(S)\mid SS\mid\eps$. مثلاً $(()())$.
+\end{example}
+
+\begin{example}[پالیندروم‌های زوج]
+$G_p:\ S\to aSa\mid bSb\mid\eps$ زبان $L(G_p)=\{ww^R\st w\in\{a,b\}^*\}$ را تولید می‌کند. هر قاعده یک نماد را هم‌زمان در ابتدا و انتها می‌گذارد.
+\end{example}
+
+\begin{example}[عبارت‌های حسابی]
+گرامر $G_4$ بخشی از یک زبان برنامه‌نویسی است:
+\begin{ltrfig}
+$\begin{array}{rcl}
+\langle\text{EXPR}\rangle&\to&\langle\text{EXPR}\rangle+\langle\text{TERM}\rangle\mid\langle\text{TERM}\rangle\\
+\langle\text{TERM}\rangle&\to&\langle\text{TERM}\rangle\times\langle\text{FACTOR}\rangle\mid\langle\text{FACTOR}\rangle\\
+\langle\text{FACTOR}\rangle&\to&(\,\langle\text{EXPR}\rangle\,)\mid a
+\end{array}$
+\end{ltrfig}
+درخت تجزیه \textbf{معنی} عبارت را نشان می‌دهد. در شکل‌های زیر $E$، $T$ و $F$ به جای $\langle\text{EXPR}\rangle$، $\langle\text{TERM}\rangle$ و $\langle\text{FACTOR}\rangle$ آمده‌اند. در $a+a\times a$ ضرب پایین‌تر از جمع است، یعنی اول انجام می‌شود. در $(a+a)\times a$ پرانتز جمع را پایین‌تر می‌برد:
+\begin{ltrfig}
+\begin{tikzpicture}[level distance=8mm,every node/.style={font=\small},edge from parent/.style={draw,jzMain!80}]
+\node {$E$} [sibling distance=16mm]
+  child {node {$E$} child {node {$T$} child {node {$F$} child {node {$a$}}}}}
+  child {node {$+$}}
+  child {node {$T$} [sibling distance=10mm]
+    child {node {$T$} child {node {$F$} child {node {$a$}}}}
+    child {node {$\times$}}
+    child {node {$F$} child {node {$a$}}}};
+\begin{scope}[xshift=7cm]
+\node {$E$} child {node {$T$} [sibling distance=18mm]
+  child {node {$T$} child {node {$F$} [sibling distance=8mm]
+     child {node {$($}}
+     child {node {$E$} [sibling distance=9mm]
+        child {node {$E$} child {node {$T$} child {node {$F$} child {node {$a$}}}}}
+        child {node {$+$}}
+        child {node {$T$} child {node {$F$} child {node {$a$}}}}}
+     child {node {$)$}}}}
+  child {node {$\times$}}
+  child {node {$F$} child {node {$a$}}}};
+\end{scope}
+\end{tikzpicture}
+\end{ltrfig}
+\end{example}
+
+\section{ابهام}
+
+گاهی یک گرامر یک رشته را به چند روش تولید می‌کند. به چنین رشته‌ای \textbf{مبهم} می‌گوییم. اگر رشته چند \emph{درخت تجزیه} متفاوت داشته باشد، چند \emph{معنی} متفاوت دارد، که در کاربردهایی مثل زبان برنامه‌نویسی مشکل‌ساز است.
+
+\begin{example}[یک گرامر مبهم]
+\[G_5:\quad\langle\text{EXPR}\rangle\to\langle\text{EXPR}\rangle+\langle\text{EXPR}\rangle\mid\langle\text{EXPR}\rangle\times\langle\text{EXPR}\rangle\mid(\langle\text{EXPR}\rangle)\mid a.\]
+رشته $a+a\times a$ در $G_5$ دو درخت تجزیه دارد: در درخت چپ ضرب زودتر انجام می‌شود ($a+(a\times a)$) و در درخت راست جمع ($(a+a)\times a$):
+\begin{ltrfig}
+\begin{tikzpicture}[level distance=8mm,every node/.style={font=\small},edge from parent/.style={draw,jzMain!80}]
+\node {$E$} [sibling distance=14mm]
+  child {node {$E$} child {node {$a$}}}
+  child {node {$+$}}
+  child {node {$E$} [sibling distance=9mm] child {node {$E$} child {node {$a$}}} child {node {$\times$}} child {node {$E$} child {node {$a$}}}};
+\begin{scope}[xshift=6.5cm]
+\node {$E$} [sibling distance=14mm]
+  child {node {$E$} [sibling distance=9mm] child {node {$E$} child {node {$a$}}} child {node {$+$}} child {node {$E$} child {node {$a$}}}}
+  child {node {$\times$}}
+  child {node {$E$} child {node {$a$}}};
+\end{scope}
+\end{tikzpicture}
+\end{ltrfig}
+گرامر $G_4$ همین زبان را بدون ابهام تولید می‌کند.
+\end{example}
+
+دو اشتقاق مختلف ممکن است فقط در \textbf{ترتیب} جایگزینی فرق داشته باشند و درخت تجزیه یکسانی بسازند. برای اینکه ابهام را به درخت (ساختار) مربوط کنیم نه به ترتیب، ترتیب را ثابت می‌کنیم:
+
+\begin{definition}[اشتقاق چپ‌ترین و ابهام]
+در \textbf{اشتقاق چپ‌ترین} در هر گام \textbf{چپ‌ترین} متغیر باقی‌مانده جایگزین می‌شود. رشته $w$ \textbf{به‌طور مبهم} در گرامر $G$ تولید می‌شود اگر دو اشتقاق چپ‌ترین متفاوت (یا معادلاً دو درخت تجزیه متفاوت) داشته باشد. گرامر $G$ \textbf{مبهم} است اگر دست‌کم یک رشته را به‌طور مبهم تولید کند.
+\end{definition}
+
+\begin{example}
+دو اشتقاق چپ‌ترین برای $a+a\times a$ در $G_5$ ($E$ به جای $\langle\text{EXPR}\rangle$):
+\begin{ltrfig}
+$\begin{array}{l}
+E\Rightarrow E\times E\Rightarrow E+E\times E\Rightarrow a+E\times E\Rightarrow a+a\times E\Rightarrow a+a\times a\\[3pt]
+E\Rightarrow E+E\Rightarrow a+E\Rightarrow a+E\times E\Rightarrow a+a\times E\Rightarrow a+a\times a
+\end{array}$
+\end{ltrfig}
+به جای چپ‌ترین می‌توان از \textbf{اشتقاق راست‌ترین} هم استفاده کرد (در هر گام راست‌ترین متغیر جایگزین شود)؛ تعریف ابهام تغییر نمی‌کند:
+\begin{ltrfig}
+$\begin{array}{l}
+E\Rightarrow E+E\Rightarrow E+E\times E\Rightarrow E+E\times a\Rightarrow E+a\times a\Rightarrow a+a\times a\\[3pt]
+E\Rightarrow E\times E\Rightarrow E\times a\Rightarrow E+E\times a\Rightarrow E+a\times a\Rightarrow a+a\times a
+\end{array}$
+\end{ltrfig}
+\end{example}
+
+\begin{example}[گرامر انگلیسی مبهم است]
+جمله «\lr{the girl touches the boy with the flower}» در $G_2$ دو درخت تجزیه دارد. در یکی، \lr{with the flower} بخشی از گروه اسمی \lr{the boy with the flower} است (پسری که گل دارد). در دیگری بخشی از گروه فعلی است (دختر با گل پسر را لمس می‌کند):
+\begin{itemize}
+\item $\langle\text{CMPLX-VERB}\rangle\to\langle\text{VERB}\rangle\langle\text{NOUN-PHRASE}\rangle$ و $\langle\text{NOUN-PHRASE}\rangle\to\langle\text{CMPLX-NOUN}\rangle\langle\text{PREP-PHRASE}\rangle$؛
+\item $\langle\text{VERB-PHRASE}\rangle\to\langle\text{CMPLX-VERB}\rangle\langle\text{PREP-PHRASE}\rangle$ و $\langle\text{NOUN-PHRASE}\rangle\to\langle\text{CMPLX-NOUN}\rangle$.
+\end{itemize}
+\end{example}
+
+\begin{example}[مشکل \lr{else} آویزان]
+\begin{ltrfig}
+$\begin{array}{rcl}
+\langle\text{IF-STMT}\rangle&\to&\text{if }\langle\text{EXPR}\rangle\text{ then }\langle\text{STMT}\rangle\\
+&\mid&\text{if }\langle\text{EXPR}\rangle\text{ then }\langle\text{STMT}\rangle\text{ else }\langle\text{STMT}\rangle\\
+\langle\text{EXPR}\rangle&\to&E_1\mid E_2\\
+\langle\text{STMT}\rangle&\to&S_1\mid S_2\mid\langle\text{IF-STMT}\rangle
+\end{array}$
+\end{ltrfig}
+رشته \lr{if $E_1$ then if $E_2$ then $S_1$ else $S_2$} دو اشتقاق چپ‌ترین دارد. در اولی \lr{else} به \lr{if} درونی تعلق دارد (قاعده اول برای \lr{if} بیرونی و قاعده دوم برای درونی) و در دومی به \lr{if} بیرونی (برعکس). این دو برنامه رفتار متفاوتی دارند. زبان‌های برنامه‌نویسی معمولاً با یک قانون اضافه («\lr{else} به نزدیک‌ترین \lr{if} تعلق دارد») این ابهام را رفع می‌کنند.
+\end{example}
+
+\begin{definition}[زبان ذاتاً مبهم]
+زبانی که \textbf{هیچ} گرامر غیرمبهمی برای آن وجود نداشته باشد \textbf{ذاتاً مبهم} است.
+\end{definition}
+
+مثلاً زبان $\{a^ib^jc^k\st i=j\ \text{\rl{یا}}\ j=k\}$ ذاتاً مبهم است: هر گرامری برای آن، دست‌کم یکی از رشته‌های $a^nb^nc^n$ را به دو روش تولید می‌کند (یک بار به عنوان $i=j$ و یک بار به عنوان $j=k$). اثبات دقیق این ادعا دشوار است و در این درس نمی‌آید.
+
+\begin{note}
+تشخیص اینکه یک گرامر مستقل از متن مبهم است یا یک زبان ذاتاً مبهم است، \textbf{تصمیم‌ناپذیر} است: هیچ الگوریتمی وجود ندارد که برای هر گرامری در زمان متناهی جواب درست «بله» یا «نه» بدهد. (معنای دقیق تصمیم‌ناپذیری را در بخش چهارم می‌بینیم.)
+\end{note}
+
+\begin{summary}
+\begin{itemize}
+\item \lr{CFG} چهارتایی $(V,\Sigma,R,S)$ است و سمت چپ هر قاعده یک متغیر است.
+\item اشتقاق ($\Rightarrow$، $\der$) و درخت تجزیه دو روش نمایش تولید یک رشته‌اند. $L(G)=\{w\in\Sigma^*\st S\der w\}$.
+\item زبان‌های منظم زیرمجموعه سره زبان‌های مستقل از متن‌اند ($\{a^nb^n\}$ مستقل از متن است ولی منظم نیست).
+\item گرامر مبهم یک رشته را با دو اشتقاق چپ‌ترین متفاوت تولید می‌کند. بعضی زبان‌ها ذاتاً مبهم‌اند و تشخیص ابهام الگوریتم ندارد.
+\end{itemize}
+\end{summary}

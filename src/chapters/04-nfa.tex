@@ -1,0 +1,265 @@
+\chapter{نامعینی و ماشین‌های متناهی غیرقطعی}
+
+در ماشین قطعی، حرکت بعدی همیشه به‌طور یکتا مشخص است. در این فصل این شرط را برمی‌داریم و به ماشین اجازه می‌دهیم در یک لحظه چند انتخاب داشته باشد. این کار ماشین را قوی‌تر نمی‌کند (در پایان فصل ثابت می‌کنیم)، اما طراحی ماشین و اثبات قضیه‌ها را خیلی ساده‌تر می‌کند.
+
+\section{ایده نامعینی}
+
+\term{ماشین متناهی غیرقطعی}{Nondeterministic Finite Automaton} یا \lr{NFA} تعمیم \lr{DFA} است؛ یعنی هر \lr{DFA} یک \lr{NFA} هم هست. تفاوت‌ها:
+\begin{itemize}
+\item \textbf{چند گذار برای یک نماد:} از یک حالت ممکن است با یک نماد چند پیکان خارج شود. در این صورت ماشین به چند \textbf{نسخه} تقسیم می‌شود و هر نسخه یکی از راه‌ها را دنبال می‌کند؛ مثل محاسبه موازی.
+\item \textbf{هیچ گذاری برای یک نماد:} اگر از حالت فعلی با نماد ورودی هیچ پیکانی نباشد، آن نسخه (آن \textbf{شاخه} از محاسبه) \textbf{می‌میرد}.
+\item \textbf{گذار $\eps$:} پیکانی با برچسب $\eps$ اجازه می‌دهد ماشین \textbf{بدون خواندن نماد} حالتش را عوض کند. (در واقع ماشین هم در حالت فعلی می‌ماند و هم نسخه‌ای از آن به سر دیگر پیکان می‌رود.)
+\item \textbf{پذیرش:} اگر \textbf{دست‌کم یکی} از نسخه‌ها در پایان ورودی در حالت پذیرش باشد، ماشین ورودی را می‌پذیرد.
+\end{itemize}
+
+\begin{ltrfig}
+\begin{tikzpicture}[every node/.style={circle,fill=jzMain,inner sep=1.3pt},level distance=7mm,font=\small]
+  \begin{scope}
+    \node (d0) at (0,0) {}; \node (d1) at (0,-0.7) {}; \node (d2) at (0,-1.4) {}; \node (d3) at (0,-2.1) {}; \node (d4) at (0,-2.8) {};
+    \draw[jzMain] (d0)--(d1)--(d2)--(d3)--(d4);
+    \node[fill=none,above=1mm] at (d0) {start};
+    \node[fill=none,right=1mm] at (d4) {accept or reject};
+    \node[fill=none] at (0,-3.6) {Deterministic};
+  \end{scope}
+  \begin{scope}[xshift=6cm,sibling distance=12mm,edge from parent/.style={draw,jzMain}]
+    \node (r) at (0,0) {}
+      child {node {} child {node {} child {node {}}}}
+      child {node {} child {node {} child {node {} child[sibling distance=8mm] {node[fill=exFrame] (acc) {}}}} child {node {}}}
+      child {node {} child {node[fill=warnFrame] (rej) {}}};
+    \node[fill=none,right=1mm] at (acc) {accept};
+    \node[fill=none,right=1mm] at (rej) {reject};
+    \node[fill=none] at (0,-3.6) {Nondeterministic};
+  \end{scope}
+\end{tikzpicture}
+\end{ltrfig}
+
+\begin{example}[ماشین $N_1$]\label{ex:N1}
+ماشین زیر را در نظر بگیرید. از $q_1$ با نماد $1$ دو انتخاب داریم و از $q_2$ یک گذار $\eps$ هست:
+\begin{automaton}
+  \node[state,initial] (q1) {$q_1$};
+  \node[state,right=of q1] (q2) {$q_2$};
+  \node[state,right=of q2] (q3) {$q_3$};
+  \node[state,accepting,right=of q3] (q4) {$q_4$};
+  \path (q1) edge[loop above] node {$0,1$} (q1)
+        (q1) edge node {$1$} (q2)
+        (q2) edge node {$0,\eps$} (q3)
+        (q3) edge node {$1$} (q4)
+        (q4) edge[loop above] node {$0,1$} (q4);
+\end{automaton}
+محاسبه $N_1$ روی ورودی $010110$ را با نوشتن مجموعه حالت‌های \textbf{فعال} (حالت‌هایی که دست‌کم یک نسخه در آن‌هاست) بعد از هر نماد دنبال می‌کنیم:
+\begin{ltrfig}
+\begin{tabular}{l|ccccccc}
+read & -- & $0$ & $1$ & $0$ & $1$ & $1$ & $0$\\ \hline
+active & $\{q_1\}$ & $\{q_1\}$ & $\{q_1,q_2,q_3\}$ & $\{q_1,q_3\}$ & $\{q_1,q_2,q_3,q_4\}$ & $\{q_1,q_2,q_3,q_4\}$ & $\{q_1,q_3,q_4\}$
+\end{tabular}
+\end{ltrfig}
+مثلاً بعد از خواندن اولین $1$، نسخه‌ای که در $q_1$ بود دو نسخه می‌شود (یکی در $q_1$ و یکی در $q_2$) و نسخه $q_2$ بلافاصله با گذار $\eps$ یک نسخه هم در $q_3$ می‌سازد. نسخه‌ای که در $q_3$ است با خواندن $0$ می‌میرد، چون از $q_3$ با $0$ پیکانی نیست. چون در پایان $q_4$ فعال است، $N_1$ ورودی را می‌پذیرد.
+در واقع $N_1$ دقیقاً رشته‌هایی را می‌پذیرد که $101$ یا $11$ زیررشته آن‌ها باشد.
+\end{example}
+
+\subsection{ماشین غیرقطعی می‌تواند «حدس بزند»}
+
+یک راه مفید برای فکر کردن به نامعینی این است: ماشین در لحظه مناسب «حدس می‌زند» چه کند و اگر حدس درستی وجود داشته باشد، ورودی را می‌پذیرد.
+
+\begin{example}[سومین نماد از آخر]
+زبان $A=\{w\st \text{\rl{سومین نماد $w$ از آخر، $1$ است}}\}$. ماشین زیر در $q_1$ می‌ماند و در لحظه‌ای که فکر می‌کند به سومین نماد از آخر رسیده، با خواندن $1$ «حدس می‌زند» و به $q_2$ می‌رود. سپس دقیقاً دو نماد دیگر باید بیاید:
+\begin{automaton}
+  \node[state,initial] (q1) {$q_1$};
+  \node[state,right=of q1] (q2) {$q_2$};
+  \node[state,right=of q2] (q3) {$q_3$};
+  \node[state,accepting,right=of q3] (q4) {$q_4$};
+  \path (q1) edge[loop above] node {$0,1$} (q1)
+        (q1) edge node {$1$} (q2)
+        (q2) edge node {$0,1$} (q3)
+        (q3) edge node {$0,1$} (q4);
+\end{automaton}
+یک \lr{DFA} برای همین زبان باید سه نماد آخر را به خاطر بسپارد و به $2^3=8$ حالت نیاز دارد.
+\end{example}
+
+\begin{example}[مضرب ۲ یا ۳]
+زبان $A=\{0^{2k}\st k\ge0\}\cup\{0^{3k}\st k\ge0\}$ روی الفبای $\{0\}$. ماشین در ابتدا با گذار $\eps$ «حدس می‌زند» که طول ورودی مضرب ۲ است یا مضرب ۳، و بعد آن را بررسی می‌کند:
+\begin{automaton}[node distance=1.7cm]
+  \node[state,initial] (s) {$s$};
+  \node[state,accepting,above right=0.6cm and 1.7cm of s] (a0) {$a_0$};
+  \node[state,right=of a0] (a1) {$a_1$};
+  \node[state,accepting,below right=0.6cm and 1.7cm of s] (b0) {$b_0$};
+  \node[state,right=of b0] (b1) {$b_1$};
+  \node[state,right=of b1] (b2) {$b_2$};
+  \path (s) edge node {$\eps$} (a0)
+        (s) edge node[below left] {$\eps$} (b0)
+        (a0) edge[bend left] node {$0$} (a1)
+        (a1) edge[bend left] node {$0$} (a0)
+        (b0) edge node {$0$} (b1)
+        (b1) edge node {$0$} (b2)
+        (b2) edge[bend left=40] node {$0$} (b0);
+\end{automaton}
+\end{example}
+
+\begin{example}[ماشین $N_4$]\label{ex:N4}
+\begin{automaton}[node distance=2.4cm]
+  \node[state,initial,accepting] (1) {$1$};
+  \node[state,below left=1.6cm and 1.2cm of 1] (2) {$2$};
+  \node[state,below right=1.6cm and 1.2cm of 1] (3) {$3$};
+  \path (1) edge node[above left] {$b$} (2)
+        (1) edge node {$\eps$} (3)
+        (2) edge[loop left] node {$a$} (2)
+        (2) edge node[below] {$a,b$} (3)
+        (3) edge[bend right=40] node[right] {$a$} (1);
+\end{automaton}
+این ماشین رشته‌های $\eps$، $a$، $baba$ و $baa$ را می‌پذیرد، اما $b$، $bb$ و $babba$ را رد می‌کند. مثلاً برای $a$: از $1$ با $\eps$ به $3$ می‌رویم و با $a$ به $1$ برمی‌گردیم که پذیرش است. برای $b$: تنها راه رفتن به $2$ است که پذیرش نیست.
+\end{example}
+
+\section{تعریف صوری \lr{NFA}}
+
+برای نوشتن تعریف صوری از دو نماد استفاده می‌کنیم: $\Sigma_\eps=\Sigma\cup\{\eps\}$ و $\mathcal{P}(Q)$ (مجموعه توانی $Q$). تفاوت اصلی با \lr{DFA} در تابع گذار است: در \lr{NFA}، خروجی تابع گذار یک \textbf{مجموعه} از حالت‌هاست (که ممکن است تهی باشد) و ورودی آن می‌تواند $\eps$ هم باشد.
+
+\begin{definition}[\lr{NFA}]
+یک ماشین متناهی غیرقطعی یک پنج‌تایی $(Q,\Sigma,\delta,q_0,F)$ است که در آن
+\begin{enumerate}
+\item $Q$ مجموعه‌ای متناهی از حالت‌ها،
+\item $\Sigma$ الفبای متناهی،
+\item $\delta:Q\times\Sigma_\eps\to\mathcal{P}(Q)$ تابع گذار،
+\item $q_0\in Q$ حالت شروع، و
+\item $F\subseteq Q$ مجموعه حالت‌های پذیرش است.
+\end{enumerate}
+\end{definition}
+
+\begin{example}[توصیف صوری $N_1$]
+$Q=\{q_1,q_2,q_3,q_4\}$، $\Sigma=\{0,1\}$، حالت شروع $q_1$، $F=\{q_4\}$ و تابع گذار:
+\begin{ltrfig}
+\begin{tabular}{c|ccc}
+ & $0$ & $1$ & $\eps$\\ \hline
+$q_1$ & $\{q_1\}$ & $\{q_1,q_2\}$ & $\emptyset$\\
+$q_2$ & $\{q_3\}$ & $\emptyset$ & $\{q_3\}$\\
+$q_3$ & $\emptyset$ & $\{q_4\}$ & $\emptyset$\\
+$q_4$ & $\{q_4\}$ & $\{q_4\}$ & $\emptyset$
+\end{tabular}
+\end{ltrfig}
+\end{example}
+
+\begin{example}[چند \lr{NFA} ساده روی $\Sigma=\{0,1\}$]
+برای $\emptyset$ یک حالت غیرپذیرش بدون هیچ گذاری کافی است. برای $\{\eps\}$ یک حالت پذیرش بدون هیچ گذاری کافی است: هر نمادی که بیاید، تنها شاخه می‌میرد. برای $\{w\st w\text{ \rl{با $0$ شروع و به $1$ ختم می‌شود}}\}$:
+\begin{automaton}
+  \node[state,initial] (a) {$p$};
+  \node[state,right=of a] (b) {$q$};
+  \node[state,accepting,right=of b] (c) {$r$};
+  \path (a) edge node {$0$} (b)
+        (b) edge[loop above] node {$0,1$} (b)
+        (b) edge node {$1$} (c);
+\end{automaton}
+ماشین روی آخرین $1$ «حدس می‌زند» که ورودی تمام شده است. اگر حدس غلط باشد، آن شاخه در $r$ می‌میرد و ضرری ندارد.
+\end{example}
+
+\begin{definition}[محاسبه \lr{NFA}]
+فرض کنید $N=(Q,\Sigma,\delta,q_0,F)$ یک \lr{NFA} باشد. $N$ رشته $w$ را می‌پذیرد اگر بتوان $w$ را به صورت $w=y_1y_2\cdots y_m$ نوشت که هر $y_i\in\Sigma_\eps$ (یعنی بین نمادها می‌توان هر تعداد $\eps$ گذاشت) و دنباله‌ای از حالت‌ها $r_0,r_1,\dots,r_m$ در $Q$ با این شرایط وجود داشته باشد:
+\begin{enumerate}
+\item $r_0=q_0$،
+\item $r_{i+1}\in\delta(r_i,y_{i+1})$ برای $i=0,\dots,m-1$، و
+\item $r_m\in F$.
+\end{enumerate}
+\end{definition}
+
+تفاوت با تعریف \lr{DFA} در شرط دوم است: $r_{i+1}$ باید \textbf{یکی از} حالت‌های مجاز بعدی باشد، نه تنها حالت بعدی.
+
+\section{هم‌ارزی \lr{NFA} و \lr{DFA}}
+
+دو ماشین را \textbf{هم‌ارز} می‌گوییم اگر یک زبان را تشخیص دهند. شاید فکر کنید \lr{NFA} قوی‌تر است، اما قضیه زیر نشان می‌دهد این‌طور نیست.
+
+\begin{theorem}\label{thm:nfa-dfa}
+هر \lr{NFA} یک \lr{DFA} هم‌ارز دارد.
+\end{theorem}
+
+\begin{proofidea}
+یک \lr{DFA} می‌سازیم که \lr{NFA} را شبیه‌سازی کند. \lr{DFA} همان کاری را می‌کند که ما در مثال \ref{ex:N1} با دست کردیم: \textbf{مجموعه حالت‌های فعال} را دنبال می‌کند. اگر \lr{NFA} $k$ حالت داشته باشد، $2^k$ زیرمجموعه از حالت‌هایش وجود دارد، پس \lr{DFA} حداکثر $2^k$ حالت دارد که باز هم متناهی است. به این روش \textbf{ساخت زیرمجموعه‌ای} می‌گوییم.
+\end{proofidea}
+
+\begin{proof}
+فرض کنید $N=(Q,\Sigma,\delta,q_0,F)$ زبان $A$ را تشخیص دهد. ابتدا حالت ساده‌تر را بررسی می‌کنیم.
+
+\textbf{حالت ۱: $N$ گذار $\eps$ ندارد.} \lr{DFA} $M=(Q',\Sigma,\delta',q_0',F')$ را می‌سازیم:
+\begin{enumerate}
+\item $Q'=\mathcal{P}(Q)$؛ هر حالت $M$ یک مجموعه از حالت‌های $N$ است.
+\item برای $R\in Q'$ و $a\in\Sigma$: \quad $\delta'(R,a)=\{q\in Q\st q\in\delta(r,a)\ \text{\rl{برای یک}}\ r\in R\}=\bigcup_{r\in R}\delta(r,a)$.
+\item $q_0'=\{q_0\}$.
+\item $F'=\{R\in Q'\st R\ \text{\rl{دست‌کم یک حالت پذیرش $N$ را دارد}}\}$.
+\end{enumerate}
+
+\textbf{حالت ۲: $N$ گذار $\eps$ دارد.} برای هر $R\subseteq Q$ تعریف کنید
+\[E(R)=\{q\st q\ \text{\rl{از یک عضو $R$ با صفر یا چند پیکان $\eps$ قابل دسترسی است}}\}.\]
+به $E(R)$ \textbf{بستار $\eps$} مجموعه $R$ می‌گوییم. ساخت را این‌طور اصلاح می‌کنیم:
+\begin{itemize}
+\item $\delta'(R,a)=\{q\in Q\st q\in E(\delta(r,a))\ \text{\rl{برای یک}}\ r\in R\}$؛ یعنی بعد از هر حرکت، همه حالت‌هایی را که با $\eps$ در دسترس‌اند هم اضافه می‌کنیم.
+\item $q_0'=E(\{q_0\})$؛ چون قبل از خواندن هر نمادی هم ماشین می‌تواند پیکان‌های $\eps$ را طی کند.
+\item $Q'$ و $F'$ مثل قبل.
+\end{itemize}
+
+\textbf{اثبات درستی.} می‌گوییم «$N$ پس از خواندن $w$ می‌تواند در حالت $q$ باشد» اگر دنباله‌ای مثل تعریف محاسبه \lr{NFA} برای $w$ وجود داشته باشد که به $q$ ختم شود (بدون شرط $r_m\in F$). با استقرا روی $\abs{w}$ ثابت می‌کنیم:
+\[\delta'^*(q_0',w)=\{q\st N\ \text{\rl{پس از خواندن $w$ می‌تواند در $q$ باشد}}\}.\tag{$\star$}\]
+\textbf{پایه} ($w=\eps$): بدون خواندن هیچ نمادی، $N$ فقط با پیکان‌های $\eps$ از $q_0$ حرکت می‌کند، پس می‌تواند دقیقاً در حالت‌های $E(\{q_0\})=q_0'$ باشد.
+\textbf{گام:} فرض کنید $(\star)$ برای $w$ درست باشد و $R=\delta'^*(q_0',w)$. $N$ پس از خواندن $wa$ در $q$ است اگر و تنها اگر پس از $w$ در حالتی مثل $r\in R$ بوده، با $a$ به یک حالت در $\delta(r,a)$ رفته و سپس با صفر یا چند پیکان $\eps$ به $q$ رسیده باشد؛ یعنی $q\in E(\delta(r,a))$ برای یک $r\in R$. این دقیقاً تعریف $\delta'(R,a)=\delta'^*(q_0',wa)$ است.
+
+حالا طبق $(\star)$، $M$ رشته $w$ را می‌پذیرد اگر و تنها اگر $\delta'^*(q_0',w)$ شامل یک حالت پذیرش $N$ باشد، یعنی اگر و تنها اگر $N$ بتواند پس از خواندن $w$ در یک حالت پذیرش باشد؛ یعنی $N$، $w$ را بپذیرد. پس $L(M)=L(N)=A$.
+\end{proof}
+
+\begin{corollary}
+یک زبان منظم است اگر و تنها اگر یک \lr{NFA} آن را تشخیص دهد.
+\end{corollary}
+\begin{proof}
+اگر زبان منظم باشد، یک \lr{DFA} آن را تشخیص می‌دهد و هر \lr{DFA} یک \lr{NFA} است. برعکس، اگر یک \lr{NFA} آن را تشخیص دهد، طبق قضیه \ref{thm:nfa-dfa} یک \lr{DFA} هم آن را تشخیص می‌دهد.
+\end{proof}
+
+\begin{example}[تبدیل $N_4$ به \lr{DFA}]
+ماشین $N_4$ از مثال \ref{ex:N4} را با $Q=\{1,2,3\}$ به \lr{DFA} تبدیل می‌کنیم.
+\begin{itemize}
+\item $Q'=\{\emptyset,\{1\},\{2\},\{3\},\{1,2\},\{1,3\},\{2,3\},\{1,2,3\}\}$.
+\item حالت شروع: $E(\{1\})=\{1,3\}$، چون از $1$ با $\eps$ به $3$ می‌رسیم.
+\item حالت‌های پذیرش: زیرمجموعه‌هایی که شامل $1$ هستند: $\{1\},\{1,2\},\{1,3\},\{1,2,3\}$.
+\end{itemize}
+جدول گذار (مثلاً $\delta'(\{3\},a)=E(\{1\})=\{1,3\}$ و $\delta'(\{2\},a)=E(\{2,3\})=\{2,3\}$):
+\begin{ltrfig}
+\begin{tabular}{c|cc}
+ & $a$ & $b$\\ \hline
+$\emptyset$ & $\emptyset$ & $\emptyset$\\
+$\{1\}$ & $\emptyset$ & $\{2\}$\\
+$\{2\}$ & $\{2,3\}$ & $\{3\}$\\
+$\{3\}$ & $\{1,3\}$ & $\emptyset$\\
+$\{1,2\}$ & $\{2,3\}$ & $\{2,3\}$\\
+$\{1,3\}$ & $\{1,3\}$ & $\{2\}$\\
+$\{2,3\}$ & $\{1,2,3\}$ & $\{3\}$\\
+$\{1,2,3\}$ & $\{1,2,3\}$ & $\{2,3\}$
+\end{tabular}
+\end{ltrfig}
+حالت‌های $\{1\}$ و $\{1,2\}$ هیچ پیکان ورودی ندارند و از حالت شروع قابل دسترسی نیستند، پس می‌توانیم حذفشان کنیم. نتیجه یک \lr{DFA} شش‌حالتی است:
+\begin{automaton}[node distance=2.4cm,every state/.style={draw=jzMain,fill=jzMain!7,thick,minimum size=11mm,inner sep=1pt,font=\small}]
+  \node[state,initial,accepting] (13) {$\{1,3\}$};
+  \node[state,right=of 13] (2) {$\{2\}$};
+  \node[state,right=of 2] (23) {$\{2,3\}$};
+  \node[state,accepting,right=of 23] (123) {$\{1,2,3\}$};
+  \node[state,below=1.6cm of 2] (3) {$\{3\}$};
+  \node[state,below=1.6cm of 13] (e) {$\emptyset$};
+  \path (13) edge[loop above] node {$a$} (13)
+        (13) edge node {$b$} (2)
+        (2) edge node {$a$} (23)
+        (2) edge node {$b$} (3)
+        (23) edge[bend left] node {$a$} (123)
+        (123) edge[bend left] node {$b$} (23)
+        (123) edge[loop above] node {$a$} (123)
+        (23) edge node {$b$} (3)
+        (3) edge node[right] {$a$} (13)
+        (3) edge node {$b$} (e)
+        (e) edge[loop left] node {$a,b$} (e);
+\end{automaton}
+\end{example}
+
+\begin{note}
+ساخت زیرمجموعه‌ای ممکن است تعداد حالت‌ها را به‌طور نمایی زیاد کند ($k$ حالت به $2^k$ حالت). مثال «سومین نماد از آخر» نشان می‌دهد که گاهی این افزایش واقعاً لازم است. پس \lr{NFA} از نظر \textbf{قدرت} با \lr{DFA} برابر است، اما می‌تواند بسیار \textbf{کوچک‌تر} باشد.
+\end{note}
+
+\begin{summary}
+\begin{itemize}
+\item \lr{NFA} می‌تواند برای یک نماد چند انتخاب، هیچ انتخاب یا گذار $\eps$ داشته باشد و اگر \textbf{یک} شاخه بپذیرد، ورودی پذیرفته می‌شود.
+\item تابع گذار \lr{NFA}: $\delta:Q\times\Sigma_\eps\to\mathcal{P}(Q)$.
+\item ساخت زیرمجموعه‌ای: \lr{DFA} مجموعه حالت‌های فعال \lr{NFA} را دنبال می‌کند (همراه با بستار $\eps$).
+\item \lr{NFA} و \lr{DFA} هم‌ارزند؛ هر دو دقیقاً زبان‌های منظم را تشخیص می‌دهند.
+\end{itemize}
+\end{summary}

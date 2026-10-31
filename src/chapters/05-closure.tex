@@ -1,0 +1,224 @@
+\chapter{ویژگی‌های بستاری زبان‌های منظم}
+
+در فصل ۳ دیدیم که بستاری تحت الحاق با \lr{DFA} به‌سادگی ثابت نمی‌شود، چون ماشین نمی‌داند رشته را کجا بشکند. با \lr{NFA} این مشکل حل می‌شود: ماشین «حدس می‌زند» کجا بشکند. در این فصل بستاری تحت سه عمل منظم را با \lr{NFA} ثابت می‌کنیم و بعد چند عملیات دیگر (معکوس، پیشوند، پسوند و خارج‌قسمت) را بررسی می‌کنیم.
+
+در همه شکل‌های این فصل، یک ماشین را با یک قاب نشان می‌دهیم که حالت شروعش در سمت چپ و حالت‌های پذیرشش در سمت راست است.
+
+\section{اجتماع}
+
+\begin{theorem}
+دسته زبان‌های منظم تحت اجتماع بسته است.
+\end{theorem}
+
+\begin{proofidea}
+فرض کنید \lr{NFA}های $N_1$ و $N_2$ زبان‌های $A_1$ و $A_2$ را تشخیص دهند. ماشین $N$ را با یک \textbf{حالت شروع جدید} می‌سازیم که دو پیکان $\eps$ به حالت‌های شروع $N_1$ و $N_2$ دارد. $N$ در ابتدا «حدس می‌زند» ورودی متعلق به کدام زبان است. (اثبات دیگری با ساخت ضربی در فصل ۳ دیدیم.)
+\begin{ltrfig}
+\begin{tikzpicture}[jzaut,every state/.style={draw=jzMain,fill=jzMain!7,minimum size=5mm,inner sep=0pt},node distance=1cm]
+  \draw[rounded corners,jzMain!60] (0,0.15) rectangle (2.6,1.45); \node at (-0.4,0.8) {$N_1$};
+  \node[state] (a1) at (0.5,0.8) {}; \node[state,accepting] at (2.1,1.1) {}; \node[state,accepting] at (2.1,0.5) {};
+  \draw[rounded corners,jzMain!60] (0,-1.45) rectangle (2.6,-0.15); \node at (-0.4,-0.8) {$N_2$};
+  \node[state] (a2) at (0.5,-0.8) {}; \node[state,accepting] at (2.1,-0.8) {};
+  \draw[->] (-0.1,0.8)--(a1); \draw[->] (-0.1,-0.8)--(a2);
+  \begin{scope}[xshift=6cm]
+    \draw[rounded corners,jzMain] (-1.4,-1.7) rectangle (2.8,1.7); \node at (2.5,-1.45) {$N$};
+    \draw[rounded corners,jzMain!60] (0,0.15) rectangle (2.6,1.45);
+    \node[state] (b1) at (0.5,0.8) {}; \node[state,accepting] at (2.1,1.1) {}; \node[state,accepting] at (2.1,0.5) {};
+    \draw[rounded corners,jzMain!60] (0,-1.45) rectangle (2.6,-0.15);
+    \node[state] (b2) at (0.5,-0.8) {}; \node[state,accepting] at (2.1,-0.8) {};
+    \node[state,initial,initial distance=4mm] (q0) at (-0.8,0) {};
+    \draw[->] (q0) to[bend left] node[font=\scriptsize] {$\eps$} (b1);
+    \draw[->] (q0) to[bend right] node[font=\scriptsize,below left] {$\eps$} (b2);
+  \end{scope}
+\end{tikzpicture}
+\end{ltrfig}
+\end{proofidea}
+
+\begin{proof}
+فرض کنید $N_1=(Q_1,\Sigma,\delta_1,q_1,F_1)$ زبان $A_1$ و $N_2=(Q_2,\Sigma,\delta_2,q_2,F_2)$ زبان $A_2$ را تشخیص دهند و $Q_1\cap Q_2=\emptyset$ (در صورت لزوم نام حالت‌ها را عوض می‌کنیم). ماشین $N=(Q,\Sigma,\delta,q_0,F)$ را می‌سازیم:
+\begin{enumerate}
+\item $Q=\{q_0\}\cup Q_1\cup Q_2$ که $q_0$ یک حالت جدید است،
+\item حالت شروع $q_0$ و $F=F_1\cup F_2$،
+\item برای $q\in Q$ و $a\in\Sigma_\eps$:
+\[\delta(q,a)=\begin{cases}
+\delta_1(q,a) & q\in Q_1\\
+\delta_2(q,a) & q\in Q_2\\
+\{q_1,q_2\} & q=q_0,\ a=\eps\\
+\emptyset & q=q_0,\ a\neq\eps.
+\end{cases}\]
+\end{enumerate}
+\textbf{درستی:} هر محاسبه $N$ با یک گذار $\eps$ از $q_0$ به $q_1$ یا $q_2$ شروع می‌شود و چون هیچ پیکانی بین $Q_1$ و $Q_2$ یا به $q_0$ نیست، از آن به بعد کاملاً درون $N_1$ یا کاملاً درون $N_2$ می‌ماند. پس $N$ رشته $w$ را می‌پذیرد اگر و تنها اگر $N_1$ یا $N_2$ آن را بپذیرد، یعنی $L(N)=A_1\cup A_2$.
+\end{proof}
+
+\section{الحاق}
+
+\begin{theorem}
+دسته زبان‌های منظم تحت الحاق بسته است.
+\end{theorem}
+
+\begin{proofidea}
+حالت شروع $N$ همان حالت شروع $N_1$ است. از هر حالت پذیرش $N_1$ یک پیکان $\eps$ به حالت شروع $N_2$ می‌کشیم و فقط حالت‌های پذیرش $N_2$ را پذیرش نگه می‌داریم. هر وقت $N_1$ به حالت پذیرش برسد، $N$ می‌تواند «حدس بزند» که تکه اول تمام شده و به $N_2$ برود.
+\begin{ltrfig}
+\begin{tikzpicture}[jzaut,every state/.style={draw=jzMain,fill=jzMain!7,minimum size=5mm,inner sep=0pt}]
+  \draw[rounded corners,jzMain] (-0.5,-1.2) rectangle (6.4,1.2); \node at (6.1,-0.95) {$N$};
+  \draw[rounded corners,jzMain!60] (0,-0.8) rectangle (2.4,0.8); \node at (1.2,1.0) {$N_1$};
+  \node[state,initial,initial distance=4mm] (s1) at (0.4,0) {}; \node[state] (f1) at (2,0.4) {}; \node[state] (f2) at (2,-0.4) {};
+  \draw[rounded corners,jzMain!60] (3.4,-0.8) rectangle (5.8,0.8); \node at (4.6,1.0) {$N_2$};
+  \node[state] (s2) at (3.8,0) {}; \node[state,accepting] at (5.4,0.4) {}; \node[state,accepting] at (5.4,-0.4) {};
+  \draw[->] (f1) to node[font=\scriptsize] {$\eps$} (s2); \draw[->] (f2) to node[font=\scriptsize,below] {$\eps$} (s2);
+\end{tikzpicture}
+\end{ltrfig}
+\end{proofidea}
+
+\begin{proof}
+با همان نمادها، $N=(Q_1\cup Q_2,\Sigma,\delta,q_1,F_2)$ را می‌سازیم که در آن برای $q\in Q$ و $a\in\Sigma_\eps$:
+\[\delta(q,a)=\begin{cases}
+\delta_1(q,a) & q\in Q_1,\ q\notin F_1\\
+\delta_1(q,a) & q\in F_1,\ a\neq\eps\\
+\delta_1(q,a)\cup\{q_2\} & q\in F_1,\ a=\eps\\
+\delta_2(q,a) & q\in Q_2.
+\end{cases}\]
+\textbf{درستی:} اگر $w=xy$ با $x\in A_1$ و $y\in A_2$، آنگاه $N$ می‌تواند $x$ را مثل $N_1$ بخواند و به یک حالت پذیرش $N_1$ برسد، با $\eps$ به $q_2$ برود و $y$ را مثل $N_2$ بخواند و بپذیرد. برعکس، هر محاسبه پذیرنده $N$ از $q_1\in Q_1$ شروع و در $F_2\subseteq Q_2$ تمام می‌شود. تنها راه رفتن از $Q_1$ به $Q_2$ پیکان‌های $\eps$ از $F_1$ به $q_2$ است و هیچ راه برگشتی نیست. پس محاسبه دقیقاً یک بار از این پیکان‌ها رد می‌شود. بخشی از ورودی که قبل از آن خوانده شده ($x$) توسط $N_1$ پذیرفته می‌شود و بقیه ($y$) توسط $N_2$. پس $w=xy\in A_1\circ A_2$.
+\end{proof}
+
+\section{ستاره}
+
+\begin{theorem}
+دسته زبان‌های منظم تحت ستاره بسته است.
+\end{theorem}
+
+\begin{proofidea}
+$N$ باید رشته‌ای را بپذیرد که از چند تکه پشت سر هم تشکیل شده که هر تکه را $N_1$ می‌پذیرد. پس از هر حالت پذیرش $N_1$ یک پیکان $\eps$ به حالت شروع $N_1$ برمی‌گردانیم تا تکه بعدی شروع شود. همچنین چون $\eps\in A_1^*$، یک \textbf{حالت شروع جدید} اضافه می‌کنیم که خودش پذیرش است و با $\eps$ به حالت شروع قبلی می‌رود.
+\begin{ltrfig}
+\begin{tikzpicture}[jzaut,every state/.style={draw=jzMain,fill=jzMain!7,minimum size=5mm,inner sep=0pt}]
+  \draw[rounded corners,jzMain] (-1.4,-1.0) rectangle (2.8,1.5); \node at (2.5,-0.75) {$N$};
+  \draw[rounded corners,jzMain!60] (0,-0.7) rectangle (2.4,0.7);
+  \node[state] (s1) at (0.4,0) {}; \node[state,accepting] (f1) at (2,0.3) {}; \node[state,accepting] (f2) at (2,-0.3) {};
+  \node[state,initial,accepting,initial distance=4mm] (q0) at (-0.8,0) {};
+  \draw[->] (q0) to node[font=\scriptsize] {$\eps$} (s1);
+  \draw[->] (f1) to[bend right=50] node[font=\scriptsize,above] {$\eps$} (s1);
+  \draw[->] (f2) to[bend left=50] node[font=\scriptsize,below] {$\eps$} (s1);
+\end{tikzpicture}
+\end{ltrfig}
+\end{proofidea}
+
+\begin{proof}
+فرض کنید $N_1=(Q_1,\Sigma,\delta_1,q_1,F_1)$ زبان $A_1$ را تشخیص دهد. ماشین $N=(\{q_0\}\cup Q_1,\Sigma,\delta,q_0,\{q_0\}\cup F_1)$ را با حالت جدید $q_0$ می‌سازیم که در آن
+\[\delta(q,a)=\begin{cases}
+\delta_1(q,a) & q\in Q_1,\ q\notin F_1\\
+\delta_1(q,a) & q\in F_1,\ a\neq\eps\\
+\delta_1(q,a)\cup\{q_1\} & q\in F_1,\ a=\eps\\
+\{q_1\} & q=q_0,\ a=\eps\\
+\emptyset & q=q_0,\ a\neq\eps.
+\end{cases}\]
+\textbf{درستی:} $\eps$ را $N$ می‌پذیرد چون $q_0$ پذیرش است. اگر $w=x_1\cdots x_k$ با $k\ge1$ و $x_i\in A_1$، $N$ از $q_0$ با $\eps$ به $q_1$ می‌رود، $x_1$ را مثل $N_1$ می‌خواند و به $F_1$ می‌رسد، با $\eps$ به $q_1$ برمی‌گردد و همین کار را برای $x_2,\dots,x_k$ تکرار می‌کند. برعکس، هر محاسبه پذیرنده روی رشته ناتهی از $q_0$ به $q_1$ می‌رود؛ هر بار که از پیکان‌های $\eps$ برگشتی استفاده می‌کند، تکه‌ای از ورودی که از آخرین ورود به $q_1$ خوانده شده توسط $N_1$ پذیرفته شده است. پس ورودی به تکه‌هایی از $A_1$ شکسته می‌شود و $w\in A_1^*$.
+\end{proof}
+
+\begin{warning}
+چرا حالت شروع جدید لازم است؟ شاید فکر کنید کافی است حالت شروع قدیمی $q_1$ را پذیرش کنیم. اما اگر پیکانی به $q_1$ برگردد، ممکن است رشته‌های ناخواسته پذیرفته شوند. مثلاً اگر $N_1$ زبان $a^*b$ را با یک حلقه $a$ روی $q_1$ تشخیص دهد، پذیرش کردن $q_1$ باعث می‌شود رشته $a$ هم پذیرفته شود، در حالی که $a\notin(a^*b)^*$.
+\end{warning}
+
+\begin{corollary}
+دسته زبان‌های منظم تحت اجتماع، الحاق، ستاره، متمم، اشتراک و تفاضل بسته است.
+\end{corollary}
+
+\section{معکوس}
+
+\begin{theorem}\label{thm:reg-reverse}
+اگر $A$ منظم باشد، $A^R$ هم منظم است.
+\end{theorem}
+\begin{proof}
+فرض کنید \lr{DFA} $M=(Q,\Sigma,\delta,q_0,F)$ زبان $A$ را تشخیص دهد. \lr{NFA} $N$ را این‌طور می‌سازیم: همه پیکان‌های $M$ را \textbf{برعکس} می‌کنیم، یک حالت شروع جدید $s$ اضافه می‌کنیم که با پیکان‌های $\eps$ به همه حالت‌های $F$ می‌رود، و تنها حالت پذیرش را $q_0$ قرار می‌دهیم. به‌طور دقیق، برای $q\in Q$ و $a\in\Sigma$:
+\[\delta_N(q,a)=\{p\in Q\st \delta(p,a)=q\},\qquad \delta_N(s,\eps)=F.\]
+مسیر $q_0\xrightarrow{w_1}r_1\xrightarrow{w_2}\cdots\xrightarrow{w_n}r_n\in F$ در $M$ وجود دارد اگر و تنها اگر مسیر برعکس $s\xrightarrow{\eps}r_n\xrightarrow{w_n}\cdots\xrightarrow{w_1}q_0$ در $N$ وجود داشته باشد. پس $w\in A$ اگر و تنها اگر $N$ رشته $w^R$ را بپذیرد، یعنی $L(N)=A^R$.
+\end{proof}
+
+\section{پیشوند، پسوند و خارج‌قسمت}
+
+چند عملیات مفید دیگر روی زبان‌ها:
+\begin{itemize}
+\item \textbf{پیشوند:} $\pre(A)=\{w\st w\ \text{\rl{پیشوند رشته‌ای در $A$ است}}\}$.
+\item \textbf{پسوند:} $\suf(A)=\{w\st w\ \text{\rl{پسوند رشته‌ای در $A$ است}}\}$.
+\item \textbf{خارج‌قسمت راست} $A$ بر رشته $u\in\Sigma^*$: همه رشته‌هایی که اگر $u$ به انتهایشان اضافه شود عضو $A$ می‌شوند: $Au^{-1}=\{w\in\Sigma^*\st wu\in A\}$.
+\item \textbf{خارج‌قسمت چپ} $A$ بر رشته $u$: \quad $u^{-1}A=\{w\in\Sigma^*\st uw\in A\}$.
+\end{itemize}
+
+\begin{example}
+\lr{DFA} زیر را در نظر بگیرید:
+\begin{automaton}[node distance=1.9cm]
+  \node[state,initial] (q0) {$q_0$};
+  \node[state,right=of q0] (q1) {$q_1$};
+  \node[state,accepting,right=of q1] (q2) {$q_2$};
+  \node[state,below=1.5cm of q0] (q3) {$q_3$};
+  \node[state,below=1.5cm of q1] (q4) {$q_4$};
+  \node[state,below=1.5cm of q2] (q5) {$q_5$};
+  \path (q0) edge node {$a$} (q1)
+        (q0) edge node[left] {$b$} (q3)
+        (q1) edge[bend left] node {$b$} (q2)
+        (q2) edge[bend left] node {$a,b$} (q1)
+        (q3) edge node[pos=0.3] {$a$} (q1)
+        (q3) edge node[below] {$b$} (q4)
+        (q1) edge node[pos=0.3] {$a$} (q4)
+        (q4) edge[bend left] node {$a,b$} (q5)
+        (q5) edge[bend left] node {$a$} (q4)
+        (q5) edge[loop right] node {$b$} (q5);
+\end{automaton}
+چند رشته در $L(M)$: $ab$، $bab$، $abab$، $abbb$، $babab$، $babbb$. چند رشته در $\pre(L(M))$: $\eps$، $a$، $b$، $ab$، $ba$، $bab$. دقت کنید $q_4$ و $q_5$ حالت‌هایی هستند که دیگر هرگز به حالت پذیرش نمی‌رسند؛ پس مثلاً $aa\notin\pre(L(M))$.
+\end{example}
+
+\begin{theorem}
+دسته زبان‌های منظم تحت پیشوند بسته است.
+\end{theorem}
+
+\begin{proofidea}
+رشته $w$ پیشوند یک عضو $L$ است اگر و تنها اگر بعد از خواندن $w$ در حالتی باشیم که از آن \textbf{بتوان} به یک حالت پذیرش رسید. پس کافی است همه حالت‌هایی را که به یک حالت پذیرش راه دارند، پذیرش کنیم.
+\end{proofidea}
+
+\begin{proof}
+فرض کنید \lr{DFA} $M_1=(Q_1,\Sigma,\delta_1,q_1,F_1)$ زبان $L$ را تشخیص دهد. $M_2=(Q_1,\Sigma,\delta_1,q_1,F_2)$ را با
+\[F_2=\{q\in Q_1\st \text{\rl{در نمودار $M_1$ از $q$ به یک حالت $F_1$ مسیری (شاید به طول صفر) هست}}\}\]
+می‌سازیم. ($F_2$ را با یک جست‌وجوی ساده در گراف حالت‌ها پیدا می‌کنیم.)
+
+\textbf{$L(M_2)\subseteq\pre(L)$:} فرض کنید $w$ ماشین $M_2$ را به $q\in F_2$ ببرد. طبق تعریف $F_2$ مسیری از $q$ به حالتی در $F_1$ هست. اگر $x$ رشته برچسب‌های این مسیر باشد، $\delta_1^*(q_1,wx)\in F_1$، پس $wx\in L$ و $w\in\pre(L)$.
+
+\textbf{$\pre(L)\subseteq L(M_2)$:} اگر $w\in\pre(L)$، رشته‌ای مثل $x$ هست که $wx\in L$. فرض کنید $q=\delta_1^*(q_1,w)$. خواندن $x$ از $q$ به حالتی در $F_1$ می‌رسد، پس $q\in F_2$ و $w\in L(M_2)$.
+\end{proof}
+
+\begin{theorem}
+دسته زبان‌های منظم تحت پسوند بسته است.
+\end{theorem}
+
+\begin{proofidea}
+$w$ پسوند یک عضو $L$ است اگر رشته‌ای مثل $x$ باشد که $xw\in L$. خواندن $x$ ماشین را به یکی از حالت‌های \textbf{قابل دسترس} می‌برد. پس یک \lr{NFA} می‌سازیم که در ابتدا «حدس بزند» $x$ ماشین را به کدام حالت قابل دسترس برده است و از آنجا $w$ را بخواند.
+\end{proofidea}
+
+\begin{proof}
+فرض کنید \lr{DFA} $M=(Q,\Sigma,\delta,q_0,F)$ زبان $L$ را تشخیص دهد و
+$R=\{\delta^*(q_0,x)\st x\in\Sigma^*\}$ مجموعه حالت‌های قابل دسترس از $q_0$ باشد (با جست‌وجو در گراف به دست می‌آید). \lr{NFA} $N$ را با حالت شروع جدید $s$، پیکان‌های $\eps$ از $s$ به همه حالت‌های $R$، همان گذارهای $M$ و همان $F$ می‌سازیم. آنگاه
+\begin{align*}
+w\in L(N)&\iff \exists q\in R:\ \delta^*(q,w)\in F\iff\exists x:\ \delta^*(q_0,xw)\in F\\
+&\iff \exists x:\ xw\in L\iff w\in\suf(L).
+\end{align*}
+(راه دیگر: $\suf(L)=\big(\pre(L^R)\big)^R$ و از بستاری تحت معکوس و پیشوند استفاده کنیم.)
+\end{proof}
+
+\begin{theorem}
+دسته زبان‌های منظم تحت خارج‌قسمت چپ و راست بر یک رشته بسته است.
+\end{theorem}
+\begin{proof}
+فرض کنید \lr{DFA} $M_1=(Q_1,\Sigma,\delta_1,q_1,F_1)$ زبان $A$ را تشخیص دهد و $u\in\Sigma^*$.
+
+\textbf{خارج‌قسمت چپ:} $M_2=(Q_1,\Sigma,\delta_1,q_2,F_1)$ را می‌سازیم که در آن $q_2=\delta_1^*(q_1,u)$ حالتی است که $M_1$ بعد از خواندن $u$ در آن است. یعنی فقط حالت شروع را جابه‌جا می‌کنیم. آنگاه
+\[x\in L(M_2)\iff \delta_1^*(q_2,x)\in F_1\iff\delta_1^*(q_1,ux)\in F_1\iff ux\in A\iff x\in u^{-1}A.\]
+
+\textbf{خارج‌قسمت راست:} این بار حالت شروع را نگه می‌داریم و حالت‌های پذیرش را عوض می‌کنیم: $F'=\{q\in Q_1\st \delta_1^*(q,u)\in F_1\}$، یعنی حالت‌هایی که اگر از آن‌ها $u$ را بخوانیم پذیرفته می‌شویم. آنگاه
+\[w\in L(M')\iff\delta_1^*(q_1,w)\in F'\iff\delta_1^*(q_1,wu)\in F_1\iff wu\in A\iff w\in Au^{-1}.\qedhere\]
+\end{proof}
+
+\begin{summary}
+\begin{itemize}
+\item با \lr{NFA} بستاری تحت اجتماع (حالت شروع جدید)، الحاق (پیکان $\eps$ از پذیرش‌های $N_1$ به شروع $N_2$) و ستاره (پیکان $\eps$ برگشتی و شروع جدید پذیرش) ثابت شد.
+\item معکوس: برعکس کردن پیکان‌ها، شروع و پذیرش را جابه‌جا کردن.
+\item پیشوند: پذیرش کردن هر حالتی که به $F$ راه دارد. پسوند: شروع از هر حالت قابل دسترس.
+\item خارج‌قسمت چپ: جابه‌جا کردن حالت شروع. خارج‌قسمت راست: عوض کردن حالت‌های پذیرش.
+\end{itemize}
+\end{summary}

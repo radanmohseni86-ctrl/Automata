@@ -1,0 +1,9 @@
+{
+  "name": "jozve-automata-web",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Builds the web version of the Automata lecture notes",
+  "dependencies": {
+    "katex": "0.16.11"
+  }
+}

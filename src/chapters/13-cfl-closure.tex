@@ -1,0 +1,139 @@
+\chapter{ویژگی‌های بستاری زبان‌های مستقل از متن}
+
+در فصل ۵ دیدیم زبان‌های منظم تحت تقریباً همه عملیات معمول بسته‌اند. زبان‌های مستقل از متن تحت بسیاری از عملیات بسته‌اند، اما نه همه. در این فصل هر دو طرف را بررسی می‌کنیم. در اثبات‌ها از گرامرها یا ماشین‌های پشته‌ای استفاده می‌کنیم، هر کدام که ساده‌تر باشد.
+
+در همه اثبات‌ها فرض می‌کنیم متغیرهای دو گرامر مختلف با هم مشترک نیستند (در صورت لزوم نامشان را عوض می‌کنیم).
+
+\section{اجتماع، الحاق و ستاره}
+
+\begin{theorem}
+زبان‌های مستقل از متن تحت \textbf{اجتماع} بسته‌اند.
+\end{theorem}
+\begin{proof}
+فرض کنید $G_1=(V_1,\Sigma,R_1,S_1)$ زبان $A$ و $G_2=(V_2,\Sigma,R_2,S_2)$ زبان $B$ را تولید کنند. گرامر $G=(V,\Sigma,R,S)$ را با متغیر شروع جدید $S$ می‌سازیم:
+\[V=V_1\cup V_2\cup\{S\},\qquad R=R_1\cup R_2\cup\{S\to S_1\mid S_2\}.\]
+اگر $w\in A$، آنگاه $S_1\der w$ و پس $S\Rightarrow S_1\der w$. اگر $w\in B$ هم به همین شکل $S\Rightarrow S_2\der w$. برعکس، اگر $w\in L(G)$، اولین گام اشتقاق یا $S\Rightarrow S_1$ است یا $S\Rightarrow S_2$؛ چون متغیرهای دو گرامر از هم جدا هستند، بقیه اشتقاق کاملاً در $G_1$ یا کاملاً در $G_2$ است. پس $w\in A\cup B$.
+\end{proof}
+
+\begin{theorem}
+زبان‌های مستقل از متن تحت \textbf{الحاق} بسته‌اند.
+\end{theorem}
+\begin{proof}
+با همان نمادها، $R=R_1\cup R_2\cup\{S\to S_1S_2\}$. هر رشته‌ای که $G$ تولید کند به شکل $xy$ است که $S_1\der x$ و $S_2\der y$ (چون $S_1$ و $S_2$ متغیرهای مشترکی ندارند و مستقل از هم جایگزین می‌شوند). برعکس، برای هر $x\in A$ و $y\in B$ داریم $S\Rightarrow S_1S_2\der xS_2\der xy$. پس $L(G)=A\circ B$.
+\end{proof}
+
+\begin{theorem}
+زبان‌های مستقل از متن تحت \textbf{ستاره} بسته‌اند.
+\end{theorem}
+\begin{proof}
+اگر $G_1=(V_1,\Sigma,R_1,S_1)$ زبان $A$ را تولید کند، قرار دهید $V=V_1\cup\{S\}$ و $R=R_1\cup\{S\to SS_1\mid\eps\}$. با $k$ بار استفاده از $S\to SS_1$ و یک بار $S\to\eps$ داریم $S\der S_1S_1\cdots S_1$ ($k$ بار) و هر $S_1$ مستقلاً یک رشته از $A$ تولید می‌کند. پس $L(G)=\{x_1\cdots x_k\st k\ge0,\ x_i\in A\}=A^*$.
+\end{proof}
+
+\section{پیشوند}
+
+\begin{theorem}
+زبان‌های مستقل از متن تحت \textbf{پیشوند} بسته‌اند.
+\end{theorem}
+
+\begin{proofidea}
+گرامری در فرم نرمال چامسکی برای $L$ بگیرید. درخت تجزیه یک رشته $w$ و یک پیشوند آن را در نظر بگیرید. «خط برش» پیشوند، برگ‌ها را به دو دسته چپ و راست تقسیم می‌کند و متغیرهای درخت سه نوع می‌شوند:
+\begin{itemize}
+\item $\langle A,L\rangle$: همه برگ‌های زیردرخت $A$ در پیشوند هستند (\textbf{چپ} خط برش)؛
+\item $\langle A,S\rangle$: زیردرخت $A$ \textbf{روی خط برش} است؛ بخشی از برگ‌هایش در پیشوند هستند. این متغیرها مسیری از ریشه به پایین می‌سازند (\textbf{مسیر برش})؛
+\item $\langle A,R\rangle$: هیچ برگی از زیردرخت $A$ در پیشوند نیست (\textbf{راست} خط برش).
+\end{itemize}
+گرامر جدید درخت را با این برچسب‌ها می‌سازد: متغیرهای «چپ» مثل قبل رشته تولید می‌کنند، متغیرهای «راست» با $\eps$ جایگزین می‌شوند و متغیرهای «روی برش» مسیر برش را دنبال می‌کنند.
+\end{proofidea}
+
+\begin{proof}
+اگر $L=\emptyset$ آنگاه $\pre(L)=\emptyset$ و حکم بدیهی است. فرض کنید $L\neq\emptyset$ و $G=(V,\Sigma,R,S)$ گرامری در \lr{CNF} و بدون متغیر بی‌فایده برای $L$ باشد. پس قاعده‌ها سه شکل دارند: $S\to\eps$، $A\to BC$ و $A\to t$. گرامر $G'=(V',\Sigma,R',S')$ را می‌سازیم:
+\[V'=\{\langle A,D\rangle\st A\in V,\ D\in\{L,S,R\}\},\qquad S'=\langle S,S\rangle,\]
+و قاعده‌های $R'$:
+\begin{center}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{cc}
+\toprule
+قاعده در $G$ & قاعده‌های جدید در $G'$\\ \midrule
+(چون $L\neq\emptyset$) & $\langle S,S\rangle\to\eps$\\ \midrule
+$A\to BC$ & $\begin{array}{l}\langle A,L\rangle\to\langle B,L\rangle\langle C,L\rangle\\ \langle A,S\rangle\to\langle B,L\rangle\langle C,S\rangle\mid\langle B,S\rangle\langle C,R\rangle\\ \langle A,R\rangle\to\langle B,R\rangle\langle C,R\rangle\end{array}$\\ \midrule
+$A\to t$ & $\langle A,L\rangle\to t,\quad\langle A,S\rangle\to t,\quad\langle A,R\rangle\to\eps$\\ \bottomrule
+\end{tabular}
+\end{center}
+با استقرا روی طول اشتقاق ساده است که (۱) $\langle A,L\rangle\der x$ اگر و تنها اگر $A\der x$، و (۲) $\langle A,R\rangle\der\eps$ و این متغیر چیز دیگری تولید نمی‌کند (چون هر متغیر $G$ رشته‌ای تولید می‌کند، $\langle A,R\rangle$ همیشه به $\eps$ می‌رسد). ادعای اصلی:
+\[\langle A,S\rangle\der x\iff x\ \text{\rl{پیشوند ناتهی یک رشته از زبان $A$ است}}.\]
+\emph{جهت رفت:} اگر گام اول $\langle A,S\rangle\to t$ باشد، $x=t$ که خودش رشته‌ای از $A$ است. اگر $\langle B,L\rangle\langle C,S\rangle$ باشد، $x=yz$ که $B\der y$ و طبق استقرا $z$ پیشوند ناتهی یک رشته $z'$ از $C$ است؛ پس $x$ پیشوند $yz'$ است که $A$ آن را تولید می‌کند. اگر $\langle B,S\rangle\langle C,R\rangle$ باشد، $x$ پیشوند ناتهی رشته‌ای $y'$ از $B$ است و $A$ رشته $y'z'$ را (برای هر $z'$ که $C$ تولید می‌کند) تولید می‌کند.
+\emph{جهت برگشت:} فرض کنید $x$ پیشوند ناتهی رشته $w$ با $A\der w$ باشد. اگر $A\to t$، $x=t$. اگر $A\to BC$ با $B\der y$، $C\der z$ و $w=yz$: اگر $x$ داخل $y$ تمام شود (یا دقیقاً در انتهای آن)، $x$ پیشوند ناتهی $y$ است و از $\langle B,S\rangle\langle C,R\rangle$ استفاده می‌کنیم؛ وگرنه $x=yz_1$ که $z_1$ پیشوند ناتهی $z$ است و از $\langle B,L\rangle\langle C,S\rangle$ استفاده می‌کنیم.
+
+با $A=S$ و قاعده $\langle S,S\rangle\to\eps$ (برای پیشوند تهی) نتیجه می‌گیریم $L(G')=\pre(L)$.
+\end{proof}
+
+\begin{example}
+اگر $w=w_1w_2\cdots w_n\in L$ و $S\der A_1A_2\cdots A_n$ با $A_i\Rightarrow w_i$، آنگاه برای هر $i$:
+\[\langle S,S\rangle\der\langle A_1,L\rangle\cdots\langle A_{i-1},L\rangle\langle A_i,S\rangle\langle A_{i+1},R\rangle\cdots\langle A_n,R\rangle\der w_1w_2\cdots w_i.\]
+\end{example}
+
+\section{معکوس و پسوند}
+
+\begin{theorem}
+زبان‌های مستقل از متن تحت \textbf{معکوس} بسته‌اند.
+\end{theorem}
+\begin{proof}
+فرض کنید $G=(V,\Sigma,R,S)$ زبان $B$ را تولید کند. گرامر $G'$ را با همان متغیرها و قاعده‌های
+\[R'=\{A\to u^R\st A\to u\ \text{\rl{قاعده‌ای در $R$ است}}\}\]
+می‌سازیم. با $A\overset{n}{\Rightarrow}u$ نشان می‌دهیم $A$ در دقیقاً $n$ گام $u$ را مشتق می‌کند. با استقرا روی $n$ ثابت می‌کنیم برای هر $A\in V$ و $u\in(V\cup\Sigma)^*$:
+\[A\overset{n}{\Rightarrow}_G u\iff A\overset{n}{\Rightarrow}_{G'}u^R.\]
+\emph{پایه} ($n=0$): $u=A=A^R$، پس دو طرف برابرند.
+\emph{گام:} فرض کنید حکم برای $n-1$ درست باشد. اگر $A\overset{n}{\Rightarrow}_G u$، آخرین گام یک متغیر $C$ را با قاعده $C\to y$ جایگزین کرده است؛ یعنی $u=xyz$ و $A\overset{n-1}{\Rightarrow}_G xCz$. طبق فرض استقرا $A\overset{n-1}{\Rightarrow}_{G'}(xCz)^R=z^RCx^R$. طبق ساخت، $C\to y^R$ در $G'$ هست. پس
+\[A\overset{n}{\Rightarrow}_{G'}z^Ry^Rx^R=(xyz)^R=u^R.\]
+جهت برگشت هم دقیقاً به همین شکل است (چون $G$ از $G'$ با همان تبدیل به دست می‌آید). با $A=S$ و $u=w\in\Sigma^*$ داریم $S\der_G w\iff S\der_{G'}w^R$، پس $L(G')=B^R$.
+\end{proof}
+
+\begin{theorem}
+زبان‌های مستقل از متن تحت \textbf{پسوند} بسته‌اند.
+\end{theorem}
+\begin{proof}
+$w$ پسوند یک رشته از $A$ است اگر و تنها اگر $w^R$ پیشوند یک رشته از $A^R$ باشد. پس $\suf(A)=\big(\pre(A^R)\big)^R$ و از بستاری تحت معکوس و پیشوند نتیجه می‌گیریم $\suf(A)$ مستقل از متن است.
+\end{proof}
+
+\section{اشتراک با یک زبان منظم}
+
+\begin{theorem}\label{thm:cfl-cap-reg}
+اگر $A$ مستقل از متن و $B$ منظم باشد، $A\cap B$ مستقل از متن است.
+\end{theorem}
+\begin{proofidea}
+یک \lr{PDA} برای $A$ و یک \lr{DFA} برای $B$ را \textbf{هم‌زمان} اجرا می‌کنیم (مثل ساخت ضربی فصل ۳). این کار ممکن است چون \lr{DFA} پشته‌ای ندارد و فقط یک پشته لازم داریم.
+\end{proofidea}
+\begin{proof}
+فرض کنید \lr{PDA} $M_1=(Q_1,\Sigma,\Gamma,\delta_1,q_1,F_1)$ زبان $A$ و \lr{DFA} $M_2=(Q_2,\Sigma,\delta_2,q_2,F_2)$ زبان $B$ را تشخیص دهند. \lr{PDA} $M=(Q_1\times Q_2,\Sigma,\Gamma,\delta,(q_1,q_2),F_1\times F_2)$ را می‌سازیم که برای هر $a\in\Sigma_\eps$ و $b,c\in\Gamma_\eps$:
+\[\delta\big((q,r),a,b\big)=\{((s,t),c)\st (s,c)\in\delta_1(q,a,b)\ \text{\rl{و}}\ t=\delta_2(r,a)\},\]
+با این قرارداد که اگر $a=\eps$، $t=r$ (\lr{DFA} بدون خواندن ورودی حرکت نمی‌کند). وقتی $M$ روی $w$ اجرا می‌شود، پشته و مؤلفه اول حالتش دقیقاً مثل $M_1$ تغییر می‌کنند و مؤلفه دوم مثل $M_2$. پس $M$ رشته $w$ را می‌پذیرد اگر و تنها اگر یک شاخه $M_1$ آن را بپذیرد و $M_2$ هم آن را بپذیرد؛ یعنی $L(M)=A\cap B$.
+\end{proof}
+
+\section{عملیاتی که تحت آن‌ها بسته نیستند}
+
+تا اینجا بستاری زبان‌های مستقل از متن را تحت اجتماع، الحاق، ستاره، پیشوند، معکوس، پسوند و اشتراک با زبان منظم دیدیم. اما:
+
+\begin{theorem}\label{thm:cfl-not-cap}
+زبان‌های مستقل از متن تحت \textbf{اشتراک} بسته نیستند.
+\end{theorem}
+\begin{proof}
+دو زبان زیر مستقل از متن‌اند:
+\[A=\{a^mb^mc^n\st m,n\ge0\},\qquad B=\{a^mb^nc^n\st m,n\ge0\}.\]
+مثلاً $A$ با گرامر $S\to XC$، $X\to aXb\mid\eps$، $C\to cC\mid\eps$ تولید می‌شود و $B$ به شکل مشابه. اما
+\[A\cap B=\{a^nb^nc^n\st n\ge0\}\]
+که در فصل بعد (مثال \ref{ex:anbncn}) ثابت می‌کنیم مستقل از متن نیست.
+\end{proof}
+
+\begin{corollary}
+زبان‌های مستقل از متن تحت \textbf{متمم} بسته نیستند.
+\end{corollary}
+\begin{proof}
+اگر بسته بودند، چون تحت اجتماع بسته‌اند، طبق قانون دمورگان $A\cap B=\overline{\overline{A}\cup\overline{B}}$ تحت اشتراک هم بسته بودند، که با قضیه \ref{thm:cfl-not-cap} تناقض دارد.
+\end{proof}
+
+\begin{summary}
+\begin{itemize}
+\item \textbf{بسته است:} اجتماع ($S\to S_1\mid S_2$)، الحاق ($S\to S_1S_2$)، ستاره ($S\to SS_1\mid\eps$)، پیشوند (متغیرهای $\langle A,L/S/R\rangle$ روی گرامر \lr{CNF})، معکوس (برعکس کردن سمت راست قاعده‌ها)، پسوند و اشتراک با زبان منظم (ضرب \lr{PDA} و \lr{DFA}).
+\item \textbf{بسته نیست:} اشتراک ($\{a^mb^mc^n\}\cap\{a^mb^nc^n\}$) و در نتیجه متمم.
+\end{itemize}
+\end{summary}

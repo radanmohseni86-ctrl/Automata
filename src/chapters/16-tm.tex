@@ -1,0 +1,219 @@
+\chapter{ماشین تورینگ}
+
+تا اینجا سه مدل محاسباتی دیدیم:
+\begin{itemize}
+\item \lr{DFA}: قطعی، بدون حافظه موقت؛
+\item \lr{NFA}: غیرقطعی، بدون حافظه موقت؛
+\item \lr{PDA}: غیرقطعی، با یک پشته نامحدود.
+\end{itemize}
+در این فصل به مدلی می‌رسیم که \textbf{مدل یک کامپیوتر همه‌منظوره} است: \term{ماشین تورینگ}{Turing Machine} که آلن تورینگ در سال ۱۹۳۶ پیشنهاد کرد. ماشین تورینگ قطعی است و یک نوار نامحدود (از یک طرف) دارد که می‌تواند روی آن بنویسد و بخواند. هر کاری که یک کامپیوتر واقعی انجام دهد، ماشین تورینگ هم می‌تواند انجام دهد.
+
+\section{ماشین تورینگ چیست؟}
+
+ماشین تورینگ این اجزا را دارد:
+\begin{itemize}
+\item یک مجموعه متناهی از حالت‌ها با یک حالت شروع و دو حالت خاص: \textbf{پذیرش} و \textbf{رد}.
+\item یک \textbf{نوار} که از یک طرف نامحدود است و به خانه‌ها تقسیم شده. در ابتدا رشته ورودی در خانه‌های اول نوار است و بقیه خانه‌ها \textbf{خالی} ($\blank$) هستند.
+\item یک \textbf{هد} که روی نوار قرار دارد، نماد زیرش را می‌خواند، می‌تواند آن را عوض کند و یک خانه به چپ یا راست حرکت کند.
+\end{itemize}
+\begin{ltrfig}
+\begin{tikzpicture}[font=\small]
+  \node[draw=jzMain,thick,rounded corners,minimum width=2.2cm,minimum height=1cm,fill=jzMain!6] (c) at (0,1.5) {control};
+  \foreach \s [count=\i] in {a,b,a,b,\sqcup,\sqcup} {\node[cell] (t\i) at (\i*0.65-1.6,0) {$\s$};}
+  \node at (3.0,0) {$\cdots$};
+  \draw[->,thick,jzMain] (c.south) -- (t1.north);
+\end{tikzpicture}
+\end{ltrfig}
+
+\textbf{تفاوت‌ها با ماشین‌های متناهی:}
+\begin{enumerate}
+\item ماشین تورینگ هم می‌تواند روی نوار \textbf{بنویسد} و هم از آن بخواند.
+\item هد می‌تواند هم به \textbf{چپ} و هم به \textbf{راست} حرکت کند.
+\item نوار \textbf{نامحدود} است.
+\item حالت‌های پذیرش و رد \textbf{فوراً} اثر می‌کنند: به محض ورود به آن‌ها ماشین متوقف می‌شود (لازم نیست ورودی تمام شده باشد).
+\end{enumerate}
+
+\textbf{نمایش گذارها:} برچسب $a\to b,R$ روی پیکانی از $q_1$ به $q_2$ یعنی: «اگر در $q_1$ هستی و هد نماد $a$ را می‌خواند، آن را با $b$ عوض کن، هد را یک خانه به راست ببر و به $q_2$ برو». برچسب $a\to R$ کوتاه‌شده $a\to a,R$ است (نماد عوض نمی‌شود) و $a\to L$ هم به همین شکل.
+
+\section{مثال: سه دسته نماد برابر}
+
+در فصل ۱۴ دیدیم $A=\{a^nb^nc^n\st n\ge0\}$ مستقل از متن نیست. حالا یک ماشین تورینگ برای آن می‌سازیم.
+
+\begin{example}[ماشین تورینگ برای $a^nb^nc^n$]
+فرض کنید ورودی آن‌قدر طولانی است که نمی‌توانید همه‌اش را به خاطر بسپارید، اما اجازه دارید روی ورودی جلو و عقب بروید و روی آن علامت بگذارید. ماشین در هر دور یک $a$، یک $b$ و یک $c$ را با هم جفت می‌کند. برای اینکه بداند کدام نمادها قبلاً بررسی شده‌اند، آن‌ها را با $x$، $y$ و $z$ جایگزین می‌کند. اگر همه نمادها جایگزین شدند، همه چیز جفت شده و ماشین می‌پذیرد؛ اگر جایی ناهماهنگی پیدا کرد، رد می‌کند.
+\begin{automaton}[node distance=2.5cm]
+  \node[state,initial] (q0) {$q_0$};
+  \node[state,above=1.9cm of q0] (q1) {$q_1$};
+  \node[state,right=2.9cm of q1] (q2) {$q_2$};
+  \node[state,right=2.9cm of q0] (q3) {$q_3$};
+  \node[state,below=1.7cm of q0] (q4) {$q_4$};
+  \node[state,accepting,right=2.9cm of q4] (qa) {$q_{\mathrm{acc}}$};
+  \path (q0) edge node {$a\to x,R$} (q1)
+        (q1) edge[loop above] node[align=center] {$a\to R$\\$y\to R$} (q1)
+        (q1) edge node {$b\to y,R$} (q2)
+        (q2) edge[loop above] node[align=center] {$b\to R$\\$z\to R$} (q2)
+        (q2) edge node {$c\to z,L$} (q3)
+        (q3) edge[loop right] node[align=left] {$a\to L,\ b\to L$\\$y\to L,\ z\to L$} (q3)
+        (q3) edge node[above] {$x\to R$} (q0)
+        (q0) edge node[left] {$y\to R$} (q4)
+        (q4) edge[loop below] node[align=center] {$y\to R$\\$z\to R$} (q4)
+        (q4) edge node[below] {$\sqcup\to R$} (qa)
+        (q0) edge node[pos=0.65] {$\sqcup\to R$} (qa);
+\end{automaton}
+گذارهایی که رسم نشده‌اند به حالت رد می‌روند. $q_1$ به دنبال اولین $b$ علامت‌نخورده می‌گردد، $q_2$ به دنبال اولین $c$ و $q_3$ هد را به اولین نماد علامت‌نخورده برمی‌گرداند. اگر در $q_0$ به جای $a$ یک $y$ ببینیم، همه $a$ها جفت شده‌اند و $q_4$ بررسی می‌کند که دیگر $b$ یا $c$ علامت‌نخورده‌ای نمانده باشد.
+\end{example}
+
+\section{تعریف صوری}
+
+\begin{definition}[ماشین تورینگ]
+یک ماشین تورینگ هفت‌تایی $M=(Q,\Sigma,\Gamma,\delta,q_0,\qacc,\qrej)$ است که در آن $Q$، $\Sigma$ و $\Gamma$ مجموعه‌های متناهی‌اند و
+\begin{enumerate}
+\item $Q$ مجموعه حالت‌ها،
+\item $\Sigma$ الفبای ورودی است و نماد خالی را ندارد ($\blank\notin\Sigma$)،
+\item $\Gamma$ الفبای نوار است، $\blank\in\Gamma$ و $\Sigma\subseteq\Gamma$،
+\item $\delta:(Q-\{\qacc,\qrej\})\times\Gamma\to Q\times\Gamma\times\{L,R\}$ تابع گذار،
+\item $q_0\in Q$ حالت شروع،
+\item $\qacc\in Q$ تنها حالت پذیرش، و
+\item $\qrej\in Q$ تنها حالت رد است و $\qacc\neq\qrej$.
+\end{enumerate}
+\end{definition}
+
+اگر $\delta(q,s)=(r,t,D)$، یعنی: در حالت $q$ وقتی هد نماد $s$ را می‌خواند، به حالت $r$ برو، $s$ را با $t$ عوض کن و هد را در جهت $D\in\{L,R\}$ حرکت بده. چون دامنه $\delta$ همه حالت‌ها جز پذیرش و رد است، از هر حالت دیگر برای هر نماد نوار دقیقاً یک گذار وجود دارد و از حالت‌های پذیرش و رد هیچ گذاری نیست؛ ماشین با ورود به آن‌ها متوقف می‌شود.
+
+\begin{note}
+در عمل تقریباً هیچ‌وقت توصیف صوری کامل یک ماشین تورینگ را نمی‌نویسیم، چون خیلی بزرگ می‌شود. بیشتر توصیف‌های \textbf{سطح بالا} می‌دهیم. اما باید به خاطر داشت هر توصیف سطح بالا در واقع خلاصه‌ای از یک توصیف صوری است که با حوصله می‌توان آن را کامل نوشت.
+\end{note}
+
+\section{محاسبه ماشین تورینگ}
+
+\begin{itemize}
+\item ماشین ورودی $w=w_1\cdots w_n\in\Sigma^*$ را در $n$ خانه اول نوار می‌گیرد و بقیه نوار خالی است. هد روی چپ‌ترین خانه است.
+\item چون $\blank\notin\Sigma$، اولین $\blank$ روی نوار انتهای ورودی را نشان می‌دهد.
+\item محاسبه طبق تابع گذار پیش می‌رود. اگر ماشین بخواهد هد را از انتهای چپ نوار به چپ ببرد، هد سر جایش می‌ماند.
+\item محاسبه تا ورود به حالت پذیرش یا رد ادامه می‌یابد و آنجا متوقف می‌شود. اگر هیچ‌کدام رخ ندهد، ماشین \textbf{برای همیشه} ادامه می‌دهد.
+\end{itemize}
+
+\begin{definition}[پیکربندی]
+در طول محاسبه سه چیز تغییر می‌کند: حالت فعلی، محتوای نوار و مکان هد. به ترکیب این سه یک \term{پیکربندی}{Configuration} می‌گوییم و آن را به شکل $u\,q\,v$ می‌نویسیم: حالت فعلی $q$ است، محتوای نوار $uv$ (و بعد از آن فقط $\blank$) و هد روی اولین نماد $v$ قرار دارد.
+\end{definition}
+
+\begin{example}
+در اجرای ماشین مثال قبل روی $aabbcc$، پیکربندی $xxy\,q_1\,bzc$ یعنی نوار $xxybzc$ است، ماشین در $q_1$ است و هد روی $b$ (چهارمین خانه) قرار دارد.
+\end{example}
+
+\begin{definition}[حرکت یک‌گامی]
+پیکربندی $C_1$ پیکربندی $C_2$ را \textbf{نتیجه می‌دهد} اگر ماشین بتواند در یک گام از $C_1$ به $C_2$ برود. برای $a,b,c\in\Gamma$، $u,v\in\Gamma^*$ و $q_i,q_j\in Q$:
+\begin{itemize}
+\item \textbf{حرکت به چپ:} اگر $\delta(q_i,b)=(q_j,c,L)$، آنگاه $ua\,q_i\,bv$ نتیجه می‌دهد $u\,q_j\,acv$. در انتهای چپ نوار، $q_i\,bv$ نتیجه می‌دهد $q_j\,cv$.
+\item \textbf{حرکت به راست:} اگر $\delta(q_i,b)=(q_j,c,R)$، آنگاه $ua\,q_i\,bv$ نتیجه می‌دهد $uac\,q_j\,v$. در انتهای چپ هم $q_i\,bv$ نتیجه می‌دهد $c\,q_j\,v$.
+\item \textbf{انتهای راست:} پیکربندی $ua\,q_i$ همان $ua\,q_i\,\blank$ است؛ یعنی فرض می‌کنیم هد روی یک خانه خالی است و قوانین بالا را به کار می‌بریم.
+\end{itemize}
+\end{definition}
+
+\begin{definition}[پذیرش]
+\begin{itemize}
+\item \textbf{پیکربندی شروع} روی ورودی $w$ برابر $q_0\,w$ است.
+\item در \textbf{پیکربندی پذیرش} حالت $\qacc$ و در \textbf{پیکربندی رد} حالت $\qrej$ است. این دو \textbf{پیکربندی توقف} هستند و پیکربندی دیگری را نتیجه نمی‌دهند.
+\end{itemize}
+ماشین $M$ ورودی $w$ را \textbf{می‌پذیرد} اگر دنباله‌ای از پیکربندی‌ها $C_1,C_2,\dots,C_k$ وجود داشته باشد که (۱) $C_1$ پیکربندی شروع $M$ روی $w$ باشد، (۲) هر $C_i$ نتیجه دهد $C_{i+1}$ و (۳) $C_k$ یک پیکربندی پذیرش باشد.
+\end{definition}
+
+\begin{example}
+اجرای ماشین $a^nb^nc^n$ روی $aabbcc$ (با $\vdash$ برای «نتیجه می‌دهد» و $\vdash^*$ برای چند گام):
+\[
+\begin{array}{l}
+q_0aabbcc\vdash xq_1abbcc\vdash xaq_1bbcc\vdash xayq_2bcc\vdash xaybq_2cc\vdash xayq_3bzc\\
+\vdash^* q_3xaybzc\vdash xq_0aybzc\vdash xxq_1ybzc\vdash xxyq_1bzc\vdash xxyyq_2zc\\
+\vdash xxyyzq_2c\vdash xxyyq_3zz\vdash^* xq_3xyyzz\vdash xxq_0yyzz\vdash xxyq_4yzz\\
+\vdash^* xxyyzzq_4\blank\vdash xxyyzz\blank\, q_{\mathrm{acc}}.
+\end{array}
+\]
+\end{example}
+
+\section{زبان‌های تشخیص‌پذیر و تصمیم‌پذیر}
+
+\begin{definition}[تشخیص‌پذیر]
+مجموعه رشته‌هایی که $M$ می‌پذیرد، \textbf{زبان} $M$ است و با $L(M)$ نشان داده می‌شود. زبانی را \term{تورینگ-تشخیص‌پذیر}{Turing-recognizable} (یا \term{بازگشتی شمارش‌پذیر}{Recursively Enumerable}) می‌نامیم اگر یک ماشین تورینگ آن را تشخیص دهد.
+\end{definition}
+
+اجرای یک ماشین تورینگ روی یک ورودی سه نتیجه ممکن دارد: \textbf{پذیرش}، \textbf{رد} یا \textbf{حلقه} (هرگز متوقف نمی‌شود). ماشین می‌تواند یک ورودی را با ورود به $\qrej$ یا با حلقه زدن «نپذیرد». مشکل این است که از بیرون نمی‌توان فهمید ماشینی که هنوز متوقف نشده، در حلقه افتاده یا فقط کارش طول می‌کشد.
+
+\begin{definition}[تصمیم‌گیرنده و تصمیم‌پذیر]
+ماشین تورینگی که روی \textbf{همه} ورودی‌ها متوقف شود یک \term{تصمیم‌گیرنده}{Decider} است. تصمیم‌گیرنده‌ای که زبانی را تشخیص دهد، آن زبان را \textbf{تصمیم می‌گیرد}. زبانی \term{تصمیم‌پذیر}{Decidable} (یا \textbf{بازگشتی}) است اگر یک ماشین تورینگ آن را تصمیم بگیرد.
+\end{definition}
+
+هر زبان تصمیم‌پذیر تورینگ-تشخیص‌پذیر است. در فصل ۱۹ می‌بینیم که زبانی وجود دارد که تشخیص‌پذیر هست اما تصمیم‌پذیر نیست.
+
+\begin{note}
+تصمیم‌پذیری \textbf{ویژگی زبان} است، نه ویژگی یک ماشین خاص. فرض کنید تصمیم‌گیرنده $M$ زبان $L$ را تصمیم بگیرد. می‌توانیم $M$ را طوری تغییر دهیم که به جای رد کردن، حلقه بزند: یک حالت جدید $q_{\mathrm{loop}}$ اضافه کنیم، همه گذارهایی را که به $\qrej$ می‌روند به $q_{\mathrm{loop}}$ ببریم و در $q_{\mathrm{loop}}$ با هر نمادی به راست حرکت کنیم. ماشین جدید دیگر تصمیم‌گیرنده نیست، اما زبانش همان $L$ است. $L$ همچنان تصمیم‌پذیر است، چون \emph{یک} تصمیم‌گیرنده (یعنی $M$) دارد.
+\end{note}
+
+\begin{theorem}
+هر زبان منظم تصمیم‌پذیر است.
+\end{theorem}
+\begin{proof}
+فرض کنید \lr{DFA} $M=(Q,\Sigma,\delta,q_0,F)$ زبان منظم $A$ را تشخیص دهد. ماشین تورینگ $M'=(Q',\Sigma,\Gamma,\delta',q_0,\qacc,\qrej)$ را با $Q'=Q\cup\{\qacc,\qrej\}$ و $\Gamma=\Sigma\cup\{\blank\}$ می‌سازیم:
+\[\delta'(q,t)=\begin{cases}
+(\delta(q,t),\ t,\ R) & t\in\Sigma\\
+(\qacc,\ \blank,\ R) & t=\blank\ \text{\rl{و}}\ q\in F\\
+(\qrej,\ \blank,\ R) & t=\blank\ \text{\rl{و}}\ q\notin F.
+\end{cases}\]
+$M'$ ورودی را از چپ به راست می‌خواند و حالتش را دقیقاً مثل $M$ عوض می‌کند. وقتی به اولین $\blank$ (انتهای ورودی) می‌رسد، بر اساس اینکه $M$ در حالت پذیرش است یا نه، می‌پذیرد یا رد می‌کند. پس $L(M')=L(M)=A$. همچنین $M'$ بعد از هر نماد به راست می‌رود و با رسیدن به $\blank$ متوقف می‌شود، پس روی هر ورودی متوقف می‌شود و تصمیم‌گیرنده است.
+\end{proof}
+
+\section{مثال: توان‌های دو}
+
+\begin{example}
+ماشین تورینگ $M_2$ زبان $A=\{0^{2^n}\st n\ge0\}$ (رشته‌هایی از $0$ که طولشان توانی از ۲ است) را تصمیم می‌گیرد.
+
+\textbf{توصیف سطح بالا.} روی ورودی $w$:
+\begin{enumerate}
+\item نوار را از چپ به راست طی کن و یکی در میان $0$ها را خط بزن (تعداد $0$ها نصف می‌شود).
+\item اگر در مرحله ۱ نوار فقط یک $0$ داشت، \textbf{بپذیر}.
+\item اگر در مرحله ۱ نوار بیش از یک $0$ داشت و تعداد $0$ها فرد بود، \textbf{رد کن}؛ چون عدد فرد بزرگ‌تر از ۱ توانی از ۲ نیست. (ماشین با حالتش زوج یا فرد بودن تعداد $0$های دیده‌شده را به خاطر می‌سپارد.)
+\item هد را به انتهای چپ نوار برگردان.
+\item به مرحله ۱ برو.
+\end{enumerate}
+
+\textbf{توصیف صوری.} $M_2=(Q,\Sigma,\Gamma,\delta,q_1,\qacc,\qrej)$ با $Q=\{q_1,q_2,q_3,q_4,q_5,\qacc,\qrej\}$، $\Sigma=\{0\}$، $\Gamma=\{0,x,\blank\}$ و تابع گذار زیر:
+\begin{automaton}[node distance=2.6cm]
+  \node[state,initial] (q1) {$q_1$};
+  \node[state,right=2.8cm of q1] (q2) {$q_2$};
+  \node[state,right=2.8cm of q2] (q3) {$q_3$};
+  \node[state,above right=1.4cm and 1.0cm of q2] (q5) {$q_5$};
+  \node[state,below=1.6cm of q3] (q4) {$q_4$};
+  \node[state,below=1.6cm of q1] (qr) {$q_{\mathrm{rej}}$};
+  \node[state,accepting,below=1.6cm of q2] (qa) {$q_{\mathrm{acc}}$};
+  \path (q1) edge node {$0\to\sqcup,R$} (q2)
+        (q1) edge node[left,align=right] {$\sqcup\to R$\\$x\to R$} (qr)
+        (q2) edge[loop above] node {$x\to R$} (q2)
+        (q2) edge node {$0\to x,R$} (q3)
+        (q2) edge node[left] {$\sqcup\to R$} (qa)
+        (q3) edge[loop right] node {$x\to R$} (q3)
+        (q3) edge[bend left=12] node[right] {$0\to R$} (q4)
+        (q4) edge[bend left=12] node[left] {$0\to x,R$} (q3)
+        (q4) edge[loop right] node {$x\to R$} (q4)
+        (q3) edge node[above right] {$\sqcup\to L$} (q5)
+        (q5) edge[loop above] node[align=center] {$0\to L$\\$x\to L$} (q5)
+        (q5) edge node[above left] {$\sqcup\to R$} (q2)
+        (q4) edge[bend left=25] node[below] {$\sqcup\to R$} (qr);
+\end{automaton}
+در $q_1$ اولین $0$ با $\blank$ جایگزین می‌شود تا انتهای چپ نوار علامت‌گذاری شود. $q_3$ و $q_4$ زوج و فرد بودن را دنبال می‌کنند و $q_5$ هد را به ابتدای نوار برمی‌گرداند. نمونه اجرا روی $0000$:
+\[
+\begin{array}{l}
+q_10000\vdash\blank q_2000\vdash\blank xq_300\vdash\blank x0q_40\vdash\blank x0xq_3\blank\vdash\blank x0q_5x\blank\\
+\vdash\blank xq_50x\blank\vdash\blank q_5x0x\blank\vdash q_5\blank x0x\blank\vdash\blank q_2x0x\blank\vdash\blank xq_20x\blank\\
+\vdash\blank xxq_3x\blank\vdash\blank xxxq_3\blank\vdash\blank xxq_5x\blank\vdash\blank xq_5xx\blank\vdash\blank q_5xxx\blank\\
+\vdash q_5\blank xxx\blank\vdash\blank q_2xxx\blank\vdash\blank xq_2xx\blank\vdash\blank xxq_2x\blank\vdash\blank xxxq_2\blank\vdash\blank xxx\blank q_{\mathrm{acc}}.
+\end{array}
+\]
+\end{example}
+
+\begin{summary}
+\begin{itemize}
+\item ماشین تورینگ: نوار نامحدود خواندنی/نوشتنی، هد دوطرفه، حالت‌های پذیرش و رد با اثر فوری.
+\item $\delta:(Q-\{\qacc,\qrej\})\times\Gamma\to Q\times\Gamma\times\{L,R\}$. پیکربندی $uqv$ وضعیت کامل ماشین است.
+\item سه نتیجه: پذیرش، رد، حلقه. تشخیص‌پذیر: یک ماشین می‌پذیردش. تصمیم‌پذیر: یک ماشین که همیشه متوقف می‌شود آن را می‌پذیرد.
+\item هر زبان منظم تصمیم‌پذیر است و $\{a^nb^nc^n\}$ و $\{0^{2^n}\}$ هم تصمیم‌پذیرند.
+\end{itemize}
+\end{summary}

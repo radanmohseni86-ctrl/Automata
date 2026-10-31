@@ -1,0 +1,288 @@
+\chapter{ماشین‌های پشته‌ای}
+
+در این فصل مدل محاسباتی جدیدی می‌بینیم: \term{ماشین پشته‌ای}{Pushdown Automaton} یا \lr{PDA}. این ماشین شبیه \lr{NFA} است، اما یک حافظه اضافه به شکل \textbf{پشته} دارد. ثابت می‌کنیم قدرت ماشین‌های پشته‌ای دقیقاً با گرامرهای مستقل از متن برابر است. پس برای اثبات مستقل از متن بودن یک زبان دو راه داریم: یا گرامری بسازیم که آن را \textbf{تولید} کند، یا ماشین پشته‌ای که آن را \textbf{تشخیص} دهد.
+
+\section{ایده ماشین پشته‌ای}
+
+\begin{ltrfig}
+\begin{tikzpicture}[font=\small]
+  \node[draw=jzMain,thick,rounded corners,minimum width=2.2cm,minimum height=1cm,fill=jzMain!6] (c) at (0,0) {control};
+  \foreach \s [count=\i] in {a,a,b,b} {\node[cell] (in\i) at (2.2+\i*0.65,0) {$\s$};}
+  \node at (5.6,0) {$\cdots$};
+  \node[right=0.1cm of in4,xshift=0.9cm] {input};
+  \draw[->,thick,jzMain] (c.east) -- ([xshift=-1mm]in1.west);
+  \foreach \s [count=\i] in {x,y,\$} {\node[cell] (st\i) at (0,-1.2-\i*0.65) {$\s$};}
+  \draw[->,thick,jzMain] (c.south) -- (st1.north);
+  \node[left=3mm of st2] {stack};
+\end{tikzpicture}
+\end{ltrfig}
+
+\begin{itemize}
+\item \textbf{بخش کنترل:} حالت‌ها و گذارها، مثل \lr{NFA}.
+\item \textbf{ورودی:} رشته‌ای که نماد به نماد از چپ به راست خوانده می‌شود.
+\item \textbf{پشته:} ماشین می‌تواند نمادی را روی پشته بگذارد (\textbf{push}) یا نماد بالای پشته را بردارد (\textbf{pop}). فقط بالای پشته قابل دسترسی است (آخرین ورودی، اولین خروجی). پشته می‌تواند هر تعداد نماد را نگه دارد؛ یعنی حافظه \textbf{نامحدود} اما با دسترسی محدود.
+\end{itemize}
+
+با همین حافظه ماشین می‌تواند $\{0^n1^n\}$ را تشخیص دهد: هر $0$ را روی پشته می‌گذارد و به ازای هر $1$ یک $0$ برمی‌دارد.
+
+\subsection{گذارها}
+برچسب یک گذار در \lr{PDA} شکل $a,b\to c$ دارد:
+\begin{automaton}[node distance=2.6cm]
+  \node[state] (q1) {$q_1$}; \node[state,right=of q1] (q2) {$q_2$};
+  \path (q1) edge node {$a,b\to c$} (q2);
+\end{automaton}
+یعنی: نماد $a$ را از ورودی بخوان، نماد $b$ را از بالای پشته بردار و نماد $c$ را روی پشته بگذار. هر کدام از $a$، $b$ و $c$ می‌تواند $\eps$ باشد:
+\begin{itemize}
+\item $a,b\to c$: \textbf{جایگزینی} بالای پشته؛ $b$ برداشته و $c$ گذاشته می‌شود.
+\item $a,\eps\to c$: \textbf{push}؛ چیزی برداشته نمی‌شود و $c$ گذاشته می‌شود.
+\item $a,b\to\eps$: \textbf{pop}؛ $b$ برداشته می‌شود و چیزی گذاشته نمی‌شود.
+\item $a,\eps\to\eps$: پشته \textbf{تغییری نمی‌کند}.
+\item $\eps,b\to c$: بدون خواندن ورودی فقط پشته عوض می‌شود.
+\end{itemize}
+اگر ماشین بخواهد $b$ را بردارد ولی بالای پشته $b$ نباشد (یا پشته خالی باشد)، آن گذار قابل اجرا نیست و آن شاخه از محاسبه می‌میرد.
+
+\begin{note}
+ماشین‌های پشته‌ای می‌توانند غیرقطعی باشند (از یک حالت با یک ورودی و یک نماد پشته چند انتخاب داشته باشند، یا گذار $\eps$ در کنار گذار با ورودی داشته باشند). برخلاف ماشین‌های متناهی، اینجا نامعینی قدرت را زیاد می‌کند: \lr{PDA}های قطعی از \lr{PDA}های غیرقطعی ضعیف‌ترند (فصل ۱۵). منظور ما از \lr{PDA} همیشه نوع غیرقطعی است.
+\end{note}
+
+\section{تعریف صوری}
+
+\begin{definition}[ماشین پشته‌ای]
+یک ماشین پشته‌ای شش‌تایی $(Q,\Sigma,\Gamma,\delta,q_0,F)$ است که $Q$، $\Sigma$، $\Gamma$ و $F$ مجموعه‌های متناهی‌اند و
+\begin{enumerate}
+\item $Q$ مجموعه حالت‌ها،
+\item $\Sigma$ الفبای ورودی،
+\item $\Gamma$ \textbf{الفبای پشته}،
+\item $\delta:Q\times\Sigma_\eps\times\Gamma_\eps\to\mathcal{P}(Q\times\Gamma_\eps)$ تابع گذار،
+\item $q_0\in Q$ حالت شروع، و
+\item $F\subseteq Q$ مجموعه حالت‌های پذیرش است.
+\end{enumerate}
+\end{definition}
+
+اگر $(r,c)\in\delta(q,a,b)$، یعنی در حالت $q$ با خواندن $a$ و برداشتن $b$ از پشته، ماشین می‌تواند به $r$ برود و $c$ را روی پشته بگذارد.
+
+\begin{definition}[محاسبه \lr{PDA}]
+ماشین پشته‌ای $M=(Q,\Sigma,\Gamma,\delta,q_0,F)$ رشته $w$ را \textbf{می‌پذیرد} اگر بتوان نوشت $w=w_1w_2\cdots w_m$ که $w_i\in\Sigma_\eps$، و دنباله‌ای از حالت‌ها $r_0,r_1,\dots,r_m\in Q$ و دنباله‌ای از محتواهای پشته $s_0,s_1,\dots,s_m\in\Gamma^*$ وجود داشته باشد که
+\begin{enumerate}
+\item $r_0=q_0$ و $s_0=\eps$ \hfill (شروع از حالت شروع با پشته خالی)
+\item برای $i=0,\dots,m-1$: \ $(r_{i+1},b)\in\delta(r_i,w_{i+1},a)$ که $s_i=at$ و $s_{i+1}=bt$ برای $a,b\in\Gamma_\eps$ و $t\in\Gamma^*$ \hfill (حرکت درست)
+\item $r_m\in F$ \hfill (پایان در حالت پذیرش)
+\end{enumerate}
+\end{definition}
+
+در شرط ۲، $a$ نمادی است که برداشته می‌شود، $b$ نمادی است که گذاشته می‌شود و $t$ بقیه پشته است که دست نمی‌خورد.
+
+\section{یک مثال}
+
+\begin{example}[ماشین پشته‌ای برای $\{0^n1^n\st n\ge0\}$]
+ایده:
+\begin{enumerate}
+\item هر $0$ که خوانده شد را روی پشته بگذار.
+\item با خواندن اولین $1$، به ازای هر $1$ یک $0$ از پشته بردار.
+\item اگر بعد از $1$ها دوباره $0$ آمد، رد کن.
+\item اگر ورودی تمام شد و پشته خالی بود، بپذیر؛ اگر پشته خالی نبود یا پشته زودتر از ورودی خالی شد، رد کن.
+\end{enumerate}
+\lr{PDA} در تعریف رسمی راهی برای فهمیدن خالی بودن پشته ندارد. ترفند رایج این است که در ابتدا یک نماد خاص $\$$ روی پشته بگذاریم؛ هر وقت دوباره $\$$ را دیدیم، یعنی پشته خالی است.
+\begin{automaton}[node distance=2.8cm]
+  \node[state,initial,accepting] (q1) {$q_1$};
+  \node[state,right=of q1] (q2) {$q_2$};
+  \node[state,below=1.6cm of q2] (q3) {$q_3$};
+  \node[state,accepting,below=1.6cm of q1] (q4) {$q_4$};
+  \path (q1) edge node {$\eps,\eps\to\$$} (q2)
+        (q2) edge[loop right] node {$0,\eps\to0$} (q2)
+        (q2) edge node {$1,0\to\eps$} (q3)
+        (q3) edge[loop right] node {$1,0\to\eps$} (q3)
+        (q3) edge node {$\eps,\$\to\eps$} (q4);
+\end{automaton}
+اجرای ماشین روی $000111$ (بالای پشته در سمت چپ نوشته شده):
+\begin{ltrfig}
+\begin{tabular}{lccccccccc}
+\toprule
+state & $q_1$ & $q_2$ & $q_2$ & $q_2$ & $q_2$ & $q_3$ & $q_3$ & $q_3$ & $q_4$\\
+read & -- & $\eps$ & $0$ & $0$ & $0$ & $1$ & $1$ & $1$ & $\eps$\\
+stack & $\eps$ & $\$$ & $0\$$ & $00\$$ & $000\$$ & $00\$$ & $0\$$ & $\$$ & $\eps$\\
+\bottomrule
+\end{tabular}
+\end{ltrfig}
+توصیف صوری: $Q=\{q_1,q_2,q_3,q_4\}$، $\Sigma=\{0,1\}$، $\Gamma=\{0,\$\}$، حالت شروع $q_1$ و $F=\{q_1,q_4\}$ ($q_1$ پذیرش است تا رشته تهی پذیرفته شود). تابع گذار (خانه‌های خالی یعنی $\emptyset$):
+\begin{ltrfig}
+\begin{tabular}{c|ccc|ccc|ccc}
+input: & \multicolumn{3}{c|}{$0$} & \multicolumn{3}{c|}{$1$} & \multicolumn{3}{c}{$\eps$}\\
+stack: & $0$ & $\$$ & $\eps$ & $0$ & $\$$ & $\eps$ & $0$ & $\$$ & $\eps$\\ \hline
+$q_1$ & & & & & & & & & $\{(q_2,\$)\}$\\
+$q_2$ & & & $\{(q_2,0)\}$ & $\{(q_3,\eps)\}$ & & & & & \\
+$q_3$ & & & & $\{(q_3,\eps)\}$ & & & & $\{(q_4,\eps)\}$ & \\
+$q_4$ & & & & & & & & &
+\end{tabular}
+\end{ltrfig}
+\end{example}
+
+\begin{example}[پالیندروم‌های زوج]
+برای $\{ww^R\st w\in\{0,1\}^*\}$ ماشین نمادها را روی پشته می‌گذارد و در جایی «حدس می‌زند» که به وسط رشته رسیده است. از آن به بعد هر نماد ورودی را با بالای پشته مقایسه می‌کند:
+\begin{automaton}[node distance=2.8cm]
+  \node[state,initial,accepting] (q1) {$q_1$};
+  \node[state,right=of q1] (q2) {$q_2$};
+  \node[state,right=of q2] (q3) {$q_3$};
+  \node[state,accepting,right=of q3] (q4) {$q_4$};
+  \path (q1) edge node {$\eps,\eps\to\$$} (q2)
+        (q2) edge[loop above] node[align=center] {$0,\eps\to0$\\$1,\eps\to1$} (q2)
+        (q2) edge node {$\eps,\eps\to\eps$} (q3)
+        (q3) edge[loop above] node[align=center] {$0,0\to\eps$\\$1,1\to\eps$} (q3)
+        (q3) edge node {$\eps,\$\to\eps$} (q4);
+\end{automaton}
+اگر حدس درست باشد (و رشته پالیندروم باشد) یک شاخه می‌پذیرد. هیچ ماشین \emph{قطعی}‌ای نمی‌تواند وسط رشته را تشخیص دهد.
+\end{example}
+
+\section{هم‌ارزی ماشین‌های پشته‌ای و گرامرهای مستقل از متن}
+
+\begin{theorem}\label{thm:pda-cfg}
+یک زبان مستقل از متن است اگر و تنها اگر یک ماشین پشته‌ای آن را تشخیص دهد.
+\end{theorem}
+
+این قضیه دو جهت دارد که هر کدام را در یک لم ثابت می‌کنیم.
+
+\subsection{از گرامر به ماشین پشته‌ای}
+
+\begin{lemma}\label{lem:cfg-pda}
+اگر یک زبان مستقل از متن باشد، یک ماشین پشته‌ای آن را تشخیص می‌دهد.
+\end{lemma}
+
+\begin{proofidea}
+گرامر $G$ برای زبان را داریم. ماشین $P$ را می‌سازیم که ورودی $w$ را می‌پذیرد اگر $G$ آن را تولید کند. $P$ با استفاده از نامعینی یک اشتقاق چپ‌ترین از $w$ را «حدس می‌زند» و آن را روی پشته شبیه‌سازی می‌کند. پشته \textbf{بقیه صورت جمله‌ای} را نگه می‌دارد: پایانه‌های ابتدای صورت جمله‌ای با ورودی مقایسه و برداشته می‌شوند و اولین متغیر روی پشته با سمت راست یکی از قاعده‌هایش جایگزین می‌شود.
+\end{proofidea}
+
+\textbf{نحوه کار $P$:}
+\begin{enumerate}
+\item نماد $\$$ و سپس متغیر شروع را روی پشته بگذار.
+\item این مراحل را تکرار کن:
+\begin{enumerate}
+\item اگر بالای پشته یک متغیر $A$ است، به‌طور غیرقطعی یکی از قاعده‌های $A$ را انتخاب کن و $A$ را با سمت راست آن قاعده جایگزین کن.
+\item اگر بالای پشته یک پایانه $a$ است، نماد بعدی ورودی را بخوان. اگر برابر $a$ بود آن را از پشته بردار و ادامه بده؛ وگرنه این شاخه رد می‌شود.
+\item اگر بالای پشته $\$$ است، به حالت پذیرش برو. اگر کل ورودی خوانده شده باشد، ورودی پذیرفته می‌شود.
+\end{enumerate}
+\end{enumerate}
+
+\textbf{یک نمادگذاری کوتاه:} گذاشتن یک \textbf{رشته} $u=u_1\cdots u_l$ روی پشته در یک گام را با $a,s\to u$ نشان می‌دهیم (طوری که $u_1$ بالای پشته قرار گیرد). این کار با حالت‌های میانی جدید $q_1,\dots,q_{l-1}$ قابل پیاده‌سازی است:
+\[(q_1,u_l)\in\delta(q,a,s),\quad\delta(q_1,\eps,\eps)=\{(q_2,u_{l-1})\},\quad\dots,\quad\delta(q_{l-1},\eps,\eps)=\{(r,u_1)\}.\]
+یعنی رشته را از آخر به اول، یکی‌یکی push می‌کنیم.
+\begin{automaton}[node distance=1.9cm]
+  \node[state] (q) {$q$}; \node[state,right=of q] (r) {$r$};
+  \path (q) edge node {$a,s\to xyz$} (r);
+  \node[right=0.6cm of r] (arr) {\Large$\Rightarrow$};
+  \node[state,right=0.6cm of arr] (p) {$q$};
+  \node[state,right=of p] (p1) {$q_1$};
+  \node[state,right=of p1] (p2) {$q_2$};
+  \node[state,right=of p2] (pr) {$r$};
+  \path (p) edge node {$a,s\to z$} (p1) (p1) edge node {$\eps,\eps\to y$} (p2) (p2) edge node {$\eps,\eps\to x$} (pr);
+\end{automaton}
+
+\begin{proof}
+فرض کنید $G=(V,\Sigma,R,S)$ گرامر زبان باشد. ماشین $P=(Q,\Sigma,\Gamma,\delta,\qstart,\{\qacc\})$ را می‌سازیم که $Q=\{\qstart,q_{\mathrm{loop}},\qacc\}\cup E$ ($E$ حالت‌های میانی نمادگذاری کوتاه)، $\Gamma=V\cup\Sigma\cup\{\$\}$ و
+\begin{align*}
+\delta(\qstart,\eps,\eps)&=\{(q_{\mathrm{loop}},S\$)\},\\
+\delta(q_{\mathrm{loop}},\eps,A)&=\{(q_{\mathrm{loop}},w)\st A\to w\ \text{\rl{یک قاعده در $R$ است}}\},\\
+\delta(q_{\mathrm{loop}},a,a)&=\{(q_{\mathrm{loop}},\eps)\}\quad\text{\rl{برای هر پایانه $a$}},\\
+\delta(q_{\mathrm{loop}},\eps,\$)&=\{(\qacc,\eps)\}.
+\end{align*}
+\begin{automaton}[node distance=2.6cm,every state/.style={draw=jzMain,fill=jzMain!7,thick,minimum size=11mm,inner sep=1pt,font=\small}]
+  \node[state,initial] (s) {$q_{\mathrm{start}}$};
+  \node[state,right=of s] (l) {$q_{\mathrm{loop}}$};
+  \node[state,accepting,right=of l] (a) {$q_{\mathrm{accept}}$};
+  \path (s) edge node {$\eps,\eps\to S\$$} (l)
+        (l) edge[loop above] node[align=left] {$\eps,A\to w$ for rule $A\to w$\\$a,a\to\eps$ for terminal $a$} (l)
+        (l) edge node {$\eps,\$\to\eps$} (a);
+\end{automaton}
+\textbf{درستی:} در هر لحظه، رشته‌ای که تا اینجا از ورودی خوانده شده و پس از آن محتوای پشته (بدون $\$$)، با هم یک صورت جمله‌ای از یک اشتقاق چپ‌ترین را تشکیل می‌دهند. گذار نوع دوم یک گام اشتقاق را روی چپ‌ترین متغیر (که بالای پشته است) انجام می‌دهد و گذار نوع سوم پایانه‌های ابتدایی را با ورودی تطبیق می‌دهد. پس $P$ وقتی به $\$$ می‌رسد و کل ورودی را خوانده، یک اشتقاق کامل $S\der w$ را دنبال کرده است. برعکس، برای هر اشتقاق چپ‌ترین $S\der w$، شاخه‌ای از $P$ که همان قاعده‌ها را به همان ترتیب انتخاب کند، $w$ را می‌پذیرد. پس $L(P)=L(G)$.
+\end{proof}
+
+\begin{corollary}
+هر زبان منظم مستقل از متن است.
+\end{corollary}
+\begin{proof}
+هر \lr{NFA} یک ماشین پشته‌ای است که از پشته‌اش استفاده نمی‌کند. پس هر زبان منظم را یک \lr{PDA} تشخیص می‌دهد و طبق قضیه \ref{thm:pda-cfg} مستقل از متن است.
+\end{proof}
+
+\subsection{از ماشین پشته‌ای به گرامر}
+
+\begin{lemma}\label{lem:pda-cfg}
+اگر یک ماشین پشته‌ای زبانی را تشخیص دهد، آن زبان مستقل از متن است.
+\end{lemma}
+
+برای ساده شدن اثبات، فرض می‌کنیم ماشین $P$ سه ویژگی دارد:
+\begin{enumerate}
+\item دقیقاً یک حالت پذیرش، $\qacc$، دارد.
+\item قبل از پذیرش، پشته‌اش را خالی می‌کند.
+\item هر گذار یا دقیقاً یک نماد push می‌کند یا دقیقاً یک نماد pop می‌کند، نه هر دو و نه هیچ‌کدام.
+\end{enumerate}
+این فرض‌ها محدودیتی ایجاد نمی‌کنند: برای ۱، از همه حالت‌های پذیرش با $\eps,\eps\to\eps$ به یک حالت پذیرش جدید می‌رویم. برای ۲، در ابتدا $\$$ را push می‌کنیم و قبل از رفتن به حالت پذیرش با چند گذار $\eps$ پشته را تا $\$$ خالی می‌کنیم. برای ۳، هر گذار $a,b\to c$ با $b,c\neq\eps$ را با دو گذار (اول pop و بعد push، با یک حالت میانی) و هر گذار $a,\eps\to\eps$ را با دو گذار (push یک نماد دلخواه و سپس pop همان) جایگزین می‌کنیم.
+
+\begin{proofidea}
+برای هر زوج حالت $p,q$ از $P$ یک متغیر $A_{pq}$ در گرامر می‌گذاریم. $A_{pq}$ همه رشته‌هایی را تولید می‌کند که می‌توانند $P$ را از حالت $p$ \textbf{با پشته خالی} به حالت $q$ \textbf{با پشته خالی} ببرند. (این رشته‌ها پشته را از $p$ تا $q$ دست‌نخورده باقی می‌گذارند؛ یعنی هر چه روی پشته باشد، در $q$ دوباره همان است.)
+
+فرض کنید $x$ چنین رشته‌ای باشد. طبق ویژگی ۳، اولین حرکت $P$ روی $x$ یک push است (پشته خالی است و چیزی برای pop نیست) و آخرین حرکت یک pop (چون پشته در پایان خالی است). دو حالت پیش می‌آید:
+\begin{itemize}
+\item \textbf{نمادی که در آخر pop می‌شود همان نمادی است که اول push شده.} پس پشته فقط در ابتدا و انتها خالی است. اگر نماد خوانده‌شده در حرکت اول $a$ و در حرکت آخر $b$ باشد، $r$ حالت بعد از حرکت اول و $s$ حالت قبل از حرکت آخر باشد، قاعده $A_{pq}\to aA_{rs}b$ را می‌گذاریم.
+\item \textbf{در غیر این صورت،} نماد اول قبل از پایان pop شده، پس پشته در نقطه‌ای میانی مثل حالت $r$ خالی می‌شود. قاعده $A_{pq}\to A_{pr}A_{rq}$ را می‌گذاریم.
+\end{itemize}
+\begin{ltrfig}
+\begin{tikzpicture}[font=\small,scale=0.9]
+  \draw[->] (0,0) -- (0,2.3) node[above] {stack height};
+  \draw[->] (0,0) -- (6.4,0) node[right] {input};
+  \draw[thick,jzMain] plot[smooth,tension=0.6] coordinates {(0.4,0) (0.9,0.8) (1.6,1.3) (2.3,1.9) (3.1,1.0) (3.8,1.6) (4.6,1.2) (5.3,0.8) (5.8,0)};
+  \fill (0.4,0) circle (1.5pt) node[below] {$p$}; \fill (0.9,0.8) circle (1.5pt) node[left] {$r$};
+  \fill (5.3,0.8) circle (1.5pt) node[right] {$s$}; \fill (5.8,0) circle (1.5pt) node[below] {$q$};
+  \node at (0.55,0.6) {$a$}; \node at (5.75,0.55) {$b$};
+  \draw[decorate,decoration={brace,mirror,amplitude=4pt}] (0.9,-0.45) -- (5.3,-0.45) node[midway,below=4pt] {$A_{rs}$};
+  \begin{scope}[xshift=7.6cm]
+  \draw[->] (0,0) -- (0,2.3) node[above] {stack height};
+  \draw[->] (0,0) -- (6.4,0) node[right] {input};
+  \draw[thick,jzMain] plot[smooth,tension=0.6] coordinates {(0.4,0) (1.0,1.2) (1.8,1.7) (2.6,0.9) (3.1,0) (3.8,1.3) (4.6,1.8) (5.3,0.9) (5.8,0)};
+  \fill (0.4,0) circle (1.5pt) node[below] {$p$}; \fill (3.1,0) circle (1.5pt) node[below] {$r$}; \fill (5.8,0) circle (1.5pt) node[below] {$q$};
+  \draw[decorate,decoration={brace,mirror,amplitude=4pt}] (0.4,-0.5) -- (3.1,-0.5) node[midway,below=4pt] {$A_{pr}$};
+  \draw[decorate,decoration={brace,mirror,amplitude=4pt}] (3.1,-0.5) -- (5.8,-0.5) node[midway,below=4pt] {$A_{rq}$};
+  \end{scope}
+\end{tikzpicture}
+\end{ltrfig}
+\end{proofidea}
+
+\begin{proof}
+فرض کنید $P=(Q,\Sigma,\Gamma,\delta,q_0,\{\qacc\})$ سه ویژگی بالا را داشته باشد. گرامر $G$ متغیرهای $\{A_{pq}\st p,q\in Q\}$ و متغیر شروع $A_{q_0,\qacc}$ دارد. قاعده‌های $G$:
+\begin{enumerate}
+\item برای هر $p,q,r,s\in Q$، $u\in\Gamma$ و $a,b\in\Sigma_\eps$: اگر $\delta(p,a,\eps)$ شامل $(r,u)$ باشد و $\delta(s,b,u)$ شامل $(q,\eps)$، قاعده $A_{pq}\to aA_{rs}b$ را بگذار.
+\item برای هر $p,q,r\in Q$، قاعده $A_{pq}\to A_{pr}A_{rq}$ را بگذار.
+\item برای هر $p\in Q$، قاعده $A_{pp}\to\eps$ را بگذار.
+\end{enumerate}
+درستی ساخت از دو ادعای زیر نتیجه می‌شود: $A_{pq}$ رشته $x$ را تولید می‌کند اگر و تنها اگر $x$ بتواند $P$ را از $p$ با پشته خالی به $q$ با پشته خالی ببرد. با $p=q_0$ و $q=\qacc$ داریم $L(G)=L(P)$ (طبق ویژگی ۲، پذیرش یعنی رسیدن به $\qacc$ با پشته خالی).
+
+\textbf{ادعای ۱.} اگر $A_{pq}\der x$، آنگاه $x$ می‌تواند $P$ را از $p$ با پشته خالی به $q$ با پشته خالی ببرد.
+
+با استقرا روی تعداد گام‌های اشتقاق.
+\emph{پایه} (یک گام): تنها قاعده‌هایی که سمت راستشان متغیر ندارد $A_{pp}\to\eps$ هستند، و رشته $\eps$ ماشین را از $p$ با پشته خالی به خود $p$ با پشته خالی می‌برد.
+\emph{گام:} فرض کنید ادعا برای اشتقاق‌های حداکثر $k$ گامی درست باشد و $A_{pq}\der x$ در $k+1$ گام. گام اول یا $A_{pq}\Rightarrow aA_{rs}b$ است یا $A_{pq}\Rightarrow A_{pr}A_{rq}$.
+\begin{itemize}
+\item اگر $A_{pq}\Rightarrow aA_{rs}b$، بنویسید $x=ayb$ که $A_{rs}\der y$ در $k$ گام. طبق فرض استقرا $y$ ماشین را از $r$ با پشته خالی به $s$ با پشته خالی می‌برد. طبق ساخت، $\delta(p,a,\eps)$ شامل $(r,u)$ و $\delta(s,b,u)$ شامل $(q,\eps)$ است. پس با خواندن $a$، ماشین از $p$ به $r$ می‌رود و $u$ را push می‌کند؛ سپس $y$ را می‌خواند و به $s$ می‌رسد در حالی که $u$ زیر پشته دست‌نخورده مانده؛ سپس با خواندن $b$ و pop کردن $u$ به $q$ با پشته خالی می‌رسد.
+\item اگر $A_{pq}\Rightarrow A_{pr}A_{rq}$، بنویسید $x=yz$ که $A_{pr}\der y$ و $A_{rq}\der z$، هر کدام حداکثر در $k$ گام. طبق فرض استقرا $y$ ماشین را از $p$ به $r$ و $z$ آن را از $r$ به $q$ می‌برد، هر دو با پشته خالی در ابتدا و انتها. پس $x$ ماشین را از $p$ به $q$ با پشته خالی می‌برد.
+\end{itemize}
+
+\textbf{ادعای ۲.} اگر $x$ بتواند $P$ را از $p$ با پشته خالی به $q$ با پشته خالی ببرد، آنگاه $A_{pq}\der x$.
+
+با استقرا روی تعداد گام‌های محاسبه.
+\emph{پایه} (صفر گام): بدون هیچ حرکتی ماشین در $p$ می‌ماند و چیزی نمی‌خواند، پس $q=p$ و $x=\eps$. قاعده $A_{pp}\to\eps$ در $G$ هست.
+\emph{گام:} فرض کنید ادعا برای محاسبه‌های حداکثر $k$ گامی درست باشد و محاسبه‌ای $k+1$ گامی روی $x$ از $p$ به $q$ با پشته خالی داریم. یا (۱) پشته فقط در ابتدا و انتهای محاسبه خالی است، یا (۲) در جای دیگری هم خالی می‌شود.
+\begin{itemize}
+\item \emph{حالت ۱:} نماد $u$ که در حرکت اول push شده، همان نمادی است که در حرکت آخر pop می‌شود. فرض کنید $a$ و $b$ نمادهای خوانده‌شده در حرکت اول و آخر، $r$ حالت بعد از حرکت اول و $s$ حالت قبل از حرکت آخر باشند. پس $\delta(p,a,\eps)$ شامل $(r,u)$ و $\delta(s,b,u)$ شامل $(q,\eps)$ است و قاعده $A_{pq}\to aA_{rs}b$ در $G$ هست. بنویسید $x=ayb$. بخش میانی محاسبه، $y$ را از $r$ تا $s$ می‌خواند و در طول آن $u$ ته پشته دست‌نخورده می‌ماند؛ پس $y$ ماشین را از $r$ با پشته خالی به $s$ با پشته خالی هم می‌برد، آن هم در $k-1$ گام. طبق فرض استقرا $A_{rs}\der y$، پس $A_{pq}\der x$.
+\item \emph{حالت ۲:} فرض کنید $r$ حالتی باشد که پشته در آن (در میانه محاسبه) خالی می‌شود و $x=yz$ که $y$ قبل و $z$ بعد از آن خوانده شده‌اند. هر دو بخش حداکثر $k$ گام دارند و با پشته خالی شروع و تمام می‌شوند. طبق فرض استقرا $A_{pr}\der y$ و $A_{rq}\der z$. چون قاعده $A_{pq}\to A_{pr}A_{rq}$ در $G$ هست، $A_{pq}\der x$.\qedhere
+\end{itemize}
+\end{proof}
+
+با دو لم \ref{lem:cfg-pda} و \ref{lem:pda-cfg} اثبات قضیه \ref{thm:pda-cfg} کامل است.
+
+\begin{summary}
+\begin{itemize}
+\item \lr{PDA} = \lr{NFA} + پشته. گذار $a,b\to c$: بخوان $a$، pop کن $b$، push کن $c$ (هر کدام می‌تواند $\eps$ باشد).
+\item تابع گذار: $\delta:Q\times\Sigma_\eps\times\Gamma_\eps\to\mathcal{P}(Q\times\Gamma_\eps)$. ترفند $\$$ برای تشخیص پشته خالی.
+\item گرامر به \lr{PDA}: پشته بقیه صورت جمله‌ای چپ‌ترین را نگه می‌دارد.
+\item \lr{PDA} به گرامر: متغیر $A_{pq}$ رشته‌هایی را تولید می‌کند که ماشین را با پشته خالی از $p$ به $q$ می‌برند؛ قاعده‌های $aA_{rs}b$، $A_{pr}A_{rq}$ و $A_{pp}\to\eps$.
+\item زبان مستقل از متن $\iff$ قابل تشخیص با \lr{PDA}. هر زبان منظم مستقل از متن است.
+\end{itemize}
+\end{summary}

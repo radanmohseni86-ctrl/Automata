@@ -1,0 +1,84 @@
+\documentclass[11pt,oneside,openany]{book}
+\usepackage{jozve}
+
+\begin{document}
+
+\pagestyle{empty}
+\begin{titlepage}
+\begin{tikzpicture}[remember picture,overlay]
+  \fill[jzMain] (current page.north west) rectangle ([yshift=-11.5cm]current page.north east);
+  \fill[jzAccent] ([yshift=-11.5cm]current page.north west) rectangle ([yshift=-11.8cm]current page.north east);
+  \begin{scope}[shift={([xshift=-2.6cm,yshift=-15.2cm]current page.north)},jzaut,node distance=1.9cm,
+      every state/.style={draw=jzMain!60,fill=jzMain!5,thick,minimum size=9mm}]
+    \node[state,initial] (a) {$q_0$};
+    \node[state,right=of a] (b) {$q_1$};
+    \node[state,accepting,right=of b] (c) {$q_2$};
+    \path (a) edge[loop above] node {$0$} (a)
+          (a) edge node {$1$} (b)
+          (b) edge[bend left] node {$0$} (c)
+          (c) edge[bend left] node {$0,1$} (b)
+          (b) edge[loop above] node {$1$} (b);
+  \end{scope}
+  \node[anchor=north] at ([yshift=-3.0cm]current page.north)
+    {\rl{\color{white}\jzheavy\fontsize{40}{60}\selectfont جزوه اتوماتا}};
+  \node[anchor=north] at ([yshift=-6.0cm]current page.north)
+    {\rl{\color{white}\jzsemi\fontsize{20}{32}\selectfont نظریه زبان‌ها و ماشین‌ها}};
+  \node[anchor=north] at ([yshift=-8.1cm]current page.north)
+    {\color{white!80!jzMain}\large Theory of Formal Languages and Automata};
+  \node[anchor=north] at ([yshift=-19.6cm]current page.north)
+    {\rl{\color{jzMain}\large بر اساس اسلایدهای درس دکتر مهدی دولتی}};
+  \node[anchor=north] at ([yshift=-20.5cm]current page.north)
+    {\rl{\color{jzMain}\normalsize دانشکده مهندسی کامپیوتر، دانشگاه صنعتی شریف}};
+  \node[anchor=south] at ([yshift=3.0cm]current page.south)
+    {\rl{\color{jzMain!70}\small از زبان‌های منظم تا ماشین تورینگ، تصمیم‌ناپذیری و \lr{NP}-تمامیت}};
+  \node[anchor=south] at ([yshift=2.4cm]current page.south)
+    {\rl{\color{jzMain!70}\small همراه با اثبات کامل قضیه‌ها به زبان ساده}};
+\end{tikzpicture}
+\end{titlepage}
+
+\frontmatter
+\pagestyle{plain}
+\input{chapters/00-preface}
+\tableofcontents
+
+\mainmatter
+\pagestyle{fancy}
+
+\part{پیش‌نیازهای ریاضی}
+\input{chapters/01-background}
+\input{chapters/02-languages-proofs}
+
+\part{زبان‌های منظم}
+\input{chapters/03-dfa}
+\input{chapters/04-nfa}
+\input{chapters/05-closure}
+\input{chapters/06-regex}
+\input{chapters/07-regular-grammars}
+\input{chapters/08-pumping}
+
+\part{زبان‌های مستقل از متن}
+\input{chapters/09-cfg}
+\input{chapters/10-normal-forms}
+\input{chapters/11-parsing}
+\input{chapters/12-pda}
+\input{chapters/13-cfl-closure}
+\input{chapters/14-cfl-pumping}
+\input{chapters/15-dcfl}
+
+\part{محاسبه‌پذیری}
+\input{chapters/16-tm}
+\input{chapters/17-tm-variants}
+\input{chapters/18-decidability}
+\input{chapters/19-undecidability}
+\input{chapters/20-reducibility}
+\input{chapters/21-pcp-mapping}
+
+\part{پیچیدگی محاسبه}
+\input{chapters/22-time-p}
+\input{chapters/23-np}
+\input{chapters/24-npc}
+
+\backmatter
+\input{chapters/99-glossary}
+
+\end{document}

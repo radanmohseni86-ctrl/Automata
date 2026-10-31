@@ -1,0 +1,181 @@
+\chapter{ماشین‌های پشته‌ای قطعی و گرامرهای \lr{LL}}
+
+در این فصل اول دو ویژگی تصمیم‌پذیر گرامرهای مستقل از متن را می‌بینیم و بعد به ماشین‌های پشته‌ای \textbf{قطعی} می‌پردازیم. نشان می‌دهیم که برخلاف ماشین‌های متناهی، اینجا نامعینی واقعاً قدرت اضافه می‌کند. در پایان گرامرهای \lr{LL} را معرفی می‌کنیم که پایه تجزیه‌گرهای سریع در کامپایلرها هستند.
+
+\section{چند ویژگی تصمیم‌پذیر}
+
+\begin{theorem}\label{thm:cfg-empty-linz}
+برای گرامر مستقل از متن $G=(V,T,S,P)$ الگوریتمی وجود دارد که تعیین می‌کند $L(G)$ تهی است یا نه.
+\end{theorem}
+\begin{proof}
+برای سادگی فرض کنید $\eps\notin L(G)$ (در غیر این صورت زبان تهی نیست و تغییر کوچکی در استدلال لازم است). الگوریتم حذف متغیرهای بی‌فایده (فصل ۱۰) را اجرا کنید. اگر $S$ بی‌فایده تشخیص داده شد، $L(G)$ تهی است؛ وگرنه $L(G)$ دست‌کم یک عضو دارد. در واقع کافی است مرحله اول آن الگوریتم را اجرا کنیم: $L(G)\neq\emptyset$ اگر و تنها اگر $S$ یک رشته پایانه‌ای تولید کند.
+\end{proof}
+
+مسئله عضویت ($w\in L(G)$؟) هم با الگوریتم \lr{CYK} (فصل ۱۱) تصمیم‌پذیر است. اما همه سؤال‌ها درباره گرامرها جواب الگوریتمی ندارند:
+
+\begin{note}
+هیچ الگوریتمی وجود ندارد که تعیین کند \textbf{دو گرامر مستقل از متن یک زبان را تولید می‌کنند یا نه}. این را در فصل ۲۰ ثابت می‌کنیم.
+\end{note}
+
+\section{ماشین پشته‌ای قطعی}
+
+اسلایدهای این بخش از کتاب لینز هستند که ماشین پشته‌ای را کمی متفاوت از سیپسر تعریف می‌کند. در تعریف لینز ماشین $M=(Q,\Sigma,\Gamma,\delta,q_0,z,F)$ یک \textbf{نماد شروع پشته} $z$ دارد (در ابتدا پشته فقط $z$ را دارد)، در هر حرکت \textbf{همیشه} نماد بالای پشته را برمی‌دارد و می‌تواند یک \textbf{رشته} را جای آن بگذارد:
+\[\delta:Q\times(\Sigma\cup\{\lambda\})\times\Gamma\to\text{\rl{زیرمجموعه‌های متناهی}}\ Q\times\Gamma^*.\]
+(لینز رشته تهی را با $\lambda$ نشان می‌دهد.) اگر $(q',u)\in\delta(q,a,b)$، ماشین در حالت $q$ با خواندن $a$ و دیدن $b$ بالای پشته، $b$ را برمی‌دارد، رشته $u$ را جای آن می‌گذارد (اولین نماد $u$ بالای پشته) و به $q'$ می‌رود. این دو تعریف هم‌ارزند.
+
+\begin{definition}[ماشین پشته‌ای قطعی (\lr{DPDA})]
+ماشین پشته‌ای $M=(Q,\Sigma,\Gamma,\delta,q_0,z,F)$ \textbf{قطعی} است اگر برای هر $q\in Q$، $a\in\Sigma\cup\{\lambda\}$ و $b\in\Gamma$:
+\begin{enumerate}
+\item $\delta(q,a,b)$ حداکثر یک عضو داشته باشد، و
+\item اگر $\delta(q,\lambda,b)$ ناتهی باشد، $\delta(q,c,b)$ برای هر $c\in\Sigma$ تهی باشد.
+\end{enumerate}
+\end{definition}
+
+شرط اول می‌گوید با یک ورودی و یک نماد پشته حداکثر یک انتخاب داریم. شرط دوم می‌گوید اگر حرکت $\lambda$ ممکن است، حرکت با خواندن ورودی ممکن نیست. پس در هر پیکربندی حداکثر یک حرکت ممکن است. (برخلاف \lr{DFA}، ممکن است در پیکربندی‌ای هیچ حرکتی نباشد.)
+
+\begin{definition}[زبان مستقل از متن قطعی]
+زبان $L$ \textbf{مستقل از متن قطعی} (\lr{DCFL}) است اگر و تنها اگر یک \lr{DPDA} مثل $M$ وجود داشته باشد که $L=L(M)$.
+\end{definition}
+
+\begin{example}
+زبان $L=\{a^nb^n\st n\ge0\}$ مستقل از متن قطعی است. ماشین
+\[M=(\{q_0,q_1,q_2\},\{a,b\},\{0,1\},\delta,q_0,0,\{q_0\})\]
+با
+\[\begin{array}{ll}
+\delta(q_0,a,0)=\{(q_1,10)\}, & \delta(q_1,a,1)=\{(q_1,11)\},\\
+\delta(q_1,b,1)=\{(q_2,\lambda)\}, & \delta(q_2,b,1)=\{(q_2,\lambda)\},\\
+\delta(q_2,\lambda,0)=\{(q_0,\lambda)\} &
+\end{array}\]
+این زبان را می‌پذیرد. نماد $0$ همان نماد شروع پشته است و نقش علامت ته پشته را دارد. هر $a$ یک $1$ اضافه می‌کند و هر $b$ یک $1$ برمی‌دارد. وقتی دوباره به $0$ برسیم، به حالت پذیرش $q_0$ می‌رویم. این ماشین هر دو شرط تعریف را دارد، پس قطعی است.
+\end{example}
+
+\section{نامعینی در ماشین‌های پشته‌ای قدرت اضافه می‌کند}
+
+\begin{theorem}
+زبان‌های مستقل از متنی وجود دارند که قطعی نیستند. مثلاً
+\[L=L_1\cup L_2,\qquad L_1=\{a^nb^n\st n\ge0\},\quad L_2=\{a^nb^{2n}\st n\ge0\}\]
+مستقل از متن است، اما مستقل از متن قطعی نیست.
+\end{theorem}
+
+مستقل از متن بودن $L$ روشن است: اجتماع دو زبان مستقل از متن است. شهود اینکه چرا قطعی نیست: در ابتدای خواندن رشته هیچ اطلاعاتی نداریم که بفهمیم رشته از $L_1$ است یا از $L_2$. پس ماشین قطعی نمی‌داند بعد از دیدن $n$ تا $b$ باید بپذیرد و تمام کند یا ادامه دهد.
+
+\begin{proofidea}
+فرض کنید یک \lr{DPDA} مثل $M$ برای $L$ وجود داشته باشد. نشان می‌دهیم آنگاه زبان
+\[\widehat L=L\cup\{a^nb^nc^n\st n\ge1\}\]
+مستقل از متن است، که ممکن نیست. ایده: چون $M$ قطعی است، روی ورودی $a^nb^{2n}$ بعد از خواندن $a^nb^n$ دقیقاً در همان پیکربندی‌ای است که روی ورودی $a^nb^n$ (که در آن می‌پذیرد) می‌رسید. یک کپی از $M$ می‌سازیم که در آن هر $b$ به $c$ تبدیل شده است. ماشین جدید $\widehat M$ وقتی $M$ به حالت پذیرش رسید، می‌تواند به کپی برود و $c^n$ را به جای $b^n$ دوم بخواند.
+\begin{ltrfig}
+\begin{tikzpicture}[jzaut,node distance=1.5cm,every state/.style={draw=jzMain,fill=jzMain!7,minimum size=6mm,inner sep=0pt}]
+  \draw[rounded corners,jzMain!70] (-0.6,-0.6) rectangle (5.6,0.6); \node[anchor=west,font=\small] at (5.7,0) {control unit of $M$};
+  \node[state,initial] (s) at (0,0) {}; \node[state,accepting] (qi) at (2.6,0) {}; \node[state,accepting] (qj) at (4.8,0) {};
+  \draw[decorate,decoration={snake,amplitude=1pt,segment length=5pt}] (s) -- node[below,font=\scriptsize] {$a^nb^n$} (qi);
+  \draw[decorate,decoration={snake,amplitude=1pt,segment length=5pt}] (qi) -- node[below,font=\scriptsize] {$b^n$} (qj);
+  \draw[rounded corners,jzMain!70] (-0.6,1.4) rectangle (5.6,2.6); \node[anchor=west,font=\small] at (5.7,2) {addition (copy, $b\mapsto c$)};
+  \node[state] (c0) at (0,2) {}; \node[state,accepting] (ci) at (2.6,2) {}; \node[state,accepting] (cj) at (4.8,2) {};
+  \draw[decorate,decoration={snake,amplitude=1pt,segment length=5pt}] (ci) -- node[above,font=\scriptsize] {$c^n$} (cj);
+  \draw (qi) -- node[right,font=\scriptsize] {$\lambda$} (ci); \draw (qj) -- node[right,font=\scriptsize] {$\lambda$} (cj);
+\end{tikzpicture}
+\end{ltrfig}
+\end{proofidea}
+
+\begin{proof}
+فرض کنید \lr{DPDA} $M=(Q,\Sigma,\Gamma,\delta,q_0,z,F)$ با $Q=\{q_0,q_1,\dots,q_n\}$ زبان $L$ را بپذیرد. ماشین $\widehat M=(\widehat Q,\Sigma\cup\{c\},\Gamma,\delta\cup\widehat\delta,q_0,z,\widehat F)$ را می‌سازیم:
+\[\widehat Q=Q\cup\{\widehat q_0,\widehat q_1,\dots,\widehat q_n\},\qquad \widehat F=F\cup\{\widehat q_i\st q_i\in F\},\]
+\begin{itemize}
+\item برای هر $q_f\in F$ و $s\in\Gamma$: \quad $\widehat\delta(q_f,\lambda,s)=\{(\widehat q_f,s)\}$ \ (پرش به کپی بدون تغییر پشته)؛
+\item برای هر $\delta(q_i,b,s)=\{(q_j,u)\}$: \quad $\widehat\delta(\widehat q_i,c,s)=\{(\widehat q_j,u)\}$ \ (کپی گذارهای $b$ با $c$)؛
+\item برای هر $\delta(q_i,\lambda,s)=\{(q_j,u)\}$: \quad $\widehat\delta(\widehat q_i,\lambda,s)=\{(\widehat q_j,u)\}$.
+\end{itemize}
+($\widehat M$ لازم نیست قطعی باشد؛ فقط یک ماشین پشته‌ای است.) نماد $\vdash^*$ یعنی «با صفر یا چند حرکت به این پیکربندی می‌رسد» و پیکربندی را با سه‌تایی (حالت، بقیه ورودی، محتوای پشته) نشان می‌دهیم.
+
+\textbf{$\widehat M$ رشته‌های $a^nb^nc^n$ (و همه رشته‌های $L$) را می‌پذیرد.} هر رشته $L$ را $\widehat M$ مثل $M$ می‌پذیرد. حالا چون $a^nb^n\in L$:
+\[(q_0,a^nb^n,z)\vdash^*_M(q_i,\lambda,u),\qquad q_i\in F.\]
+چون $M$ قطعی است، روی $a^nb^{2n}$ هم دقیقاً همین حرکت‌ها را انجام می‌دهد: $(q_0,a^nb^{2n},z)\vdash^*_M(q_i,b^n,u)$. و چون $a^nb^{2n}\in L$، ادامه محاسبه به پذیرش می‌رسد:
+\[(q_i,b^n,u)\vdash^*_M(q_j,\lambda,u_1),\qquad q_j\in F.\]
+طبق ساخت، کپی همین حرکت‌ها را با $c$ به جای $b$ انجام می‌دهد: $(\widehat q_i,c^n,u)\vdash^*_{\widehat M}(\widehat q_j,\lambda,u_1)$. پس
+\[(q_0,a^nb^nc^n,z)\vdash^*_{\widehat M}(q_i,c^n,u)\vdash_{\widehat M}(\widehat q_i,c^n,u)\vdash^*_{\widehat M}(\widehat q_j,\lambda,u_1),\]
+و چون $\widehat q_j\in\widehat F$، رشته $a^nb^nc^n$ پذیرفته می‌شود.
+
+\textbf{$\widehat M$ رشته دیگری را نمی‌پذیرد.} (این بخش در اسلایدها به عنوان تمرین آمده بود.) فرض کنید $\widehat M$ رشته $w$ را بپذیرد. اگر محاسبه پذیرنده هرگز به کپی نرود، $w$ را $M$ پذیرفته و $w\in L$. در غیر این صورت، تنها راه رفتن به کپی، حرکت $\lambda$ از یک $q_i\in F$ است. پس $w=xv$ که $(q_0,x,z)\vdash^*_M(q_i,\lambda,u)$ با $q_i\in F$؛ یعنی $M$ رشته $x$ را می‌پذیرد و $x\in L$. در کپی فقط گذارهای $c$ و $\lambda$ وجود دارد، پس $v=c^m$ و کپی، $M$ را روی $b^m$ از پیکربندی $(q_i,b^m,u)$ تا یک حالت پذیرش شبیه‌سازی می‌کند. چون $M$ قطعی است، این یعنی $M$ رشته $xb^m$ را هم می‌پذیرد؛ پس $xb^m\in L$.
+
+حالا اگر $m=0$، $w=x\in L$. اگر $m\ge1$: $x\in L$ پس $x=a^nb^n$ یا $x=a^nb^{2n}$.
+\begin{itemize}
+\item اگر $x=a^nb^{2n}$، آنگاه $xb^m=a^nb^{2n+m}$ که در $L$ نیست (برای $n\ge1$ چون $2n+m\notin\{n,2n\}$، و برای $n=0$ چون $b^m\notin L$). پس این حالت ممکن نیست.
+\item اگر $x=a^nb^n$، آنگاه $a^nb^{n+m}\in L$ ایجاب می‌کند $n+m=2n$، یعنی $m=n\ge1$. پس $w=a^nb^nc^n$.
+\end{itemize}
+در نتیجه $L(\widehat M)=\widehat L=L\cup\{a^nb^nc^n\st n\ge1\}$.
+
+\textbf{تناقض.} $\widehat L$ زبان یک ماشین پشته‌ای است، پس مستقل از متن است. طبق قضیه \ref{thm:cfl-cap-reg} اشتراک آن با زبان منظم $a^*b^*c^+$ هم مستقل از متن است. اما
+\[\widehat L\cap a^*b^*c^+=\{a^nb^nc^n\st n\ge1\}\]
+که طبق مثال \ref{ex:anbncn} (با همان استدلال) مستقل از متن نیست. پس فرض وجود $M$ غلط است و $L$ مستقل از متن قطعی نیست.
+\end{proof}
+
+\section{گرامرهای زبان‌های مستقل از متن قطعی}
+
+زبان‌های مستقل از متن قطعی را می‌توان \textbf{سریع} تجزیه کرد: گذارهای یک \lr{DPDA} را می‌توان بدون عقب‌گرد و بدون موازی‌کاری دنبال کرد (فقط باید حواسمان به گذارهای $\lambda$ باشد). برای کامپایلرها به \textbf{گرامرهای قطعی} نیاز داریم.
+
+فرض کنید در حال \textbf{تجزیه بالا به پایین} هستیم، یعنی دنبال اشتقاق چپ‌ترین یک جمله. ورودی $w$ را از چپ به راست می‌خوانیم و یک صورت جمله‌ای می‌سازیم که پیشوند پایانه‌ای آن با بخش خوانده‌شده $w$ یکی است:
+\begin{ltrfig}
+\begin{tikzpicture}[font=\small]
+  \node at (0,0.6) {$a_1\ \ a_2\ \ a_3$}; \node at (2.4,0.6) {$a_4\cdots a_n$}; \node[anchor=west] at (3.6,0.6) {input $w$};
+  \node at (0,0) {$a_1\ \ a_2\ \ a_3$}; \node at (2.4,0) {$A\ \cdots$}; \node[anchor=west] at (3.6,0) {sentential form};
+  \draw[jzAccent,thick] (1.3,1.0) -- (1.3,-0.4);
+  \draw[<->,jzMain] (0.3,-0.55) -- (2.3,-0.55);
+  \node at (0,-0.9) {matched part}; \node at (2.6,-0.9) {yet to be matched};
+\end{tikzpicture}
+\end{ltrfig}
+سؤال اصلی: برای جایگزینی متغیر $A$ از کدام قاعده استفاده کنیم؟ در \textbf{گرامرهای ساده} (فصل ۱۱) در هر گام فقط یک قاعده ممکن است (قاعده‌ای که با نماد فعلی ورودی شروع می‌شود)، اما این گرامرها برای کاربردهای واقعی بیش از حد محدودند.
+
+\begin{definition}[گرامر \lr{LL}]
+در یک گرامر \lr{LL}، ورودی از چپ به راست خوانده می‌شود (\lr{L} اول) و اشتقاق چپ‌ترین ساخته می‌شود (\lr{L} دوم). در هر گام می‌توان با دیدن نماد فعلی ورودی و تعداد متناهی نماد بعدی، قاعده درست را به‌طور یکتا پیش‌بینی کرد. در یک گرامر \lr{LL($k$)} قاعده درست با دیدن نماد فعلی و $k-1$ نماد بعدی (\textbf{پیش‌بینی} یا \lr{lookahead}) به‌طور یکتا مشخص می‌شود.
+\end{definition}
+
+هر گرامر ساده یک گرامر \lr{LL} است.
+
+\begin{example}
+گرامر $S\to aSb\mid ab$ ساده نیست (زوج $(S,a)$ در دو قاعده آمده)، اما \lr{LL} است: برای انتخاب قاعده به دو نماد متوالی ورودی نگاه می‌کنیم. اگر اولی $a$ و دومی $b$ بود، قاعده $S\to ab$ و در غیر این صورت $S\to aSb$ را به کار می‌بریم.
+\end{example}
+
+\begin{example}
+گرامر پرانتزهای متوازن
+\[S\to SS\mid aSb\mid ab\]
+برای \textbf{هیچ} $k$ یک گرامر \lr{LL($k$)} نیست. با دیدن هر تعداد متناهی نماد نمی‌توان فهمید کدام قاعده را به کار ببریم. مثلاً دو رشته زیر را در نظر بگیرید ($a$ را «$($» و $b$ را «$)$» بخوانید):
+\begin{ltrfig}
+$\underbrace{((((((\cdots(}_{>k}\ (())\ \cdots))))))$\qquad\qquad$\underbrace{((((((\cdots(}_{>k}\ \cdots))))))\ ()$
+\end{ltrfig}
+هر دو با بیش از $k$ پرانتز باز شروع می‌شوند، اما برای اولی در گام اول باید $S\to aSb$ و برای دومی $S\to SS$ را به کار برد. با این حال همین زبان یک گرامر \lr{LL} هم‌ارز دارد:
+\[S_0\to aSbS,\qquad S\to aSbS\mid\lambda.\]
+در این گرامر $S$ با دیدن $a$ قاعده اول و در غیر این صورت $\lambda$ را انتخاب می‌کند.
+\end{example}
+
+\section{تصویر کلی}
+
+رابطه دسته‌های زبانی که تا اینجا دیدیم:
+\begin{ltrfig}
+\begin{tikzpicture}[font=\small]
+  \draw[thick,fill=jzMain!5,draw=jzMain] (0,0) ellipse (2.6 and 2.6); \node at (0,2.2) {CF};
+  \draw[thick,fill=jzMain!10,draw=jzMain] (0,-0.35) ellipse (2.2 and 2.15); \node[align=center] at (0,1.25) {Deterministic CF};
+  \draw[thick,fill=jzMain!16,draw=jzMain] (0,-0.75) ellipse (1.75 and 1.6); \node at (0,0.4) {LL(1)};
+  \draw[thick,fill=jzAccent!15,draw=jzAccent] (0,-1.15) ellipse (1.2 and 0.9); \node at (0,-1.15) {Regular};
+  \begin{scope}[xshift=8.2cm,yshift=0.2cm,every node/.style={font=\scriptsize}]
+  \draw[thick,draw=jzMain] (0,0) ellipse (3.2 and 3.0); \node at (0,2.7) {All languages ($\mathcal{P}(\Sigma^*)$)};
+  \draw[thick,draw=jzMain] (0,-0.3) ellipse (2.85 and 2.65); \node at (0,2.05) {Recursively enumerable};
+  \draw[thick,draw=jzMain] (0,-0.55) ellipse (2.5 and 2.35); \node at (0,1.5) {Context-sensitive};
+  \draw[thick,draw=jzMain] (0,-0.8) ellipse (2.15 and 2.05); \node at (0,0.95) {Context-free};
+  \draw[thick,draw=jzMain!60] (-0.95,0.2) ellipse (1.05 and 0.38); \node[align=center] at (-0.95,0.2) {inherently\\ambiguous};
+  \draw[thick,draw=jzMain!60] (0.95,0.2) ellipse (1.0 and 0.38); \node[align=center] at (0.95,0.2) {unambiguous};
+  \draw[thick,draw=jzMain] (0,-1.45) ellipse (1.55 and 1.25); \node at (0,-0.55) {Deterministic CF};
+  \draw[thick,draw=jzAccent] (0,-1.85) ellipse (1.05 and 0.75); \node at (0,-1.45) {Regular};
+  \draw[thick,draw=jzAccent!70] (0,-2.15) ellipse (0.6 and 0.32); \node at (0,-2.15) {Finite};
+  \end{scope}
+\end{tikzpicture}
+\end{ltrfig}
+(در شکل راست، زبان‌های \textbf{حساس به متن} دسته‌ای بین مستقل از متن و بازگشتی شمارش‌پذیر هستند که در این درس به آن‌ها نمی‌پردازیم؛ زبان‌های بازگشتی شمارش‌پذیر را در بخش بعد می‌بینیم.)
+
+\begin{summary}
+\begin{itemize}
+\item تهی بودن زبان یک \lr{CFG} و عضویت در آن تصمیم‌پذیرند؛ هم‌ارزی دو \lr{CFG} تصمیم‌پذیر نیست.
+\item \lr{DPDA}: در هر پیکربندی حداکثر یک حرکت. \lr{DCFL}ها زیرمجموعه سره \lr{CFL}ها هستند.
+\item $\{a^nb^n\}\cup\{a^nb^{2n}\}$ مستقل از متن است ولی قطعی نیست؛ اثبات با ساختن ماشینی برای $\widehat L$ که شامل $a^nb^nc^n$ است.
+\item گرامر \lr{LL($k$)}: قاعده با دیدن $k$ نماد به‌طور یکتا انتخاب می‌شود. هر گرامر ساده \lr{LL} است.
+\end{itemize}
+\end{summary}

@@ -1,0 +1,339 @@
+\chapter{ماشین‌های متناهی قطعی}
+
+کامپیوتر واقعی آن‌قدر پیچیده است که نمی‌توان مستقیماً نظریه‌ای ریاضی درباره آن ساخت. به جای آن از \term{مدل محاسباتی}{Computational Model} استفاده می‌کنیم: یک کامپیوتر ایدئال و ساده‌شده. برای بررسی جنبه‌های مختلف، مدل‌های مختلفی به کار می‌بریم. ساده‌ترین مدل \term{ماشین متناهی}{Finite Automaton} است: ماشینی که رشته ورودی را می‌خواند و در پایان فقط می‌گوید «می‌پذیرم» یا «رد می‌کنم».
+
+\section{ایده ماشین متناهی}
+
+ماشین متناهی کامپیوتری با حافظه \textbf{بسیار محدود} است. حافظه آن فقط «حالتی» است که در آن قرار دارد.
+
+\begin{example}[کنترلر در خودکار]
+یک در خودکار فروشگاه را در نظر بگیرید که یک حسگر جلوی در و یک حسگر پشت آن دارد. کنترلر دو \textbf{حالت} دارد: \lr{OPEN} و \lr{CLOSED}، پس فقط به یک بیت حافظه نیاز دارد. ورودی در هر لحظه یکی از چهار مقدار است: \lr{FRONT} (کسی جلوی در است)، \lr{REAR} (کسی پشت در است)، \lr{BOTH} و \lr{NEITHER}.
+\begin{automaton}[node distance=3.6cm,every state/.style={draw=jzMain,fill=jzMain!7,thick,minimum size=14mm,font=\small}]
+  \node[state] (c) {CLOSED};
+  \node[state,right=of c] (o) {OPEN};
+  \path (c) edge[loop above] node[align=center,font=\scriptsize] {REAR\\BOTH\\NEITHER} (c)
+        (c) edge[bend left] node[font=\scriptsize] {FRONT} (o)
+        (o) edge[bend left] node[font=\scriptsize] {NEITHER} (c)
+        (o) edge[loop above] node[align=center,font=\scriptsize] {FRONT\\REAR\\BOTH} (o);
+\end{automaton}
+همین رفتار را می‌توان با یک \textbf{جدول گذار} هم نشان داد:
+\begin{ltrfig}
+\begin{tabular}{l|cccc}
+ & NEITHER & FRONT & REAR & BOTH\\ \hline
+CLOSED & CLOSED & OPEN & CLOSED & CLOSED\\
+OPEN & CLOSED & OPEN & OPEN & OPEN
+\end{tabular}
+\end{ltrfig}
+\end{example}
+
+کنترلر آسانسور و ترموستات الکترونیکی هم مثال‌های دیگری از ماشین متناهی هستند. ویژگی‌های مشترک همه آن‌ها:
+\begin{itemize}
+\item مجموعه‌ای \textbf{متناهی} از حالت‌ها دارند و این حالت‌ها تنها حافظه ماشین‌اند.
+\item از یک حالت ثابت (\textbf{حالت شروع}) شروع می‌کنند.
+\item ورودی را \textbf{نماد به نماد} می‌خوانند و با هر نماد حالتشان را عوض می‌کنند.
+\item اگر بعد از خواندن کل ورودی در یک \textbf{حالت پذیرش} باشند، ورودی را می‌پذیرند.
+\end{itemize}
+این مدل ساده نقطه شروع خوبی است: اول آن را دقیق تعریف می‌کنیم، بعد یاد می‌گیریم چطور با آن کار کنیم و در آخر توانایی‌ها و محدودیت‌هایش را بررسی می‌کنیم.
+
+\section{نمودار حالت و تعریف صوری}
+
+شکل زیر \textbf{نمودار حالت} ماشینی به نام $M_1$ را نشان می‌دهد:
+\begin{automaton}
+  \node[state,initial] (q1) {$q_1$};
+  \node[state,accepting,right=of q1] (q2) {$q_2$};
+  \node[state,right=of q2] (q3) {$q_3$};
+  \path (q1) edge[loop above] node {$0$} (q1)
+        (q1) edge node {$1$} (q2)
+        (q2) edge[loop above] node {$1$} (q2)
+        (q2) edge[bend left] node {$0$} (q3)
+        (q3) edge[bend left] node {$0,1$} (q2);
+\end{automaton}
+\begin{itemize}
+\item هر \textbf{حالت} یک دایره با یک نام است. \textbf{حالت شروع} با پیکانی که از هیچ‌جا به آن وارد می‌شود و \textbf{حالت پذیرش} با دایره دوخطی مشخص شده است.
+\item هر پیکان یک \textbf{گذار} است. ماشین با خواندن نمادی که روی پیکان نوشته شده، در جهت پیکان حرکت می‌کند.
+\item \textbf{ورودی} یک رشته است، مثلاً $1101$. ماشین آن را از چپ به راست، یکی‌یکی می‌خواند.
+\item \textbf{خروجی} بعد از خواندن آخرین نماد مشخص می‌شود: اگر ماشین در حالت پذیرش باشد «پذیرش» و گرنه «رد».
+\end{itemize}
+مثلاً روی ورودی $1101$: از $q_1$ شروع می‌کنیم، با $1$ به $q_2$ می‌رویم، با $1$ در $q_2$ می‌مانیم، با $0$ به $q_3$ و با $1$ دوباره به $q_2$ می‌رویم. چون $q_2$ حالت پذیرش است، ورودی پذیرفته می‌شود.
+
+\begin{definition}[ماشین متناهی قطعی (\lr{DFA})]
+یک \term{ماشین متناهی قطعی}{Deterministic Finite Automaton} یک پنج‌تایی $(Q,\Sigma,\delta,q_0,F)$ است که در آن
+\begin{enumerate}
+\item $Q$ مجموعه‌ای متناهی از \textbf{حالت‌ها}،
+\item $\Sigma$ \textbf{الفبای} ورودی،
+\item $\delta:Q\times\Sigma\to Q$ \textbf{تابع گذار}،
+\item $q_0\in Q$ \textbf{حالت شروع}، و
+\item $F\subseteq Q$ مجموعه \textbf{حالت‌های پذیرش} است.
+\end{enumerate}
+\end{definition}
+
+کلمه «قطعی» یعنی: در هر حالت و با هر نماد، \textbf{دقیقاً یک} حالت بعدی مشخص وجود دارد. چون $\delta$ یک تابع روی کل $Q\times\Sigma$ است، از هر حالت برای هر نماد دقیقاً یک پیکان خارج می‌شود.
+
+\begin{example}[توصیف صوری $M_1$]
+\begin{itemize}
+\item $Q=\{q_1,q_2,q_3\}$ و $\Sigma=\{0,1\}$،
+\item تابع گذار $\delta$ با جدول زیر،
+\item حالت شروع $q_1$ و $F=\{q_2\}$.
+\end{itemize}
+\begin{ltrfig}
+\begin{tabular}{c|cc}
+ & $0$ & $1$\\ \hline
+$q_1$ & $q_1$ & $q_2$\\
+$q_2$ & $q_3$ & $q_2$\\
+$q_3$ & $q_2$ & $q_2$
+\end{tabular}
+\end{ltrfig}
+\end{example}
+
+\begin{definition}[زبان یک ماشین]
+اگر $A$ مجموعه همه رشته‌هایی باشد که ماشین $M$ می‌پذیرد، می‌گوییم $A$ \textbf{زبان ماشین} $M$ است و می‌نویسیم $L(M)=A$. همچنین می‌گوییم $M$، $A$ را \textbf{تشخیص می‌دهد} یا \textbf{می‌پذیرد}.
+\end{definition}
+
+\begin{note}
+یک ماشین ممکن است چندین رشته را بپذیرد، اما همیشه \textbf{دقیقاً یک زبان} را تشخیص می‌دهد. اگر ماشین هیچ رشته‌ای را نپذیرد، زبانش $\emptyset$ است.
+\end{note}
+
+زبان $M_1$ این است:
+\[L(M_1)=\{w\st w\text{ \rl{دست‌کم یک $1$ دارد و بعد از آخرین $1$ تعداد زوجی $0$ آمده است}}\}.\]
+دلیل: تا وقتی $1$ ندیده‌ایم در $q_1$ می‌مانیم. بعد از دیدن هر $1$ به $q_2$ می‌رویم. از آن به بعد، $0$ها ما را بین $q_2$ و $q_3$ جابه‌جا می‌کنند (اگر بعد از $0$ یک $1$ بیاید از $q_3$ به $q_2$ برمی‌گردیم، که همان «$1$ جدید» است). پس در پایان در $q_2$ هستیم اگر و تنها اگر بعد از آخرین $1$ تعداد زوجی $0$ آمده باشد.
+
+\begin{example}[ماشین $M_2$]
+ماشین زیر با $Q=\{q_1,q_2\}$، $\Sigma=\{0,1\}$، حالت شروع $q_1$ و $F=\{q_2\}$ را در نظر بگیرید:
+\begin{automaton}[node distance=2.6cm]
+  \node[state,initial] (q1) {$q_1$};
+  \node[state,accepting,right=of q1] (q2) {$q_2$};
+  \path (q1) edge[loop above] node {$0$} (q1)
+        (q1) edge[bend left] node {$1$} (q2)
+        (q2) edge[bend left] node {$0$} (q1)
+        (q2) edge[loop above] node {$1$} (q2);
+\end{automaton}
+\begin{ltrfig}
+\begin{tabular}{c|cc}
+ & $0$ & $1$\\ \hline
+$q_1$ & $q_1$ & $q_2$\\
+$q_2$ & $q_1$ & $q_2$
+\end{tabular}
+\end{ltrfig}
+رفتار ماشین روی دو ورودی:
+\begin{itemize}
+\item ورودی $1101$: \quad $q_1\xrightarrow{1}q_2\xrightarrow{1}q_2\xrightarrow{0}q_1\xrightarrow{1}q_2$. ماشین در $q_2$ تمام می‌کند، پس \textbf{می‌پذیرد}.
+\item ورودی $1010$: \quad $q_1\xrightarrow{1}q_2\xrightarrow{0}q_1\xrightarrow{1}q_2\xrightarrow{0}q_1$. ماشین در $q_1$ تمام می‌کند، پس \textbf{رد می‌کند}.
+\end{itemize}
+در واقع حالت ماشین همیشه نشان می‌دهد آخرین نماد خوانده‌شده چه بوده است: $q_2$ یعنی «آخرین نماد $1$ بوده». پس $L(M_2)=\{w\st w\text{ \rl{به $1$ ختم می‌شود}}\}$.
+
+اگر در همین ماشین فقط حالت پذیرش را عوض کنیم و $F=\{q_1\}$ بگذاریم، ماشین $M_3$ به دست می‌آید با
+$L(M_3)=\{w\st w=\eps\ \text{\rl{یا $w$ به $0$ ختم می‌شود}}\}$.
+\end{example}
+
+\section{تعریف صوری محاسبه}
+
+تا اینجا «پذیرفتن» را به شکل شهودی توضیح دادیم. حالا آن را دقیق تعریف می‌کنیم.
+
+\begin{definition}[محاسبه \lr{DFA}]
+فرض کنید $M=(Q,\Sigma,\delta,q_0,F)$ یک \lr{DFA} و $w=w_1w_2\cdots w_n$ رشته‌ای روی $\Sigma$ باشد. $M$ رشته $w$ را \textbf{می‌پذیرد} اگر دنباله‌ای از حالت‌ها $r_0,r_1,\dots,r_n$ در $Q$ با سه شرط زیر وجود داشته باشد:
+\begin{enumerate}
+\item $r_0=q_0$ \hfill (از حالت شروع شروع می‌کنیم)
+\item $\delta(r_i,w_{i+1})=r_{i+1}$ برای $i=0,\dots,n-1$ \hfill (طبق قوانین حرکت می‌کنیم)
+\item $r_n\in F$ \hfill (در حالت پذیرش تمام می‌کنیم)
+\end{enumerate}
+می‌گوییم $M$ زبان $A$ را تشخیص می‌دهد اگر $A=\{w\st M\text{ \rl{رشته $w$ را می‌پذیرد}}\}$.
+\end{definition}
+
+\begin{example}
+برای ماشین $M_2$:
+\begin{ltrfig}
+\begin{tabular}{lll}
+\toprule
+Input & States $r_0,\dots,r_n$ & Output\\ \midrule
+$\eps$ & $q_1$ & reject\\
+$1$ & $q_1,q_2$ & accept\\
+$000$ & $q_1,q_1,q_1,q_1$ & reject\\
+$011$ & $q_1,q_1,q_2,q_2$ & accept\\
+$1110$ & $q_1,q_2,q_2,q_2,q_1$ & reject\\ \bottomrule
+\end{tabular}
+\end{ltrfig}
+\end{example}
+
+برای اثبات‌ها، یک ابزار کوچک خیلی کمک می‌کند: \textbf{تابع گذار گسترش‌یافته} که به جای یک نماد، یک رشته کامل می‌گیرد.
+
+\begin{definition}[تابع گذار گسترش‌یافته]
+برای \lr{DFA} $M$، تابع $\delta^*:Q\times\Sigma^*\to Q$ را به صورت بازگشتی تعریف می‌کنیم:
+\[\delta^*(q,\eps)=q,\qquad \delta^*(q,wa)=\delta\big(\delta^*(q,w),a\big)\quad(w\in\Sigma^*,\ a\in\Sigma).\]
+یعنی $\delta^*(q,w)$ حالتی است که ماشین با شروع از $q$ و خواندن کل $w$ به آن می‌رسد.
+\end{definition}
+
+با این نماد، دنباله $r_0,\dots,r_n$ در تعریف بالا همان $r_i=\delta^*(q_0,w_1\cdots w_i)$ است. پس
+\[M\ \text{\rl{رشته $w$ را می‌پذیرد}}\iff \delta^*(q_0,w)\in F.\]
+
+\section{زبان‌های منظم و طراحی \lr{DFA}}
+
+\begin{definition}[زبان منظم]
+زبانی را \term{منظم}{Regular} می‌نامیم اگر یک ماشین متناهی وجود داشته باشد که آن را تشخیص دهد.
+\end{definition}
+
+برای اثبات منظم بودن یک زبان کافی است یک \lr{DFA} برایش بسازیم (اثبات ساختنی). هنگام طراحی، از خودتان بپرسید: «برای تصمیم‌گیری درباره ورودی، چه اطلاعاتی را باید \textbf{تا اینجا} به خاطر داشته باشم؟» هر حالت ممکن از این اطلاعات یک حالت ماشین می‌شود.
+
+\begin{example}[چهار زبان منظم روی $\Sigma=\{0,1\}$]
+\textbf{(۱)} $L_1=\emptyset$: یک حالت که پذیرش نیست و با هر نماد در خودش می‌ماند.
+\textbf{(۲)} $L_2=\Sigma^*$: همان ماشین، اما حالتش پذیرش باشد.
+\begin{automaton}[node distance=4cm]
+  \node[state,initial] (a) {$q$};
+  \node[state,initial,accepting,right=of a] (b) {$q$};
+  \path (a) edge[loop above] node {$0,1$} (a)
+        (b) edge[loop above] node {$0,1$} (b);
+  \node[below=4mm of a,font=\small] {$L_1=\emptyset$};
+  \node[below=4mm of b,font=\small] {$L_2=\Sigma^*$};
+\end{automaton}
+\textbf{(۳)} $L_3=\{w\st w\text{ \rl{با $0$ شروع و به $0$ ختم می‌شود}}\}$: اولین نماد را چک می‌کنیم. اگر $1$ بود به یک \textbf{حالت تله} (حالتی که هرگز از آن خارج نمی‌شویم) می‌رویم. اگر $0$ بود، از آن به بعد فقط باید آخرین نماد را به خاطر بسپاریم:
+\begin{automaton}[node distance=2.4cm]
+  \node[state,initial] (s) {$s$};
+  \node[state,accepting,right=of s] (a) {$q_0$};
+  \node[state,right=of a] (b) {$q_1$};
+  \node[state,below=1.5cm of s] (d) {$d$};
+  \path (s) edge node {$0$} (a)
+        (s) edge node[left] {$1$} (d)
+        (d) edge[loop right] node {$0,1$} (d)
+        (a) edge[loop above] node {$0$} (a)
+        (a) edge[bend left] node {$1$} (b)
+        (b) edge[bend left] node {$0$} (a)
+        (b) edge[loop above] node {$1$} (b);
+\end{automaton}
+\textbf{(۴)} $L_4=\{w\st \abs{w}\ \text{\rl{مضرب ۳ نیست}}\}$: فقط باقی‌مانده طول بر ۳ مهم است، پس سه حالت $r_0,r_1,r_2$ کافی است:
+\begin{automaton}[node distance=2.4cm]
+  \node[state,initial] (r0) {$r_0$};
+  \node[state,accepting,right=of r0] (r1) {$r_1$};
+  \node[state,accepting,right=of r1] (r2) {$r_2$};
+  \path (r0) edge node {$0,1$} (r1)
+        (r1) edge node {$0,1$} (r2)
+        (r2) edge[bend left=35] node {$0,1$} (r0);
+\end{automaton}
+\end{example}
+
+\section{عملیات منظم و بستاری}
+
+نظریه محاسبه فقط ساختن ماشین نیست؛ می‌خواهیم ویژگی‌های کلی زبان‌های منظم را هم بشناسیم. یک ابزار مهم، \textbf{عملیات} روی زبان‌هاست. همان‌طور که در حساب با عملگرهایی مثل $+$ و $\times$ اعداد را ترکیب می‌کنیم، اینجا زبان‌ها را با عملیات زیر ترکیب می‌کنیم.
+
+\begin{definition}[عملیات منظم]
+اگر $A$ و $B$ دو زبان باشند:
+\begin{itemize}
+\item \textbf{اجتماع:} $A\cup B=\{x\st x\in A \text{ یا } x\in B\}$،
+\item \textbf{الحاق:} $A\circ B=\{xy\st x\in A,\ y\in B\}$،
+\item \textbf{ستاره:} $A^*=\{x_1x_2\cdots x_k\st k\ge0,\ x_i\in A\}$.
+\end{itemize}
+\end{definition}
+
+\begin{example}
+روی $\Sigma=\{a,\dots,z\}$ فرض کنید $A=\{good,bad\}$ و $B=\{boy,girl\}$. آنگاه
+\begin{align*}
+A\cup B&=\{good,bad,boy,girl\},\\
+A\circ B&=\{goodboy,goodgirl,badboy,badgirl\},\\
+A^*&=\{\eps,good,bad,goodgood,goodbad,badgood,badbad,goodgoodgood,goodgoodbad,\dots\}.
+\end{align*}
+\end{example}
+
+\begin{definition}[بستاری]
+یک دسته از اشیاء تحت یک عملیات \textbf{بسته} است اگر اعمال آن عملیات روی عضوهای دسته، همیشه عضوی از همان دسته بدهد.
+\end{definition}
+
+مثلاً اعداد طبیعی تحت ضرب بسته‌اند ولی تحت تقسیم نه ($1/2\notin\mathbb{N}$). در ادامه ثابت می‌کنیم دسته زبان‌های منظم تحت \textbf{متمم}، \textbf{اجتماع}، \textbf{اشتراک}، \textbf{الحاق} و \textbf{ستاره} بسته است.
+
+\subsection{بستاری تحت متمم}
+
+\begin{theorem}\label{thm:dfa-complement}
+متمم هر زبان منظم، منظم است.
+\end{theorem}
+
+\begin{proofidea}
+چون $A$ منظم است، یک \lr{DFA} مثل $M_1$ آن را تشخیص می‌دهد. ماشین $M_2$ را درست مثل $M_1$ می‌سازیم، فقط حالت‌های پذیرش و غیرپذیرش را جابه‌جا می‌کنیم. دو ماشین ورودی را دقیقاً یکسان طی می‌کنند، اما هر جا $M_1$ می‌پذیرد $M_2$ رد می‌کند و برعکس.
+\end{proofidea}
+
+\begin{proof}
+فرض کنید $M_1=(Q,\Sigma,\delta,q_1,F)$ یک \lr{DFA} با $L(M_1)=A$ باشد. قرار دهید
+\[M_2=(Q,\Sigma,\delta,q_1,\ Q-F).\]
+\textbf{اثبات درستی:} دو ماشین حالت‌ها، حالت شروع و تابع گذار یکسانی دارند، پس تابع گذار گسترش‌یافته آن‌ها هم یکسان است. برای هر رشته $w$ فرض کنید $q=\delta^*(q_1,w)$. آنگاه
+\[w\in L(M_2)\iff q\in Q-F\iff q\notin F\iff w\notin L(M_1)\iff w\in\overline{A}.\]
+پس $L(M_2)=\overline{A}$ و $\overline{A}$ منظم است.
+\end{proof}
+
+\begin{example}[وجود زیررشته $bba$]
+ماشین $M_1$ زیر زبان $\{w\st bba\ \text{\rl{زیررشته $w$ است}}\}$ را تشخیص می‌دهد. حالت‌ها نشان می‌دهند چه مقدار از $bba$ را تا اینجا دیده‌ایم. $M_2$ همان ماشین با حالت‌های پذیرش جابه‌جاشده است و زبان $\{w\st bba\ \text{\rl{زیررشته $w$ نیست}}\}$ را تشخیص می‌دهد:
+\begin{automaton}[node distance=2cm]
+  \node[state,initial] (s0) {$s_0$};
+  \node[state,right=of s0] (s1) {$s_1$};
+  \node[state,right=of s1] (s2) {$s_2$};
+  \node[state,accepting,right=of s2] (s3) {$s_3$};
+  \node[left=1.2cm of s0] {$M_1$:};
+  \path (s0) edge[loop above] node {$a$} (s0)
+        (s0) edge[bend left] node {$b$} (s1)
+        (s1) edge[bend left] node {$a$} (s0)
+        (s1) edge node {$b$} (s2)
+        (s2) edge[loop above] node {$b$} (s2)
+        (s2) edge node {$a$} (s3)
+        (s3) edge[loop above] node {$a,b$} (s3);
+\end{automaton}
+\begin{automaton}[node distance=2cm]
+  \node[state,initial,accepting] (s0) {$s_0$};
+  \node[state,accepting,right=of s0] (s1) {$s_1$};
+  \node[state,accepting,right=of s1] (s2) {$s_2$};
+  \node[state,right=of s2] (s3) {$s_3$};
+  \node[left=1.2cm of s0] {$M_2$:};
+  \path (s0) edge[loop above] node {$a$} (s0)
+        (s0) edge[bend left] node {$b$} (s1)
+        (s1) edge[bend left] node {$a$} (s0)
+        (s1) edge node {$b$} (s2)
+        (s2) edge[loop above] node {$b$} (s2)
+        (s2) edge node {$a$} (s3)
+        (s3) edge[loop above] node {$a,b$} (s3);
+\end{automaton}
+روی ورودی $aabb$ هر دو ماشین مسیر $s_0\xrightarrow{a}s_0\xrightarrow{a}s_0\xrightarrow{b}s_1\xrightarrow{b}s_2$ را طی می‌کنند. $M_1$ رد می‌کند و $M_2$ می‌پذیرد.
+\end{example}
+
+\begin{warning}
+این ساخت فقط برای ماشین \textbf{قطعی} درست است. در ماشین‌های غیرقطعی فصل بعد، جابه‌جا کردن حالت‌های پذیرش در حالت کلی متمم را نمی‌دهد.
+\end{warning}
+
+\subsection{بستاری تحت اجتماع و اشتراک}
+
+\begin{theorem}\label{thm:dfa-union}
+اگر $A_1$ و $A_2$ منظم باشند، $A_1\cup A_2$ هم منظم است.
+\end{theorem}
+
+\begin{proofidea}
+$M_1$ و $M_2$ ماشین‌های $A_1$ و $A_2$ هستند. آیا ماشین جدید می‌تواند اول $M_1$ را روی ورودی اجرا کند و بعد $M_2$ را؟ نه، چون ماشین متناهی نمی‌تواند نوار ورودی را به عقب برگرداند! راه درست این است که دو ماشین را \textbf{هم‌زمان} شبیه‌سازی کنیم: حالت ماشین جدید یک \textbf{زوج} است که نشان می‌دهد $M_1$ و $M_2$ هر کدام در کدام حالت‌اند. تعداد این زوج‌ها متناهی است ($\abs{Q_1}\times\abs{Q_2}$)، پس ماشین جدید هم متناهی است. به این روش \textbf{ساخت ضربی} می‌گوییم.
+\end{proofidea}
+
+\begin{proof}
+فرض کنید $M_1=(Q_1,\Sigma,\delta_1,q_1,F_1)$ زبان $A_1$ و $M_2=(Q_2,\Sigma,\delta_2,q_2,F_2)$ زبان $A_2$ را تشخیص دهند. ماشین $M=(Q,\Sigma,\delta,q_0,F)$ را این‌طور می‌سازیم:
+\begin{enumerate}
+\item $Q=Q_1\times Q_2=\{(r_1,r_2)\st r_1\in Q_1,\ r_2\in Q_2\}$،
+\item $\delta\big((r_1,r_2),a\big)=\big(\delta_1(r_1,a),\ \delta_2(r_2,a)\big)$ برای هر $a\in\Sigma$،
+\item $q_0=(q_1,q_2)$،
+\item $F=\{(r_1,r_2)\st r_1\in F_1\ \text{یا}\ r_2\in F_2\}$.
+\end{enumerate}
+\textbf{اثبات درستی.} اول با استقرا روی طول $w$ نشان می‌دهیم برای هر $w\in\Sigma^*$:
+\[\delta^*\big((q_1,q_2),w\big)=\big(\delta_1^*(q_1,w),\ \delta_2^*(q_2,w)\big).\tag{$\star$}\]
+\textbf{پایه} ($w=\eps$): هر دو طرف برابر $(q_1,q_2)$ هستند.
+\textbf{گام:} فرض کنید $(\star)$ برای $w$ درست باشد و $a\in\Sigma$. اگر $\delta_1^*(q_1,w)=r_1$ و $\delta_2^*(q_2,w)=r_2$، آنگاه
+\[\delta^*\big((q_1,q_2),wa\big)=\delta\big((r_1,r_2),a\big)=\big(\delta_1(r_1,a),\delta_2(r_2,a)\big)=\big(\delta_1^*(q_1,wa),\delta_2^*(q_2,wa)\big).\]
+حالا با $(\star)$:
+\[w\in L(M)\iff \delta_1^*(q_1,w)\in F_1\ \text{یا}\ \delta_2^*(q_2,w)\in F_2\iff w\in A_1\ \text{یا}\ w\in A_2\iff w\in A_1\cup A_2.\qedhere\]
+\end{proof}
+
+\begin{corollary}
+زبان‌های منظم تحت \textbf{اشتراک} و \textbf{تفاضل} هم بسته‌اند.
+\end{corollary}
+\begin{proof}
+در همان ساخت ضربی، اگر حالت‌های پذیرش را $F=F_1\times F_2$ بگذاریم (یعنی هر دو ماشین بپذیرند)، طبق $(\star)$ ماشین $A_1\cap A_2$ را تشخیص می‌دهد. برای تفاضل هم $A_1-A_2=A_1\cap\overline{A_2}$ و از بستاری تحت متمم و اشتراک استفاده می‌کنیم.
+\end{proof}
+
+\subsection{الحاق: نیاز به ابزاری جدید}
+آیا می‌توانیم بستاری تحت الحاق را هم با همین روش ثابت کنیم؟ ماشین باید رشته را به دو تکه بشکند طوری که $M_1$ تکه اول و $M_2$ تکه دوم را بپذیرد. مشکل این است که ماشین \textbf{نمی‌داند کجا باید رشته را بشکند}. برای حل این مشکل به تکنیک جدیدی به نام \textbf{نامعینی} نیاز داریم که موضوع فصل بعد است.
+
+\begin{summary}
+\begin{itemize}
+\item \lr{DFA} پنج‌تایی $(Q,\Sigma,\delta,q_0,F)$ است که در هر حالت با هر نماد دقیقاً یک حرکت دارد.
+\item $M$ رشته $w$ را می‌پذیرد اگر و تنها اگر $\delta^*(q_0,w)\in F$. زبانی منظم است که یک \lr{DFA} آن را تشخیص دهد.
+\item برای طراحی \lr{DFA} بپرسید «چه اطلاعاتی باید به خاطر بسپارم؟»
+\item متمم: جابه‌جا کردن $F$ و $Q-F$. اجتماع و اشتراک: ساخت ضربی با حالت‌های زوجی.
+\end{itemize}
+\end{summary}

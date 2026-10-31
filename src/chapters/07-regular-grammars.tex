@@ -1,0 +1,178 @@
+\chapter{گرامرهای منظم}
+
+تا اینجا دو روش برای توصیف زبان‌های منظم دیدیم: ماشین‌ها (\lr{DFA} و \lr{NFA}) که رشته‌ها را \textbf{تشخیص} می‌دهند و عبارات منظم که الگوی رشته‌ها را \textbf{توصیف} می‌کنند. در این فصل روش سومی می‌بینیم: \textbf{گرامر}، که رشته‌های زبان را \textbf{تولید} می‌کند. گرامرها در فصل ۹ با جزئیات بیشتری بررسی می‌شوند؛ اینجا فقط آن‌قدر که لازم است معرفی‌شان می‌کنیم.
+
+\section{گرامر چیست؟}
+
+\begin{definition}[گرامر]
+یک \term{گرامر}{Grammar} چهارتایی $G=(V,T,S,P)$ است که در آن $V$ مجموعه متناهی \textbf{متغیرها}، $T$ مجموعه متناهی \textbf{پایانه‌ها} (همان الفبا) با $V\cap T=\emptyset$، $S\in V$ \textbf{متغیر شروع} و $P$ مجموعه متناهی \textbf{قاعده‌ها} (\lr{productions}) است. هر قاعده شکل $A\to x$ دارد، یعنی «$A$ را می‌توان با $x$ جایگزین کرد».
+\end{definition}
+
+اگر $uAv$ رشته‌ای از متغیرها و پایانه‌ها باشد و قاعده $A\to x$ وجود داشته باشد، می‌نویسیم $uAv\Rightarrow uxv$ (یک گام \textbf{اشتقاق}). اگر با صفر یا چند گام از $u$ به $v$ برسیم، می‌نویسیم $u\der v$. زبان گرامر همه رشته‌های \textbf{فقط از پایانه‌ها} است که از $S$ مشتق می‌شوند:
+\[L(G)=\{w\in T^*\st S\der w\}.\]
+
+\section{گرامرهای خطی راست و چپ}
+
+\begin{definition}[گرامر خطی راست و خطی چپ]
+گرامر $G=(V,T,S,P)$ \textbf{خطی راست} است اگر همه قاعده‌هایش به یکی از این دو شکل باشند:
+\[A\to xB,\qquad A\to x,\qquad (A,B\in V,\ x\in T^*).\]
+و \textbf{خطی چپ} است اگر همه قاعده‌هایش به یکی از این دو شکل باشند:
+\[A\to Bx,\qquad A\to x.\]
+گرامری را که خطی راست یا خطی چپ باشد، \term{گرامر منظم}{Regular Grammar} می‌نامیم.
+\end{definition}
+
+یعنی در گرامر خطی راست هر قاعده حداکثر یک متغیر دارد و آن متغیر در \textbf{انتهای راست} قاعده است. در نتیجه هر رشته‌ای که در طول اشتقاق ساخته می‌شود شکل $ab\cdots c\,D$ دارد: چند پایانه و حداکثر یک متغیر در انتها.
+
+\begin{example}
+گرامر خطی راست $G_1$ با قاعده‌های $S\to abS\mid a$ (یعنی دو قاعده $S\to abS$ و $S\to a$). یک اشتقاق:
+\[S\Rightarrow abS\Rightarrow ababS\Rightarrow ababa.\]
+زبان این گرامر با عبارت منظم $(ab)^*a$ توصیف می‌شود.
+\end{example}
+
+\begin{example}
+گرامر خطی چپ $G_2$:
+\[S\to S_1ab,\qquad S_1\to S_1ab\mid S_2,\qquad S_2\to a.\]
+یک اشتقاق: $S\Rightarrow S_1ab\Rightarrow S_1abab\Rightarrow S_2abab\Rightarrow aababab$. زبان این گرامر $aab(ab)^*$ است.
+\end{example}
+
+\begin{note}[شکل ساده]
+هر قاعده خطی راست را می‌توان با چند قاعده که هر کدام \textbf{حداکثر یک پایانه} دارند جایگزین کرد. کافی است متغیرهای کمکی جدید اضافه کنیم:
+\begin{align*}
+A\to abcB\quad&\leadsto\quad A\to aB_1,\ \ B_1\to bB_2,\ \ B_2\to cB,\\
+A\to abc\quad&\leadsto\quad A\to aB_1,\ \ B_1\to bB_2,\ \ B_2\to c.
+\end{align*}
+زبان گرامر تغییر نمی‌کند، چون متغیرهای جدید فقط در همین زنجیره به کار می‌روند.
+\end{note}
+
+\begin{definition}[گرامر خطی]
+گرامری \textbf{خطی} است اگر سمت چپ هر قاعده دقیقاً یک متغیر و سمت راست آن \textbf{حداکثر یک} متغیر داشته باشد، بدون هیچ محدودیتی بر جای آن متغیر.
+\end{definition}
+
+هر گرامر منظم خطی است، اما عکس آن درست نیست. مثلاً گرامر خطی $G_3$:
+\[S\to A,\qquad A\to aB\mid\eps,\qquad B\to Ab\]
+زبان $\{a^nb^n\st n\ge0\}$ را تولید می‌کند ($A\Rightarrow aB\Rightarrow aAb$) که در فصل بعد ثابت می‌کنیم منظم نیست. ترکیب قاعده‌های خطی راست و خطی چپ در یک گرامر همین مشکل را ایجاد می‌کند.
+
+\section{هر گرامر خطی راست زبانی منظم تولید می‌کند}
+
+\begin{theorem}\label{thm:rl-regular}
+اگر $G=(V,T,S,P)$ خطی راست باشد، $L(G)$ منظم است.
+\end{theorem}
+
+\begin{proofidea}
+هر صورت میانی اشتقاق شکل $ab\cdots c\,D$ دارد و با به کار بردن قاعده $D\to dE$ به $ab\cdots cd\,E$ تبدیل می‌شود. این دقیقاً شبیه کار یک \lr{NFA} است: \textbf{متغیر} نقش \textbf{حالت} را دارد و پیشوند پایانه‌ای نقش \textbf{بخشی از ورودی که تا اینجا خوانده شده}.
+\end{proofidea}
+
+\begin{proof}
+طبق نکته بالا فرض می‌کنیم هر قاعده حداکثر یک پایانه دارد. متغیرها را $V=\{V_0,V_1,\dots\}$ بنامید که $S=V_0$. پس هر قاعده به شکل $V_i\to vV_k$ یا $V_n\to v$ است که $v\in T\cup\{\eps\}$. \lr{NFA} زیر را می‌سازیم:
+\[M=\big(V\cup\{V_f\},\ T,\ \delta,\ V_0,\ \{V_f\}\big)\]
+که $V_f$ یک حالت جدید است و گذارها از روی قاعده‌ها ساخته می‌شوند:
+\begin{center}
+\begin{tabular}{cc}
+\toprule
+قاعده & گذار\\ \midrule
+$V_i\to vV_k$ & $\delta(V_i,v)$ شامل $V_k$ است\\
+$V_n\to v$ & $\delta(V_n,v)$ شامل $V_f$ است\\ \bottomrule
+\end{tabular}
+\end{center}
+(اگر $v=\eps$ باشد، گذار یک پیکان $\eps$ است.)
+
+\textbf{درستی:} اگر $w\in L(G)$، اشتقاقی به شکل
+\[V_0\Rightarrow v_1V_{i_1}\Rightarrow v_1v_2V_{i_2}\Rightarrow\cdots\Rightarrow v_1\cdots v_{m-1}V_{i_{m-1}}\Rightarrow v_1\cdots v_m=w\]
+وجود دارد. طبق ساخت، $M$ می‌تواند مسیر $V_0\xrightarrow{v_1}V_{i_1}\xrightarrow{v_2}\cdots\xrightarrow{v_{m-1}}V_{i_{m-1}}\xrightarrow{v_m}V_f$ را طی کند، پس $w$ را می‌پذیرد. برعکس، هر مسیر پذیرنده $M$ از $V_0$ به $V_f$ روی $w$، دنباله‌ای از گذارهاست که هر کدام از یک قاعده آمده؛ با به کار بردن همان قاعده‌ها به همان ترتیب، اشتقاقی برای $w$ در $G$ به دست می‌آید. پس $L(M)=L(G)$.
+\end{proof}
+
+\begin{example}
+برای گرامر $V_0\to aV_1,\ V_1\to abV_0\mid b$ ابتدا قاعده $V_1\to abV_0$ را با متغیر کمکی $V_2$ می‌شکنیم:
+\[V_0\to aV_1,\qquad V_1\to aV_2\mid b,\qquad V_2\to bV_0.\]
+\lr{NFA} حاصل:
+\begin{automaton}
+  \node[state,initial] (v0) {$V_0$};
+  \node[state,right=of v0] (v1) {$V_1$};
+  \node[state,accepting,right=of v1] (vf) {$V_f$};
+  \node[state,below=1.4cm of v1] (v2) {$V_2$};
+  \path (v0) edge node {$a$} (v1) (v1) edge node {$b$} (vf) (v1) edge node {$a$} (v2) (v2) edge node {$b$} (v0);
+\end{automaton}
+زبان این ماشین (و گرامر) با عبارت منظم $(aab)^*ab$ توصیف می‌شود.
+\end{example}
+
+\section{هر زبان منظم یک گرامر خطی راست دارد}
+
+\begin{theorem}\label{thm:regular-rl}
+اگر $L$ زبانی منظم روی $\Sigma$ باشد، گرامر خطی راستی مثل $G$ وجود دارد که $L=L(G)$.
+\end{theorem}
+\begin{proof}
+فرض کنید \lr{DFA} $M=(Q,\Sigma,\delta,q_0,F)$ زبان $L$ را بپذیرد. گرامر $G=(V,\Sigma,S,P)$ را با $V=Q$ و $S=q_0$ می‌سازیم. یعنی هر حالت یک متغیر می‌شود. قاعده‌ها:
+\begin{itemize}
+\item برای هر گذار $\delta(q_i,a)=q_k$، قاعده $q_i\to aq_k$؛
+\item برای هر حالت پذیرش $q_k\in F$، قاعده $q_k\to\eps$.
+\end{itemize}
+این گرامر خطی راست است.
+
+\textbf{درستی:} فرض کنید $w=a_1a_2\cdots a_n\in L$. پس $M$ دنباله‌ای از حالت‌ها دارد:
+\[\delta(q_0,a_1)=r_1,\ \ \delta(r_1,a_2)=r_2,\ \ \dots,\ \ \delta(r_{n-1},a_n)=r_n\in F.\]
+طبق ساخت، اشتقاق زیر در $G$ ممکن است:
+\[q_0\Rightarrow a_1r_1\Rightarrow a_1a_2r_2\Rightarrow\cdots\Rightarrow a_1\cdots a_nr_n\Rightarrow a_1\cdots a_n,\]
+که گام آخر از قاعده $r_n\to\eps$ (چون $r_n\in F$) استفاده می‌کند. برعکس، هر اشتقاق در $G$ شکل بالا را دارد (چون تنها راه حذف متغیر قاعده $q_k\to\eps$ است و فقط برای حالت‌های پذیرش وجود دارد)، پس دنباله‌ای پذیرنده از حالت‌ها در $M$ مشخص می‌کند. بنابراین $L(G)=L$.
+\end{proof}
+
+\begin{example}
+یک گرامر خطی راست برای $aab^*a$. ابتدا یک \lr{DFA} می‌سازیم ($q_3$ حالت تله است):
+\begin{automaton}[node distance=1.6cm]
+  \node[state,initial] (q0) {$q_0$};
+  \node[state,right=of q0] (q1) {$q_1$};
+  \node[state,right=of q1] (q2) {$q_2$};
+  \node[state,accepting,right=of q2] (qf) {$q_f$};
+  \node[state,below=1.3cm of q1] (q3) {$q_3$};
+  \path (q0) edge node {$a$} (q1) (q1) edge node {$a$} (q2) (q2) edge node {$a$} (qf)
+        (q2) edge[loop above] node {$b$} (q2)
+        (q0) edge node[below left] {$b$} (q3) (q1) edge node {$b$} (q3)
+        (qf) edge[bend left] node {$a,b$} (q3)
+        (q3) edge[loop left] node {$a,b$} (q3);
+\end{automaton}
+قاعده‌های گرامر از روی گذارهای این ماشین:
+\[
+\begin{array}{llll}
+q_0\to aq_1, & q_0\to bq_3, & q_1\to aq_2, & q_1\to bq_3,\\
+q_2\to aq_f, & q_2\to bq_2, & q_f\to aq_3, & q_f\to bq_3,\\
+q_3\to aq_3, & q_3\to bq_3, & q_f\to\eps. &
+\end{array}
+\]
+پذیرش $aaa$ با مسیر $q_0\xrightarrow{a}q_1\xrightarrow{a}q_2\xrightarrow{a}q_f$ متناظر است با اشتقاق
+\[q_0\Rightarrow aq_1\Rightarrow aaq_2\Rightarrow aaaq_f\Rightarrow aaa.\]
+(قاعده‌های $q_3$ هرگز به رشته پایانه‌ای نمی‌رسند و می‌توان آن‌ها را حذف کرد.)
+\end{example}
+
+\section{گرامرهای خطی چپ}
+
+\begin{theorem}
+زبان $L$ منظم است اگر و تنها اگر گرامر خطی چپی مثل $G$ وجود داشته باشد که $L=L(G)$.
+\end{theorem}
+
+\begin{proofidea}
+گرامر خطی چپ رشته را «از راست به چپ» می‌سازد. اگر سمت راست همه قاعده‌ها را برعکس کنیم، یک گرامر خطی راست به دست می‌آید که \textbf{معکوس} همان زبان را تولید می‌کند. سپس از بستاری زبان‌های منظم تحت معکوس (قضیه \ref{thm:reg-reverse}) استفاده می‌کنیم.
+\end{proofidea}
+
+\begin{proof}
+برای گرامر خطی چپ $G$، گرامر $\widehat{G}$ را با همان متغیرها و قاعده‌های زیر می‌سازیم:
+\[A\to Bv\ \ \leftrightarrow\ \ A\to v^RB,\qquad\qquad A\to v\ \ \leftrightarrow\ \ A\to v^R.\]
+$\widehat{G}$ خطی راست است. همچنین این تبدیل دوطرفه است: از هر گرامر خطی راست هم با همین قاعده یک گرامر خطی چپ به دست می‌آید.
+
+\textbf{ادعا:} $L(G)=L(\widehat{G})^R$. هر صورت میانی در اشتقاق $G$ شکل $Bx$ و در $\widehat{G}$ شکل $x^RB$ دارد. با استقرا روی تعداد گام‌ها، $S\der_G Bx$ اگر و تنها اگر $S\der_{\widehat G} x^RB$: اگر $Bx\Rightarrow_G Cvx$ با قاعده $B\to Cv$، آنگاه $x^RB\Rightarrow_{\widehat G}x^Rv^RC=(vx)^RC$ با قاعده متناظر $B\to v^RC$؛ و گام پایانی $B\to v$ هم متناظر $B\to v^R$ است. پس $S\der_G w$ اگر و تنها اگر $S\der_{\widehat G}w^R$.
+
+\textbf{جهت رفت:} اگر $G$ خطی چپ باشد، $\widehat{G}$ خطی راست است، پس طبق قضیه \ref{thm:rl-regular} زبان $L(\widehat G)$ منظم است. طبق بستاری تحت معکوس، $L(\widehat G)^R=L(G)$ هم منظم است.
+
+\textbf{جهت برگشت:} اگر $L$ منظم باشد، $L^R$ هم منظم است و طبق قضیه \ref{thm:regular-rl} گرامر خطی راستی مثل $\widehat G$ با $L(\widehat G)=L^R$ وجود دارد. گرامر خطی چپ متناظر با آن، $G$، زبان $L(\widehat G)^R=(L^R)^R=L$ را تولید می‌کند.
+\end{proof}
+
+\begin{corollary}
+یک زبان منظم است اگر و تنها اگر یک گرامر منظم (خطی راست یا خطی چپ) آن را تولید کند.
+\end{corollary}
+
+\begin{summary}
+\begin{itemize}
+\item گرامر $(V,T,S,P)$ رشته‌های زبان را با اشتقاق از متغیر شروع تولید می‌کند.
+\item خطی راست: $A\to xB\mid x$؛ خطی چپ: $A\to Bx\mid x$. گرامر خطی که هر دو نوع قاعده را ترکیب کند ممکن است زبان نامنظم بسازد.
+\item متغیر $\leftrightarrow$ حالت: گرامر خطی راست و \lr{NFA} به‌سادگی به هم تبدیل می‌شوند.
+\item گرامر خطی چپ معکوس زبان را به شکل خطی راست تولید می‌کند؛ با بستاری تحت معکوس، آن هم دقیقاً زبان‌های منظم را می‌سازد.
+\end{itemize}
+\end{summary}

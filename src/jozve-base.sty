@@ -1,0 +1,70 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{jozve-base}[2026/10/31 Automata notes: colors, macros and diagram styles]
+
+\RequirePackage{amsmath,amssymb,mathtools}
+\RequirePackage[dvipsnames,svgnames,table]{xcolor}
+\RequirePackage{tikz}
+\usetikzlibrary{automata,positioning,arrows.meta,calc,shapes.geometric,shapes.misc,decorations.pathreplacing,decorations.pathmorphing,fit,backgrounds,matrix,trees}
+
+\definecolor{jzMain}{HTML}{1D3557}
+\definecolor{jzAccent}{HTML}{E63946}
+\definecolor{jzSoft}{HTML}{F1FAEE}
+\definecolor{defFrame}{HTML}{1F6FB2}
+\definecolor{defBack}{HTML}{EEF5FC}
+\definecolor{thmFrame}{HTML}{6A2C91}
+\definecolor{thmBack}{HTML}{F5EFFA}
+\definecolor{lemFrame}{HTML}{8A4FB0}
+\definecolor{lemBack}{HTML}{F8F3FB}
+\definecolor{corFrame}{HTML}{A23B72}
+\definecolor{corBack}{HTML}{FBF0F6}
+\definecolor{exFrame}{HTML}{1E7F5C}
+\definecolor{exBack}{HTML}{EEF8F3}
+\definecolor{noteFrame}{HTML}{C27C0E}
+\definecolor{noteBack}{HTML}{FFF7E6}
+\definecolor{proofFrame}{HTML}{4A5D70}
+\definecolor{proofBack}{HTML}{F7F9FB}
+\definecolor{ideaFrame}{HTML}{0E7C86}
+\definecolor{ideaBack}{HTML}{ECF7F8}
+\definecolor{algFrame}{HTML}{34495E}
+\definecolor{algBack}{HTML}{F3F5F7}
+\definecolor{warnFrame}{HTML}{C0392B}
+\definecolor{warnBack}{HTML}{FDEFEE}
+
+\newcommand{\eps}{\varepsilon}
+\newcommand{\blank}{\sqcup}
+\newcommand{\enc}[1]{\langle #1\rangle}
+\newcommand{\st}{\mid}
+\newcommand{\cP}{\mathrm{P}}
+\newcommand{\cNP}{\mathrm{NP}}
+\newcommand{\prob}[1]{\mathit{#1}}
+\newcommand{\lng}[2]{\mathit{#1}_{\mathsf{#2}}}
+\newcommand{\ATM}{\lng{A}{TM}}
+\newcommand{\der}{\overset{*}{\Rightarrow}}
+\newcommand{\ra}{\rightarrow}
+\newcommand{\pre}{\mathit{Prefix}}
+\newcommand{\suf}{\mathit{Suffix}}
+\newcommand{\qacc}{q_{\mathrm{accept}}}
+\newcommand{\qrej}{q_{\mathrm{reject}}}
+\newcommand{\qstart}{q_{\mathrm{start}}}
+\newcommand{\txt}[1]{\text{\lr{#1}}}
+\newcommand{\abs}[1]{\lvert #1\rvert}
+\newcommand{\dom}[2]{\left[\genfrac{}{}{0pt}{}{\mathtt{#1}}{\mathtt{#2}}\right]}
+
+\tikzset{
+  jzaut/.style={->,>={Stealth[round,length=2.6mm,width=2mm]},shorten >=1pt,auto,node distance=2.1cm,
+    semithick,initial text={},
+    every state/.style={draw=jzMain,fill=jzMain!7,thick,minimum size=8.5mm,inner sep=1pt},
+    accepting/.style={double distance=1.4pt,double=jzMain!7},
+    every loop/.style={min distance=7mm,looseness=6},
+    every edge quotes/.style={font=\small}},
+  hl/.style={fill=jzAccent!20,draw=jzAccent},
+  cell/.style={draw=jzMain!70,minimum width=6.5mm,minimum height=6.5mm,inner sep=0pt,font=\small}
+}
+
+\newcommand{\tape}[2][]{%
+  \begin{tikzpicture}[baseline=(c1.base)]
+    \foreach \s [count=\i] in {#2} {\node[cell,anchor=west] (c\i) at (\i*6.5mm,0) {$\s$};}
+    #1
+  \end{tikzpicture}}
+
+\endinput

@@ -1,0 +1,262 @@
+\chapter{عبارات منظم}
+
+در حساب با عملگرهای $+$ و $\times$ عبارت‌هایی مثل $(5+3)\times4$ می‌سازیم که مقدارشان یک عدد است. به همین شکل، با عملیات منظم عبارت‌هایی می‌سازیم که مقدارشان یک \textbf{زبان} است. به این عبارت‌ها \term{عبارات منظم}{Regular Expressions} می‌گوییم. عبارات منظم روشی فشرده و قدرتمند برای توصیف الگوها هستند و در برنامه‌نویسی (مثلاً جست‌وجوی متن و ساخت کامپایلر) کاربرد زیادی دارند.
+
+\section{تعریف و مثال}
+
+مثلاً عبارت $(0\cup1)0^*$ کوتاه‌شده $(\{0\}\cup\{1\})\circ\{0\}^*$ است: مجموعه همه رشته‌هایی که با یک $0$ یا یک $1$ شروع می‌شوند و بعد هر تعداد $0$ دارند. چند قرارداد:
+\begin{itemize}
+\item نماد الحاق $\circ$ معمولاً نوشته نمی‌شود.
+\item \textbf{اولویت عملگرها:} اول ستاره، بعد الحاق، بعد اجتماع (مثل توان، ضرب و جمع در حساب). پس $01^*\cup1$ یعنی $\big(0(1^*)\big)\cup1$.
+\item اگر $\Sigma=\{0,1\}$، خود $\Sigma$ را به عنوان عبارت $(0\cup1)$ به کار می‌بریم. پس $\Sigma$ همه رشته‌های به طول یک، $\Sigma^*$ همه رشته‌ها، $0\Sigma^*$ رشته‌هایی که با $0$ شروع می‌شوند و $\Sigma^*1$ رشته‌هایی که به $1$ ختم می‌شوند را توصیف می‌کند.
+\end{itemize}
+
+\begin{definition}[عبارت منظم]
+$R$ یک \textbf{عبارت منظم} است اگر یکی از این‌ها باشد:
+\begin{enumerate}
+\item $a$ برای یک $a\in\Sigma$؛ زبان آن $\{a\}$ است.
+\item $\eps$؛ زبان آن $\{\eps\}$ است که فقط یک رشته (رشته تهی) دارد.
+\item $\emptyset$؛ زبان آن تهی است و هیچ رشته‌ای ندارد.
+\item $(R_1\cup R_2)$، $(R_1\circ R_2)$ یا $(R_1^*)$ که $R_1$ و $R_2$ عبارت منظم‌اند.
+\end{enumerate}
+زبان توصیف‌شده با $R$ را با $L(R)$ نشان می‌دهیم. همچنین $R^+=RR^*$ و $R^k$ الحاق $k$ نسخه از $R$ است.
+\end{definition}
+
+\begin{note}[تعریف دوری یا استقرایی؟]
+ممکن است به نظر برسد عبارت منظم را با خودش تعریف کرده‌ایم (تعریف دوری). اما این‌طور نیست: $R_1$ و $R_2$ همیشه \textbf{کوچک‌تر} از $R$ هستند. پس این یک \textbf{تعریف استقرایی} است که از عبارت‌های پایه (موارد ۱ تا ۳) شروع می‌کند و عبارت‌های بزرگ‌تر را از کوچک‌ترها می‌سازد.
+\end{note}
+
+\begin{example}
+روی $\Sigma=\{0,1\}$:
+\begin{ltrfig}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{ll}
+$0^*10^*$ & $\{w\st w$ contains a single $1\}$\\
+$\Sigma^*1\Sigma^*$ & $\{w\st w$ has at least one $1\}$\\
+$\Sigma^*001\Sigma^*$ & $\{w\st w$ contains $001$ as a substring$\}$\\
+$1^*(01^+)^*$ & $\{w\st$ every $0$ in $w$ is followed by at least one $1\}$\\
+$(\Sigma\Sigma)^*$ & $\{w\st |w|$ is even$\}$\\
+$(\Sigma\Sigma\Sigma)^*$ & $\{w\st |w|$ is a multiple of $3\}$\\
+$01\cup10$ & $\{01,10\}$\\
+$0\Sigma^*0\cup1\Sigma^*1\cup0\cup1$ & $\{w\st w$ starts and ends with the same symbol$\}$\\
+$(0\cup\eps)1^*$ & $01^*\cup1^*$\\
+$(0\cup\eps)(1\cup\eps)$ & $\{\eps,0,1,01\}$\\
+$1^*\emptyset$ & $\emptyset$\\
+$\emptyset^*$ & $\{\eps\}$
+\end{tabular}
+\end{ltrfig}
+\end{example}
+
+دو مورد آخر ارزش توضیح دارند. الحاق هر زبانی با $\emptyset$ تهی است، چون برای ساختن رشته $xy$ باید $y$ را از زبان تهی برداریم که ممکن نیست. اما $\emptyset^*=\{\eps\}$، چون ستاره همیشه الحاق \emph{صفر} رشته (یعنی $\eps$) را دارد.
+
+\subsection{اتحادهای ساده}
+برای هر عبارت منظم $R$:
+\[R\cup\emptyset=R,\qquad R\circ\eps=R.\]
+اما دو عبارت شبیه به این‌ها در حالت کلی درست \textbf{نیستند}:
+\begin{itemize}
+\item $R\cup\eps\neq R$: اگر $R=0$ آنگاه $L(R)=\{0\}$ ولی $L(R\cup\eps)=\{0,\eps\}$.
+\item $R\circ\emptyset\neq R$: اگر $R=0$ آنگاه $L(R)=\{0\}$ ولی $L(R\circ\emptyset)=\emptyset$.
+\end{itemize}
+
+\begin{example}[کاربرد در کامپایلرها]
+بخش «تحلیل لغوی» کامپایلر کد برنامه را به \textbf{توکن}ها (مثل نام متغیر و عدد) می‌شکند و معمولاً از روی عبارات منظم به‌طور خودکار ساخته می‌شود. مثلاً اگر $D=\{0,1,\dots,9\}$ مجموعه ارقام باشد، عددهای اعشاری علامت‌دار با این عبارت توصیف می‌شوند:
+\[(+\cup-\cup\eps)\,(D^+\cup D^+.D^*\cup D^*.D^+).\]
+رشته‌های $72$، $3.14159$، $+7.$ و $-.01$ همه با این عبارت تطبیق دارند. (به اولویت عملگرها دقت کنید.)
+\end{example}
+
+\section{هم‌ارزی عبارات منظم و ماشین‌های متناهی}
+
+\begin{theorem}\label{thm:re-equiv}
+یک زبان منظم است اگر و تنها اگر یک عبارت منظم آن را توصیف کند.
+\end{theorem}
+
+این قضیه دو جهت دارد که هر کدام را در یک لم ثابت می‌کنیم.
+
+\subsection{از عبارت منظم به \lr{NFA}}
+
+\begin{lemma}\label{lem:re-nfa}
+اگر یک عبارت منظم زبانی را توصیف کند، آن زبان منظم است.
+\end{lemma}
+
+\begin{proofidea}
+عبارت منظم $R$ را به یک \lr{NFA} تبدیل می‌کنیم. چون \lr{NFA} و \lr{DFA} هم‌ارزند، این کافی است. تبدیل را روی ساختار استقرایی تعریف عبارت منظم انجام می‌دهیم: برای عبارت‌های پایه ماشین می‌سازیم و برای عبارت‌های مرکب از ساخت‌های بستاری فصل ۵ استفاده می‌کنیم.
+\end{proofidea}
+
+\begin{proof}
+شش حالت تعریف عبارت منظم را بررسی می‌کنیم:
+\begin{enumerate}
+\item $R=a$ برای $a\in\Sigma$، پس $L(R)=\{a\}$. ماشین $N=(\{q_1,q_2\},\Sigma,\delta,q_1,\{q_2\})$ با $\delta(q_1,a)=\{q_2\}$ و $\delta(r,b)=\emptyset$ برای بقیه حالت‌ها.
+\item $R=\eps$، پس $L(R)=\{\eps\}$. ماشین $N=(\{q_1\},\Sigma,\delta,q_1,\{q_1\})$ با $\delta(q_1,b)=\emptyset$ برای هر $b$.
+\item $R=\emptyset$. ماشین $N=(\{q_1\},\Sigma,\delta,q_1,\emptyset)$ با $\delta(q_1,b)=\emptyset$ برای هر $b$.
+\end{enumerate}
+\begin{automaton}[node distance=1.6cm]
+  \node[state,initial] (a1) {$q_1$};
+  \node[state,accepting,right=of a1] (a2) {$q_2$};
+  \path (a1) edge node {$a$} (a2);
+  \node[state,initial,accepting,right=2.4cm of a2] (b1) {$q_1$};
+  \node[state,initial,right=2.6cm of b1] (c1) {$q_1$};
+  \node[below=4mm of $(a1)!0.5!(a2)$,font=\small] {case 1};
+  \node[below=4mm of b1,font=\small] {case 2};
+  \node[below=4mm of c1,font=\small] {case 3};
+\end{automaton}
+\begin{enumerate}[resume]
+\item $R=R_1\cup R_2$،
+\item $R=R_1\circ R_2$،
+\item $R=R_1^*$.
+\end{enumerate}
+در سه حالت آخر، طبق فرض استقرا برای $R_1$ و $R_2$ (که کوچک‌ترند) \lr{NFA} داریم و با ساخت‌های اثبات بستاری تحت اجتماع، الحاق و ستاره (فصل ۵) یک \lr{NFA} برای $R$ می‌سازیم.
+\end{proof}
+
+\begin{example}[تبدیل $(ab\cup a)^*$ به \lr{NFA}]
+ماشین را از درون به بیرون می‌سازیم:
+\begin{automaton}[node distance=1.15cm,every state/.style={draw=jzMain,fill=jzMain!7,minimum size=6mm,inner sep=0pt}]
+  \node (la) {$a$:};
+  \node[state,right=0.3cm of la] (a1) {}; \node[state,accepting,right=of a1] (a2) {};
+  \path (a1) edge node {$a$} (a2);
+  \node[right=1.4cm of a2] (lb) {$b$:};
+  \node[state,right=0.3cm of lb] (b1) {}; \node[state,accepting,right=of b1] (b2) {};
+  \path (b1) edge node {$b$} (b2);
+  \node[below=1.1cm of la] (lab) {$ab$:};
+  \node[state,right=0.3cm of lab] (c1) {}; \node[state,right=of c1] (c2) {}; \node[state,right=of c2] (c3) {}; \node[state,accepting,right=of c3] (c4) {};
+  \path (c1) edge node {$a$} (c2) (c2) edge node {$\eps$} (c3) (c3) edge node {$b$} (c4);
+\end{automaton}
+\begin{automaton}[node distance=1.15cm,every state/.style={draw=jzMain,fill=jzMain!7,minimum size=6mm,inner sep=0pt}]
+  \node (l) {$ab\cup a$:};
+  \node[state,right=0.3cm of l] (s) {};
+  \node[state,above right=0.5cm and 1cm of s] (c1) {}; \node[state,right=of c1] (c2) {}; \node[state,right=of c2] (c3) {}; \node[state,accepting,right=of c3] (c4) {};
+  \node[state,below right=0.5cm and 1cm of s] (d1) {}; \node[state,accepting,right=of d1] (d2) {};
+  \path (s) edge node {$\eps$} (c1) (s) edge node[below left] {$\eps$} (d1)
+        (c1) edge node {$a$} (c2) (c2) edge node {$\eps$} (c3) (c3) edge node {$b$} (c4)
+        (d1) edge node {$a$} (d2);
+  \node[below=2.0cm of l] (l2) {$(ab\cup a)^*$:};
+  \node[state,accepting,right=0.3cm of l2] (t) {};
+  \node[state,right=0.9cm of t] (s2) {};
+  \node[state,above right=0.5cm and 1cm of s2] (e1) {}; \node[state,right=of e1] (e2) {}; \node[state,right=of e2] (e3) {}; \node[state,accepting,right=of e3] (e4) {};
+  \node[state,below right=0.5cm and 1cm of s2] (f1) {}; \node[state,accepting,right=of f1] (f2) {};
+  \path (t) edge node {$\eps$} (s2) (s2) edge node {$\eps$} (e1) (s2) edge node[below left] {$\eps$} (f1)
+        (e1) edge node {$a$} (e2) (e2) edge node {$\eps$} (e3) (e3) edge node {$b$} (e4)
+        (f1) edge node {$a$} (f2)
+        (e4) edge[bend right=50] node[above] {$\eps$} (s2)
+        (f2) edge[bend left=50] node[below] {$\eps$} (s2);
+\end{automaton}
+در شکل آخر، حالت سمت چپ حالت شروع جدیدِ ساخت ستاره است.
+\end{example}
+
+\subsection{از \lr{DFA} به عبارت منظم}
+
+\begin{lemma}\label{lem:dfa-re}
+اگر زبانی منظم باشد، یک عبارت منظم آن را توصیف می‌کند.
+\end{lemma}
+
+برای این جهت از نوع جدیدی از ماشین استفاده می‌کنیم: \term{ماشین متناهی غیرقطعی تعمیم‌یافته}{Generalized NFA} یا \lr{GNFA}. در \lr{GNFA} برچسب پیکان‌ها می‌تواند \textbf{هر عبارت منظمی} باشد، نه فقط یک نماد یا $\eps$. ماشین با رد شدن از یک پیکان، یک \textbf{بلوک} از نمادهای ورودی را می‌خواند که با برچسب آن پیکان تطبیق دارد.
+
+نقشه اثبات: \lr{DFA} را به یک \lr{GNFA} تبدیل می‌کنیم و بعد حالت‌های \lr{GNFA} را یکی‌یکی حذف می‌کنیم و برچسب‌ها را به‌روز می‌کنیم، تا فقط دو حالت بماند. برچسب تنها پیکان باقی‌مانده همان عبارت منظم مورد نظر است.
+
+\begin{ltrfig}
+\begin{tikzpicture}[->,>={Stealth[round]},semithick,every node/.style={draw=jzMain,rounded corners,fill=jzMain!5,font=\small,align=center,minimum height=8mm}]
+  \node (a) at (0,0) {3-state\\DFA}; \node (b) at (2.8,0) {5-state\\GNFA}; \node (c) at (5.6,0) {4-state\\GNFA};
+  \node (d) at (5.6,-1.6) {3-state\\GNFA}; \node (e) at (2.8,-1.6) {2-state\\GNFA}; \node (f) at (0,-1.6) {regular\\expression};
+  \draw (a)--(b); \draw (b)--(c); \draw (c)--(d); \draw (d)--(e); \draw (e)--(f);
+\end{tikzpicture}
+\end{ltrfig}
+
+برای ساده شدن کار، \lr{GNFA}ها را به یک \textbf{شکل خاص} محدود می‌کنیم:
+\begin{itemize}
+\item یک حالت شروع و یک حالت پذیرش دارد و این دو با هم فرق دارند.
+\item از حالت شروع به هر حالت دیگر پیکان هست، اما هیچ پیکانی وارد حالت شروع نمی‌شود.
+\item از هر حالت دیگر به حالت پذیرش پیکان هست، اما هیچ پیکانی از حالت پذیرش خارج نمی‌شود.
+\item بین هر دو حالت دیگر، در هر جهت دقیقاً یک پیکان هست و هر حالت یک حلقه روی خودش دارد.
+\end{itemize}
+
+\begin{definition}[\lr{GNFA}]
+یک \lr{GNFA} پنج‌تایی $(Q,\Sigma,\delta,\qstart,\qacc)$ است که در آن $Q$ مجموعه متناهی حالت‌ها، $\Sigma$ الفبای ورودی، $\qstart$ حالت شروع، $\qacc$ حالت پذیرش و
+\[\delta:\big(Q-\{\qacc\}\big)\times\big(Q-\{\qstart\}\big)\to\mathcal{R}\]
+تابع گذار است که $\mathcal{R}$ مجموعه همه عبارات منظم روی $\Sigma$ است. یعنی $\delta(q_i,q_j)$ برچسب پیکان از $q_i$ به $q_j$ است.
+
+\lr{GNFA} رشته $w\in\Sigma^*$ را می‌پذیرد اگر بتوان نوشت $w=w_1w_2\cdots w_k$ (هر $w_i\in\Sigma^*$) و دنباله‌ای از حالت‌ها $q_0,q_1,\dots,q_k$ وجود داشته باشد که $q_0=\qstart$، $q_k=\qacc$ و برای هر $i$، $w_i\in L\big(\delta(q_{i-1},q_i)\big)$.
+\end{definition}
+
+\textbf{تبدیل \lr{DFA} به \lr{GNFA} با شکل خاص:}
+\begin{itemize}
+\item یک حالت شروع جدید با پیکان $\eps$ به حالت شروع قدیمی اضافه می‌کنیم.
+\item یک حالت پذیرش جدید با پیکان‌های $\eps$ از همه حالت‌های پذیرش قدیمی اضافه می‌کنیم.
+\item اگر بین دو حالت چند پیکان (یا یک پیکان با چند برچسب) بود، آن‌ها را با اجتماع یکی می‌کنیم.
+\item بین حالت‌هایی که در \lr{DFA} پیکانی نداشتند، پیکانی با برچسب $\emptyset$ می‌گذاریم. (پیکان $\emptyset$ هرگز قابل استفاده نیست، پس زبان تغییر نمی‌کند.)
+\end{itemize}
+
+\textbf{حذف یک حالت:} یک حالت $q_{\mathrm{rip}}$ غیر از شروع و پذیرش را انتخاب و حذف می‌کنیم. برای جبران، برچسب هر پیکان $q_i\to q_j$ را طوری عوض می‌کنیم که همه رشته‌هایی را توصیف کند که ماشین را \textbf{یا مستقیماً یا از طریق $q_{\mathrm{rip}}$} از $q_i$ به $q_j$ می‌برند:
+\begin{ltrfig}
+\begin{tikzpicture}[jzaut,node distance=2cm]
+  \node[state] (qi) {$q_i$}; \node[state,right=2.6cm of qi] (qj) {$q_j$};
+  \node[state,below right=1.2cm and 0.8cm of qi] (qr) {$q_{\mathrm{rip}}$};
+  \path (qi) edge node {$R_4$} (qj) (qi) edge node[below left] {$R_1$} (qr) (qr) edge node[below right] {$R_3$} (qj) (qr) edge[loop below] node {$R_2$} (qr);
+  \node at (5.3,-0.5) {\Large$\Longrightarrow$};
+  \node[state,right=4.4cm of qj] (pi) {$q_i$}; \node[state,right=3.4cm of pi] (pj) {$q_j$};
+  \path (pi) edge node {$(R_1)(R_2)^*(R_3)\cup(R_4)$} (pj);
+\end{tikzpicture}
+\end{ltrfig}
+
+\begin{algo}{$\textsc{Convert}(G)$}{روی ورودی \lr{GNFA} $G$}
+\begin{enumerate}
+\item فرض کنید $k$ تعداد حالت‌های $G$ باشد.
+\item اگر $k=2$، آنگاه $G$ فقط یک حالت شروع، یک حالت پذیرش و یک پیکان بین آن‌ها با برچسب $R$ دارد. $R$ را برگردان.
+\item اگر $k>2$، یک $q_{\mathrm{rip}}\in Q-\{\qstart,\qacc\}$ انتخاب کن و \lr{GNFA} $G'=(Q',\Sigma,\delta',\qstart,\qacc)$ را بساز که $Q'=Q-\{q_{\mathrm{rip}}\}$ و برای هر $q_i\in Q'-\{\qacc\}$ و $q_j\in Q'-\{\qstart\}$:
+\[\delta'(q_i,q_j)=(R_1)(R_2)^*(R_3)\cup(R_4),\]
+که $R_1=\delta(q_i,q_{\mathrm{rip}})$، $R_2=\delta(q_{\mathrm{rip}},q_{\mathrm{rip}})$، $R_3=\delta(q_{\mathrm{rip}},q_j)$ و $R_4=\delta(q_i,q_j)$.
+\item $\textsc{Convert}(G')$ را برگردان.
+\end{enumerate}
+\end{algo}
+
+\begin{lemma}
+برای هر \lr{GNFA} $G$، عبارت $\textsc{Convert}(G)$ با $G$ هم‌ارز است.
+\end{lemma}
+\begin{proof}
+با استقرا روی تعداد حالت‌های $G$، یعنی $k$.
+
+\textbf{پایه} ($k=2$): $G$ فقط یک پیکان از $\qstart$ به $\qacc$ با برچسب $R$ دارد. پس $G$ دقیقاً رشته‌های $L(R)$ را می‌پذیرد و $\textsc{Convert}$ همان $R$ را برمی‌گرداند.
+
+\textbf{گام:} فرض کنید ادعا برای $k-1$ حالت درست باشد و $G$ دارای $k>2$ حالت باشد. کافی است نشان دهیم $G$ و $G'$ هم‌ارزند، چون طبق فرض استقرا $\textsc{Convert}(G')$ با $G'$ هم‌ارز است.
+
+\emph{هر رشته‌ای که $G$ بپذیرد، $G'$ هم می‌پذیرد:} فرض کنید $G$ رشته $w$ را با دنباله حالت‌های $\qstart,q_1,q_2,\dots,\qacc$ بپذیرد. اگر $q_{\mathrm{rip}}$ در این دنباله نباشد، $G'$ هم با همین دنباله $w$ را می‌پذیرد، چون هر برچسب جدید شامل برچسب قدیمی (به عنوان یکی از دو طرف اجتماع، یعنی $R_4$) است. اگر $q_{\mathrm{rip}}$ در دنباله باشد، هر دسته از $q_{\mathrm{rip}}$های پشت سر هم را حذف کنید. اگر این دسته بین $q_i$ و $q_j$ قرار داشته باشد، بخشی از ورودی که از $q_i$ تا $q_j$ خوانده شده با $R_1R_2^*R_3$ تطبیق دارد (یک بار $R_1$، چند بار $R_2$ و یک بار $R_3$). پس $G'$ می‌تواند همین بخش را با پیکان جدید $q_i\to q_j$ بخواند و $w$ را بپذیرد.
+
+\emph{هر رشته‌ای که $G'$ بپذیرد، $G$ هم می‌پذیرد:} هر پیکان $q_i\to q_j$ در $G'$ رشته‌هایی را می‌خواند که $G$ آن‌ها را یا مستقیماً (با $R_4$) یا از طریق $q_{\mathrm{rip}}$ (با $R_1R_2^*R_3$) از $q_i$ به $q_j$ می‌خواند. پس هر محاسبه پذیرنده $G'$ را می‌توان به یک محاسبه پذیرنده $G$ تبدیل کرد.
+
+بنابراین $G$ و $G'$ هم‌ارزند و حکم ثابت است.
+\end{proof}
+
+با این لم، اثبات لم \ref{lem:dfa-re} کامل است: برای زبان منظم $A$ یک \lr{DFA} می‌گیریم، آن را به \lr{GNFA} تبدیل می‌کنیم و $\textsc{Convert}$ را اجرا می‌کنیم. و قضیه \ref{thm:re-equiv} از دو لم \ref{lem:re-nfa} و \ref{lem:dfa-re} نتیجه می‌شود.
+
+\begin{example}
+\lr{DFA} دوحالته زیر را به عبارت منظم تبدیل می‌کنیم (پیکان‌های $\emptyset$ را نمی‌کشیم):
+\begin{automaton}[node distance=1.9cm]
+  \node at (-0.9,0) {(a)};
+  \node[state,initial] (1) at (0,0) {$1$};
+  \node[state,accepting] (2) at (0,-1.8) {$2$};
+  \path (1) edge[loop right] node {$a$} (1) (1) edge node[left] {$b$} (2) (2) edge[loop right] node {$a,b$} (2);
+  \node at (2.2,0) {(b)};
+  \node[state] (s) at (3,0) {$s$};
+  \node[state] (1b) at (4.6,0) {$1$};
+  \node[state] (2b) at (4.6,-1.8) {$2$};
+  \node[state] (ab) at (6.4,-1.8) {$a$};
+  \path (s) edge node {$\eps$} (1b) (1b) edge[loop right] node {$a$} (1b) (1b) edge node[left] {$b$} (2b)
+        (2b) edge[loop below] node {$a\cup b$} (2b) (2b) edge node {$\eps$} (ab);
+  \node at (8.0,0) {(c)};
+  \node[state] (sc) at (8.8,0) {$s$};
+  \node[state] (1c) at (10.4,0) {$1$};
+  \node[state] (ac) at (10.4,-1.8) {$a$};
+  \path (sc) edge node {$\eps$} (1c) (1c) edge[loop right] node {$a$} (1c) (1c) edge node[right] {$b(a\cup b)^*$} (ac);
+\end{automaton}
+در (b) دو حالت جدید $s$ (شروع) و $a$ (پذیرش) اضافه شده‌اند. در (c) حالت $2$ را حذف کرده‌ایم: پیکان جدید $1\to a$ برچسب $b(a\cup b)^*\eps\cup\emptyset=b(a\cup b)^*$ دارد. در آخر با حذف حالت $1$، پیکان $s\to a$ برچسب
+\[\eps\,a^*\,b(a\cup b)^*\cup\emptyset=a^*b(a\cup b)^*\]
+را می‌گیرد. پس زبان این \lr{DFA} برابر $a^*b(a\cup b)^*$ است: رشته‌هایی که دست‌کم یک $b$ دارند.
+\end{example}
+
+\begin{summary}
+\begin{itemize}
+\item عبارت منظم از $a$، $\eps$ و $\emptyset$ با اجتماع، الحاق و ستاره ساخته می‌شود. اولویت: ستاره، الحاق، اجتماع.
+\item $R\cup\emptyset=R$ و $R\eps=R$، اما $R\cup\eps$ و $R\emptyset$ در حالت کلی برابر $R$ نیستند. $\emptyset^*=\{\eps\}$.
+\item تبدیل عبارت منظم به \lr{NFA}: ساخت استقرایی با ساخت‌های بستاری.
+\item تبدیل \lr{DFA} به عبارت منظم: ساختن \lr{GNFA} و حذف حالت‌ها با فرمول $(R_1)(R_2)^*(R_3)\cup(R_4)$.
+\item عبارات منظم، \lr{DFA}ها و \lr{NFA}ها دقیقاً یک دسته زبان را توصیف می‌کنند.
+\end{itemize}
+\end{summary}

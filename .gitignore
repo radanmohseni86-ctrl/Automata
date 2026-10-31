@@ -1,0 +1,7 @@
+src/*.aux
+src/*.log
+src/*.out
+src/*.toc
+src/*.pdf
+web/node_modules/
+web/build/

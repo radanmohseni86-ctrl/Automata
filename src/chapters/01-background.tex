@@ -1,0 +1,359 @@
+\chapter{مقدمات ریاضی: منطق، مجموعه، تابع و گراف}
+
+در این درس با «ماشین»هایی سروکار داریم که رشته‌ها را می‌خوانند و درباره آن‌ها تصمیم می‌گیرند. برای اینکه بتوانیم درباره این ماشین‌ها دقیق حرف بزنیم و قضیه ثابت کنیم، به چند ابزار ساده ریاضی نیاز داریم. این فصل همین ابزارها را مرور می‌کند. اگر این مطالب را از درس ریاضیات گسسته به خاطر دارید، می‌توانید سریع از آن عبور کنید.
+
+\section{منطق بولی}
+
+منطق بولی یک دستگاه ریاضی است که فقط دو مقدار دارد: \textbf{درست} (\lr{True}) و \textbf{نادرست} (\lr{False}). معمولاً درست را با $1$ و نادرست را با $0$ نشان می‌دهیم. این دو مقدار می‌توانند هر دوگانه‌ای را مدل کنند: ولتاژ بالا و پایین، گزاره درست و غلط، یا جواب «بله» و «نه». منطق بولی پایه طراحی مدارهای دیجیتال و کامپیوترهاست.
+
+\subsection{عملگرهای بولی}
+با عملگرهای بولی گزاره‌های ساده را به هم وصل می‌کنیم و گزاره‌های پیچیده‌تر می‌سازیم. اگر $P$ و $Q$ دو گزاره باشند (به آن‌ها \textbf{عملوند} می‌گوییم)، عملگرهای اصلی این‌ها هستند:
+\begin{itemize}
+\item \textbf{نقیض} (\lr{NOT}) با نماد $\neg$: مقدار را برعکس می‌کند.
+\item \textbf{عطف} (\lr{AND}) با نماد $\wedge$: فقط وقتی درست است که هر دو عملوند درست باشند.
+\item \textbf{فصل} (\lr{OR}) با نماد $\vee$: وقتی درست است که دست‌کم یکی از عملوندها درست باشد.
+\item \textbf{یای انحصاری} (\lr{XOR}) با نماد $\oplus$: وقتی درست است که دقیقاً یکی از عملوندها درست باشد.
+\item \textbf{هم‌ارزی} با نماد $\leftrightarrow$: وقتی درست است که دو عملوند هم‌مقدار باشند.
+\item \textbf{استلزام} با نماد $\rightarrow$: «اگر $P$ آنگاه $Q$». فقط در یک حالت نادرست است: وقتی $P$ درست و $Q$ نادرست باشد.
+\end{itemize}
+
+\begin{ltrfig}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{cc|cccccc}
+\toprule
+$P$ & $Q$ & $\neg P$ & $P\wedge Q$ & $P\vee Q$ & $P\oplus Q$ & $P\leftrightarrow Q$ & $P\rightarrow Q$\\
+\midrule
+$0$ & $0$ & $1$ & $0$ & $0$ & $0$ & $1$ & $1$\\
+$0$ & $1$ & $1$ & $0$ & $1$ & $1$ & $0$ & $1$\\
+$1$ & $0$ & $0$ & $0$ & $1$ & $1$ & $0$ & $0$\\
+$1$ & $1$ & $0$ & $1$ & $1$ & $0$ & $1$ & $1$\\
+\bottomrule
+\end{tabular}
+\end{ltrfig}
+
+همه عملگرها را می‌توان فقط با \lr{AND} و \lr{NOT} نوشت:
+\begin{align*}
+P\vee Q&\equiv\neg(\neg P\wedge\neg Q), & P\rightarrow Q&\equiv\neg P\vee Q,\\
+P\leftrightarrow Q&\equiv(P\rightarrow Q)\wedge(Q\rightarrow P), & P\oplus Q&\equiv\neg(P\leftrightarrow Q).
+\end{align*}
+\textbf{قوانین پخش‌پذیری} هم مثل ضرب و جمع در حساب کار می‌کنند، با این تفاوت که هر دو جهت برقرارند:
+\[
+P\wedge(Q\vee R)\equiv(P\wedge Q)\vee(P\wedge R),\qquad
+P\vee(Q\wedge R)\equiv(P\vee Q)\wedge(P\vee R).
+\]
+
+\subsection{سورها}
+گاهی می‌خواهیم بگوییم یک ویژگی «برای همه» برقرار است یا «دست‌کم برای یکی». برای این کار از \textbf{سورها} استفاده می‌کنیم:
+\begin{itemize}
+\item \textbf{سور عمومی} $\forall$ («برای هر»): مثلاً $\forall x\; \big(P(x)\rightarrow Q(x)\big)$ یعنی هر $x$ که ویژگی $P$ را دارد، ویژگی $Q$ را هم دارد.
+\item \textbf{سور وجودی} $\exists$ («وجود دارد»): مثلاً $\exists x\; \big(P(x)\rightarrow Q(x)\big)$.
+\item سورها را می‌توان ترکیب کرد: $\forall x\,\exists y\; P(y)>Q(x)$ یعنی برای هر $x$ یک $y$ پیدا می‌شود که $P(y)>Q(x)$.
+\end{itemize}
+
+\textbf{نقیض سورها} قاعده ساده‌ای دارد: $\forall$ به $\exists$ تبدیل می‌شود و برعکس، و نقیض به داخل می‌رود. این قاعده در فصل‌های بعد (مثلاً در لم تزریق) بارها به کار می‌آید:
+\begin{align*}
+\neg\big(\forall x\; P(x)\rightarrow Q(x)\big) &\equiv \exists x\; \neg\big(P(x)\rightarrow Q(x)\big) \equiv \exists x\; \neg\big(\neg P(x)\vee Q(x)\big)\equiv \exists x\;\big(P(x)\wedge\neg Q(x)\big),\\
+\neg\big(\exists x\; P(x)\rightarrow Q(x)\big) &\equiv \forall x\; \neg\big(P(x)\rightarrow Q(x)\big)\equiv \forall x\;\big(P(x)\wedge\neg Q(x)\big),\\
+\neg\big(\forall x\,\exists y\; P(y)>Q(x)\big) &\equiv \exists x\,\forall y\; \neg\big(P(y)>Q(x)\big)\equiv \exists x\,\forall y\; P(y)\le Q(x).
+\end{align*}
+
+\section{مجموعه‌ها}
+
+\begin{definition}[مجموعه]
+\term{مجموعه}{Set} گروهی از اشیاء است. به این اشیاء \textbf{عضو} یا \textbf{عنصر} مجموعه می‌گوییم. ترتیب و تکرار عضوها در مجموعه مهم نیست.
+\end{definition}
+
+سه راه برای تعریف یک مجموعه داریم:
+\begin{enumerate}
+\item \textbf{فهرست کردن عضوها:} $A=\{1,2,3\}$.
+\item \textbf{استفاده از سه‌نقطه} برای مجموعه‌های نامتناهی: $\mathbb{N}=\{1,2,3,\dots\}$ و $\mathbb{Z}=\{\dots,-2,-1,0,1,2,\dots\}$.
+\item \textbf{بیان یک قاعده} (نماد سازنده مجموعه): $B=\{n\st n=m^2 \text{ و } m \text{ یک عدد صحیح است}\}$.
+\end{enumerate}
+
+چند مفهوم پایه:
+\begin{itemize}
+\item \textbf{عضویت:} $1\in\{1,2,3\}$ و $4\notin\{1,2,3\}$.
+\item \textbf{اندازه} (\lr{Cardinality}): تعداد عضوهای مجموعه، مثلاً $\abs{A}=3$.
+\item \textbf{زیرمجموعه:} $A\subseteq B$ یعنی هر عضو $A$ عضو $B$ هم هست: $a\in A\rightarrow a\in B$.
+\item \textbf{زیرمجموعه سره:} $A\subsetneq B$ یعنی $A\subseteq B$ و $A\neq B$.
+\item \textbf{چندمجموعه} (\lr{Multiset}): مجموعه‌ای که در آن تعداد تکرار مهم است؛ مثلاً $\{5\}$ و $\{5,5\}$ به عنوان چندمجموعه با هم فرق دارند، ولی به عنوان مجموعه یکی‌اند.
+\item \textbf{مجموعه تهی} $\emptyset$ یا $\{\}$ هیچ عضوی ندارد. مجموعه \textbf{تک‌عضوی} مثل $\{10\}$ و \textbf{زوج نامرتب} مثل $\{10,30\}$.
+\end{itemize}
+
+\subsection{عملیات روی مجموعه‌ها}
+فرض کنید همه مجموعه‌ها زیرمجموعه یک \textbf{مجموعه مرجع} $U$ باشند.
+\begin{itemize}
+\item \textbf{اجتماع:} $A\cup B=\{x\st x\in A \text{ یا } x\in B\}$.
+\item \textbf{اشتراک:} $A\cap B=\{x\st x\in A \text{ و } x\in B\}$.
+\item \textbf{تفاضل:} $B-A=\{x\st x\in B \text{ و } x\notin A\}$.
+\item \textbf{متمم:} $\overline{A}=U-A$.
+\end{itemize}
+دو مجموعه را \textbf{مجزا} می‌گوییم اگر $A\cap B=\emptyset$. برای نمایش این عملیات از \textbf{نمودار ون} استفاده می‌شود:
+
+\begin{ltrfig}
+\begin{tikzpicture}[scale=0.85]
+  \begin{scope}
+    \draw[jzMain,rounded corners] (-2.2,-1.4) rectangle (2.2,1.5); \node at (1.9,1.2) {$U$};
+    \begin{scope}\clip (-0.5,0) circle (1); \fill[jzAccent!30] (0.5,0) circle (1);\end{scope}
+    \draw (-0.5,0) circle (1) node[left=4mm] {$A$}; \draw (0.5,0) circle (1) node[right=4mm] {$B$};
+    \node at (0,-1.75) {$A\cap B$};
+  \end{scope}
+  \begin{scope}[xshift=5.2cm]
+    \draw[jzMain,rounded corners] (-2.2,-1.4) rectangle (2.2,1.5); \node at (1.9,1.2) {$U$};
+    \fill[defFrame!25] (-0.5,0) circle (1); \fill[defFrame!25] (0.5,0) circle (1);
+    \draw (-0.5,0) circle (1) node[left=4mm] {$A$}; \draw (0.5,0) circle (1) node[right=4mm] {$B$};
+    \node at (0,-1.75) {$A\cup B$};
+  \end{scope}
+  \begin{scope}[xshift=10.4cm]
+    \draw[jzMain,rounded corners] (-2.2,-1.4) rectangle (2.2,1.5); \node at (1.9,1.2) {$U$};
+    \draw (-1,0) circle (0.8) node {$A$}; \draw (1,0) circle (0.8) node {$B$};
+    \node at (0,-1.75) {\lr{disjoint}};
+  \end{scope}
+\end{tikzpicture}
+\end{ltrfig}
+
+چند اتحاد مفید درباره مجموعه تهی:
+\[
+A\cup\emptyset=A,\quad A\cap\emptyset=\emptyset,\quad A-\emptyset=A,\quad \emptyset-A=\emptyset,\quad \overline{\emptyset}=U.
+\]
+و \textbf{قوانین دمورگان}:
+\[
+\overline{A\cup B}=\overline{A}\cap\overline{B},\qquad \overline{A\cap B}=\overline{A}\cup\overline{B}.
+\]
+(اثبات قانون اول را در فصل بعد به عنوان نمونه‌ای از یک اثبات کامل می‌بینیم.)
+
+\subsection{مجموعه توانی و قضیه کانتور}
+
+\begin{definition}[مجموعه توانی]
+\term{مجموعه توانی}{Power Set} مجموعه $A$، که با $\mathcal{P}(A)$ یا $2^A$ نشان داده می‌شود، مجموعه همه زیرمجموعه‌های $A$ است. پس عضوهای آن خودشان مجموعه‌اند.
+\end{definition}
+
+\begin{example}
+اگر $A=\{a,b,c\}$ باشد:
+\[2^A=\big\{\emptyset,\{a\},\{b\},\{c\},\{a,b\},\{a,c\},\{b,c\},\{a,b,c\}\big\}.\]
+دقت کنید که همیشه $\emptyset\in 2^A$ و $A\in 2^A$.
+\end{example}
+
+برای مجموعه متناهی $A$ داریم $\abs{2^A}=2^{\abs{A}}$. دلیلش ساده است: برای ساختن یک زیرمجموعه، درباره هر عضو $A$ یک تصمیم دوتایی می‌گیریم: «باشد» یا «نباشد». با $\abs{A}$ تصمیم مستقل، $2^{\abs{A}}$ زیرمجموعه به دست می‌آید.
+
+قضیه زیر نشان می‌دهد که حتی برای مجموعه‌های نامتناهی، مجموعه توانی همیشه «بزرگ‌تر» است. (معنای دقیق مقایسه اندازه مجموعه‌های نامتناهی را در بخش \ref{sec:cardinality} می‌بینیم.)
+
+\begin{theorem}[کانتور]\label{thm:cantor}
+برای هر مجموعه $A$ داریم $\abs{A}<\abs{\mathcal{P}(A)}$.
+\end{theorem}
+
+\begin{proof}
+باید دو چیز را نشان دهیم: $\abs{A}\le\abs{\mathcal{P}(A)}$ و $\abs{A}\neq\abs{\mathcal{P}(A)}$.
+
+بخش اول ساده است: تابع $a\mapsto\{a\}$ هر عضو $A$ را به یک زیرمجموعه تک‌عضوی می‌برد و یک‌به‌یک است. پس $A$ با زیرمجموعه‌ای از $\mathcal{P}(A)$ هم‌اندازه است.
+
+برای بخش دوم با برهان خلف فرض کنید تابعی یک‌به‌یک و پوشا $f:A\to\mathcal{P}(A)$ وجود دارد. پس هر عضو $a$ به یک زیرمجموعه $f(a)$ نظیر شده است. مجموعه زیر را تعریف کنید:
+\[D=\{a\in A\st a\notin f(a)\}.\]
+یعنی $D$ شامل عضوهایی است که در زیرمجموعه نظیر خودشان نیستند. $D$ یک زیرمجموعه از $A$ است و چون $f$ پوشاست، عضوی مثل $d$ هست که $f(d)=D$. حالا می‌پرسیم: آیا $d\in D$؟
+\begin{itemize}
+\item اگر $d\in D$، طبق تعریف $D$ باید $d\notin f(d)=D$. تناقض.
+\item اگر $d\notin D$، یعنی $d\notin f(d)$، پس طبق تعریف $D$ باید $d\in D$. باز هم تناقض.
+\end{itemize}
+هر دو حالت به تناقض می‌رسد. پس چنین $f$ ای وجود ندارد و $\abs{A}<\abs{\mathcal{P}(A)}$.
+\end{proof}
+
+\begin{note}
+این روش اثبات «قطری‌سازی» نام دارد: $D$ طوری ساخته شده که با هر $f(a)$ دست‌کم در یک نقطه (خود $a$) فرق داشته باشد. در فصل ۱۹ همین ایده را برای اثبات وجود مسائل حل‌نشدنی به کار می‌بریم.
+\end{note}
+
+\section{دنباله‌ها، چندتایی‌ها و ضرب دکارتی}
+
+\textbf{دنباله} فهرستی از اشیاء با ترتیب مشخص است، مثل $D=(5,3,13)$. برخلاف مجموعه، در دنباله ترتیب و تکرار مهم است: $(5,3)\neq(3,5)$. دنباله متناهی را \textbf{چندتایی} (\lr{Tuple}) می‌نامیم. دنباله‌ای با $k$ عضو یک \textbf{$k$-تایی} است و به $2$-تایی \textbf{زوج مرتب} می‌گوییم.
+
+\begin{definition}[ضرب دکارتی]
+\term{ضرب دکارتی}{Cartesian Product} دو مجموعه $A$ و $B$ مجموعه همه زوج‌های مرتب $(a,b)$ است که $a\in A$ و $b\in B$:
+\[A\times B=\{(a,b)\st a\in A,\ b\in B\}.\]
+به طور کلی $A_1\times\cdots\times A_k=\{(a_1,\dots,a_k)\st a_i\in A_i\}$ و $A^k=\underbrace{A\times\cdots\times A}_{k}$.
+\end{definition}
+
+\begin{example}
+اگر $A=\{1,2\}$ و $B=\{x,y,z\}$:
+\begin{align*}
+A\times B&=\{(1,x),(1,y),(1,z),(2,x),(2,y),(2,z)\},\\
+A\times B\times A&=\{(1,x,1),(1,x,2),(1,y,1),(1,y,2),(1,z,1),(1,z,2),\\
+&\qquad (2,x,1),(2,x,2),(2,y,1),(2,y,2),(2,z,1),(2,z,2)\}.
+\end{align*}
+\end{example}
+
+\section{توابع و روابط}
+
+\begin{definition}[تابع]
+\term{تابع}{Function} شیئی است که یک رابطه ورودی–خروجی برقرار می‌کند: به هر ورودی $a$ دقیقاً یک خروجی $f(a)=b$ نسبت می‌دهد. می‌گوییم $f$، $a$ را به $b$ \textbf{می‌نگارد}. مجموعه ورودی‌های ممکن \textbf{دامنه} و مجموعه خروجی‌های ممکن \textbf{برد} نام دارد و می‌نویسیم $f:D\to R$.
+\end{definition}
+
+مثلاً تابع جمع $\mathit{add}:\mathbb{Z}\times\mathbb{Z}\to\mathbb{Z}$ و تابع قدرمطلق $\mathit{abs}:\mathbb{Z}\to\mathbb{Z}$. به عنوان مثالی دیگر، اگر $\mathbb{Z}_m=\{0,1,\dots,m-1\}$ باشد، تابع $f:\mathbb{Z}_5\to\mathbb{Z}_5$ با ضابطه $f(n)=(n+1)\bmod 5$ همان جدول زیر است:
+\begin{ltrfig}
+\begin{tabular}{c|ccccc}
+$n$ & $0$ & $1$ & $2$ & $3$ & $4$\\ \hline
+$f(n)$ & $1$ & $2$ & $3$ & $4$ & $0$
+\end{tabular}
+\end{ltrfig}
+
+\begin{definition}[انواع تابع]
+تابع $f:A\to B$ را
+\begin{itemize}
+\item \textbf{یک‌به‌یک} (\lr{Injective}) می‌گوییم اگر ورودی‌های متفاوت را به خروجی‌های متفاوت ببرد: $a_1\neq a_2\rightarrow f(a_1)\neq f(a_2)$.
+\item \textbf{پوشا} (\lr{Onto}) می‌گوییم اگر همه عضوهای برد را بپوشاند: برای هر $b\in B$ عضوی مثل $a$ باشد که $f(a)=b$.
+\item \textbf{تناظر یک‌به‌یک} یا \textbf{دوسویی} (\lr{Bijection}) می‌گوییم اگر هم یک‌به‌یک و هم پوشا باشد. چنین تابعی وارون‌پذیر است.
+\end{itemize}
+\end{definition}
+
+\begin{example}
+تابع $f(n)=(n+1)\bmod 5$ بالا دوسویی است. اما تابع $g:\mathbb{Z}_5\to\mathbb{Z}_5$ با جدول $g(0)=1,\ g(1)=2,\ g(2)=1,\ g(3)=2,\ g(4)=1$ نه یک‌به‌یک است (چون $g(0)=g(2)$) و نه پوشا (هیچ ورودی‌ای به $0$ نمی‌رود). اگر اندازه دامنه و برد متناهی و متفاوت باشد، مثل $f:\{0,1,2,3\}\to\{0,1,2,3,4\}$، تابع هرگز نمی‌تواند دوسویی باشد.
+\end{example}
+
+\subsection{مقایسه اندازه مجموعه‌ها}\label{sec:cardinality}
+برای مجموعه‌های متناهی، مقایسه اندازه یعنی شمردن. اما مجموعه‌های نامتناهی را نمی‌توان شمرد. ایده کانتور این بود که اندازه‌ها را با \textbf{جفت کردن عضوها} مقایسه کنیم.
+
+\begin{definition}[هم‌اندازگی]
+\begin{itemize}
+\item $\abs{A}=\abs{B}$ اگر و تنها اگر یک تابع دوسویی $f:A\to B$ وجود داشته باشد.
+\item $\abs{A}\le\abs{B}$ اگر زیرمجموعه‌ای مثل $C\subseteq B$ باشد که $\abs{C}=\abs{A}$.
+\item $\abs{A}<\abs{B}$ اگر $\abs{A}\le\abs{B}$ و $\abs{A}\neq\abs{B}$.
+\end{itemize}
+\end{definition}
+
+\begin{definition}[متناهی و شمارا]
+\begin{itemize}
+\item $A$ \textbf{متناهی} است اگر عدد صحیح $n\ge0$ باشد که $\abs{A}=\abs{\{1,2,\dots,n\}}$. در غیر این صورت \textbf{نامتناهی} است.
+\item $A$ \textbf{شمارای نامتناهی} (\lr{Denumerable}) است اگر با $\mathbb{N}$ تناظر یک‌به‌یک داشته باشد.
+\item $A$ \textbf{شمارا} (\lr{Countable}) است اگر متناهی یا شمارای نامتناهی باشد، و \textbf{ناشمارا} است اگر شمارا نباشد.
+\end{itemize}
+\end{definition}
+
+شمارا بودن یعنی بتوانیم عضوها را در یک فهرست (دنباله) بنویسیم طوری که هر عضو بالاخره در جایی از فهرست بیاید.
+
+\begin{example}[مجموعه‌های شمارا و ناشمارا]
+\begin{itemize}
+\item اعداد طبیعی $1,2,3,\dots$ شمارا هستند.
+\item اعداد صحیح هم شمارا هستند. کافی است آن‌ها را به این ترتیب فهرست کنیم: $0,1,-1,2,-2,3,-3,\dots$.
+\item زوج‌های مرتب اعداد طبیعی شمارا هستند: آن‌ها را بر اساس مجموع دو مؤلفه فهرست می‌کنیم: اول $(1,1)$، بعد $(1,2),(2,1)$، بعد $(1,3),(2,2),(3,1)$ و همین‌طور تا آخر.
+\item اعداد گویای بین صفر و یک شمارا هستند: آن‌ها را بر اساس مخرج فهرست می‌کنیم و تکراری‌ها را حذف می‌کنیم: $\tfrac12,\tfrac13,\tfrac23,\tfrac14,\tfrac34,\tfrac15,\dots$
+\item اما بازه $[0,1]$، مجموعه $\mathcal{P}(\mathbb{N})$ و مجموعه همه توابع $f:\mathbb{N}\to\{0,1\}$ \textbf{ناشمارا} هستند. اثبات این‌ها با قطری‌سازی است (قضیه \ref{thm:cantor} و فصل ۱۹).
+\end{itemize}
+\end{example}
+
+\begin{note}[کمی تاریخ]
+اندازه یک مجموعه متناهی همان تعداد عضوهای آن است. برای مجموعه‌های نامتناهی از \textbf{اعداد اصلی ترامتناهی} استفاده می‌شود. اولین آن‌ها $\aleph_0:=\abs{\mathbb{N}}$ است. کانتور در سال ۱۸۷۴ نشان داد $c=\abs{\mathbb{R}}=2^{\aleph_0}>\aleph_0$. \textbf{فرضیه پیوستار} می‌گوید هیچ مجموعه‌ای با اندازه‌ای بین $\aleph_0$ و $c$ وجود ندارد. این اولین مسئله از ۲۳ مسئله هیلبرت (سال ۱۹۰۰) بود. گودل و کوهن نشان دادند این فرضیه در دستگاه اصول موضوعه \lr{ZFC} نه قابل اثبات است و نه قابل رد.
+\end{note}
+
+\subsection{توابع چندمتغیره، گزاره‌نما و رابطه}
+تابعی که دامنه‌اش $A_1\times\cdots\times A_k$ باشد، یک $k$-تایی $(a_1,\dots,a_k)$ می‌گیرد. به $k$ \textbf{آریتی} و به هر $a_i$ یک \textbf{آرگومان} می‌گوییم. تابع با $k=1$ \textbf{یکانی} و با $k=2$ \textbf{دوتایی} است. تابع دوتایی را می‌توان به شکل پیشوندی ($\mathit{add}(a,b)$) یا میانوندی ($a+b$) نوشت.
+
+\begin{definition}[گزاره‌نما و رابطه]
+\begin{itemize}
+\item \textbf{گزاره‌نما} یا \textbf{ویژگی} (\lr{Predicate}) تابعی است که بردش $\{\text{\lr{True}},\text{\lr{False}}\}$ است. مثلاً $\mathit{even}(3)=\text{\lr{False}}$ و $\mathit{even}(6)=\text{\lr{True}}$.
+\item \textbf{رابطه $k$-تایی} روی $A$ یک گزاره‌نماست که دامنه‌اش $A^k$ باشد. رابطه دوتایی را معمولاً میانوندی می‌نویسیم، مثل $a<b$ یا $x=y$.
+\end{itemize}
+وقتی می‌نویسیم $aRb$ منظور این است که $aRb=\text{\lr{True}}$.
+\end{definition}
+
+هر گزاره‌نما $P:D\to\{\text{\lr{True}},\text{\lr{False}}\}$ را می‌توان با یک مجموعه نشان داد: $S=\{a\in D\st P(a)=\text{\lr{True}}\}$. اگر $D$ از متن معلوم باشد، همان $S$ کافی است. این ایده بعداً خیلی مهم می‌شود: در این درس «مسئله‌ها» را با «مجموعه‌ها» (زبان‌ها) نشان می‌دهیم.
+
+\begin{example}[سنگ، کاغذ، قیچی]
+رابطه $\mathit{beats}$ («می‌برد») را می‌توان با جدول یا با مجموعه نشان داد:
+\begin{ltrfig}
+\begin{tabular}{l|ccc}
+beats & Scissors & Paper & Stone\\ \hline
+Scissors & False & True & False\\
+Paper & False & False & True\\
+Stone & True & False & False
+\end{tabular}
+\end{ltrfig}
+که معادل مجموعه $\{(\text{\lr{Scissors}},\text{\lr{Paper}}),(\text{\lr{Paper}},\text{\lr{Stone}}),(\text{\lr{Stone}},\text{\lr{Scissors}})\}$ است.
+\end{example}
+
+\subsection{انواع رابطه دوتایی}
+رابطه دوتایی $R$ روی مجموعه $A$ را
+\begin{enumerate}
+\item \textbf{بازتابی} می‌گوییم اگر $\forall x\in A:\ xRx$،
+\item \textbf{متقارن} می‌گوییم اگر $\forall x,y\in A:\ xRy\rightarrow yRx$،
+\item \textbf{پادمتقارن} می‌گوییم اگر $\forall x,y\in A:\ (xRy \wedge yRx)\rightarrow x=y$،
+\item \textbf{متعدی} می‌گوییم اگر $\forall x,y,z\in A:\ (xRy\wedge yRz)\rightarrow xRz$.
+\end{enumerate}
+
+\begin{definition}[رابطه هم‌ارزی و ترتیب جزئی]
+رابطه‌ای که بازتابی، متقارن و متعدی باشد \term{رابطه هم‌ارزی}{Equivalence Relation} است. رابطه‌ای که بازتابی، پادمتقارن و متعدی باشد \term{رابطه ترتیب جزئی}{Partial Order} است.
+\end{definition}
+
+\begin{example}[همنهشتی به پیمانه ۷]
+روی $\mathbb{N}$ تعریف کنید $i\equiv_7 j$ اگر $i-j$ مضربی از $7$ باشد. این رابطه هم‌ارزی است:
+\begin{enumerate}
+\item \textbf{بازتابی:} $i-i=0$ مضرب $7$ است.
+\item \textbf{متقارن:} اگر $i-j$ مضرب $7$ باشد، $j-i=-(i-j)$ هم مضرب $7$ است.
+\item \textbf{متعدی:} اگر $i\equiv_7 j$ و $j\equiv_7 k$، آنگاه $i-k=(i-j)+(j-k)$ مجموع دو مضرب $7$ است و خودش مضرب $7$ است.
+\end{enumerate}
+\end{example}
+
+\begin{example}[رابطه زیرمجموعه]
+رابطه $\subseteq$ روی زیرمجموعه‌های $\{x,y,z\}$ یک ترتیب جزئی است: هر مجموعه زیرمجموعه خودش است (بازتابی)؛ اگر $A\subseteq B$ و $B\subseteq A$ آنگاه $A=B$ (پادمتقارن)؛ و اگر $A\subseteq B\subseteq C$ آنگاه $A\subseteq C$ (متعدی). به آن «جزئی» می‌گوییم چون بعضی جفت‌ها مثل $\{x\}$ و $\{y\}$ قابل مقایسه نیستند.
+\begin{ltrfig}
+\begin{tikzpicture}[xscale=1.6,yscale=1.1,every node/.style={font=\small}]
+\node (e) at (0,0) {$\emptyset$};
+\node (x) at (-1,1) {$\{x\}$}; \node (y) at (0,1) {$\{y\}$}; \node (z) at (1,1) {$\{z\}$};
+\node (xy) at (-1,2) {$\{x,y\}$}; \node (xz) at (0,2) {$\{x,z\}$}; \node (yz) at (1,2) {$\{y,z\}$};
+\node (xyz) at (0,3) {$\{x,y,z\}$};
+\draw[jzMain] (e)--(x) (e)--(y) (e)--(z) (x)--(xy) (x)--(xz) (y)--(xy) (y)--(yz) (z)--(xz) (z)--(yz) (xy)--(xyz) (xz)--(xyz) (yz)--(xyz);
+\end{tikzpicture}
+\end{ltrfig}
+\end{example}
+
+\section{گراف‌ها}
+
+\begin{definition}[گراف]
+\term{گراف}{Graph} بی‌جهت $G=(V,E)$ مجموعه‌ای از نقطه‌ها (\textbf{رأس‌ها}، $V$) است که بعضی از آن‌ها با خط (\textbf{یال‌ها}، $E$) به هم وصل شده‌اند. در گراف بی‌جهت، $(i,j)$ و $(j,i)$ یک یال‌اند، پس یال را با زوج نامرتب $\{i,j\}$ هم نشان می‌دهیم. \textbf{درجه} یک رأس تعداد یال‌های متصل به آن است.
+\end{definition}
+
+در حالت عادی بین هر دو رأس حداکثر یک یال داریم. یالی که یک رأس را به خودش وصل کند \textbf{طوقه} نام دارد. برای مثال گراف زیر $\big(\{1,2,3,4,5\},\{(1,2),(2,3),(3,4),(4,5),(5,1)\}\big)$ است:
+
+\begin{ltrfig}
+\begin{tikzpicture}[every node/.style={circle,draw=jzMain,fill=jzMain!7,minimum size=6mm,inner sep=0pt,font=\small}]
+\foreach \i/\a in {1/90,2/18,3/-54,4/-126,5/162} {\node (n\i) at (\a:1.3) {$\i$};}
+\draw[thick,jzMain] (n1)--(n2)--(n3)--(n4)--(n5)--(n1);
+\end{tikzpicture}
+\end{ltrfig}
+
+مثال‌های واقعی: رأس‌ها شهرها و یال‌ها جاده‌های بین آن‌ها؛ یا رأس‌ها افراد و یال‌ها دوستی‌ها. اگر روی رأس‌ها یا یال‌ها برچسب (مثلاً طول جاده) بگذاریم، \textbf{گراف برچسب‌دار} داریم.
+
+\begin{definition}[مفاهیم پایه گراف]
+\begin{itemize}
+\item \textbf{زیرگراف:} $G$ زیرگراف $H$ است اگر رأس‌های $G$ زیرمجموعه رأس‌های $H$ باشند و یال‌های $G$ همان یال‌های $H$ روی آن رأس‌ها باشند.
+\item \textbf{مسیر:} دنباله‌ای از رأس‌ها که رأس‌های متوالی با یال به هم وصل‌اند. \textbf{مسیر ساده} رأس تکراری ندارد.
+\item \textbf{همبند:} گرافی که بین هر دو رأس آن مسیری وجود دارد.
+\item \textbf{دور:} مسیری که از یک رأس شروع و به همان رأس ختم می‌شود. \textbf{دور ساده} دست‌کم سه رأس دارد و فقط رأس اول و آخرش تکراری است.
+\item \textbf{درخت:} گراف همبندی که دور ساده ندارد. رأس با درجه یک \textbf{برگ} است و گاهی یک رأس را به عنوان \textbf{ریشه} انتخاب می‌کنیم.
+\end{itemize}
+\end{definition}
+
+\begin{definition}[گراف جهت‌دار]
+در \textbf{گراف جهت‌دار} به جای خط، پیکان داریم و یال از $i$ به $j$ با زوج مرتب $(i,j)$ نشان داده می‌شود. تعداد پیکان‌های خارج‌شونده از یک رأس \textbf{درجه خروجی} و تعداد پیکان‌های واردشونده \textbf{درجه ورودی} آن است. \textbf{مسیر جهت‌دار} مسیری است که همه پیکان‌هایش در جهت حرکت باشند. گراف جهت‌دار \textbf{قویاً همبند} است اگر از هر رأس به هر رأس دیگر مسیر جهت‌دار وجود داشته باشد.
+\end{definition}
+
+\begin{example}
+گراف جهت‌دار $\big(\{1,\dots,6\},\{(1,2),(1,5),(2,1),(2,4),(5,4),(5,6),(6,1),(6,3)\}\big)$:
+\begin{ltrfig}
+\begin{tikzpicture}[->,>={Stealth[round]},semithick,every node/.style={circle,draw=jzMain,fill=jzMain!7,minimum size=6mm,inner sep=0pt,font=\small}]
+\node (1) at (-0.7,1.2) {$1$}; \node (2) at (0.7,1.2) {$2$}; \node (3) at (1.4,0) {$3$};
+\node (4) at (0.7,-1.2) {$4$}; \node (5) at (-0.7,-1.2) {$5$}; \node (6) at (-1.4,0) {$6$};
+\draw (1) to[bend left=15] (2); \draw (2) to[bend left=15] (1); \draw (1)--(5); \draw (2)--(4);
+\draw (5)--(4); \draw (5)--(6); \draw (6)--(1); \draw (6)--(3);
+\end{tikzpicture}
+\end{ltrfig}
+\end{example}
+
+هر رابطه دوتایی $R$ روی مجموعه $D$ را می‌توان با یک گراف جهت‌دار $G=(D,E)$ نشان داد که $E=\{(x,y)\st xRy\}$. مثلاً گراف رابطه $\mathit{beats}$ یک دور جهت‌دار سه‌رأسی است: یالی از قیچی به کاغذ، از کاغذ به سنگ و از سنگ به قیچی.
+
+\begin{summary}
+\begin{itemize}
+\item عملگرهای بولی، جدول درستی آن‌ها و قاعده نقیض سورها را دیدیم.
+\item با مجموعه، مجموعه توانی و ضرب دکارتی آشنا شدیم و قضیه کانتور را با قطری‌سازی ثابت کردیم.
+\item اندازه مجموعه‌های نامتناهی را با تابع دوسویی مقایسه می‌کنیم؛ مجموعه‌ها شمارا یا ناشمارا هستند.
+\item رابطه هم‌ارزی (بازتابی، متقارن، متعدی) و ترتیب جزئی (بازتابی، پادمتقارن، متعدی) را تعریف کردیم.
+\item مفاهیم پایه گراف‌های بی‌جهت و جهت‌دار را مرور کردیم.
+\end{itemize}
+\end{summary}

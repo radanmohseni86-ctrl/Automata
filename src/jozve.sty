@@ -1,0 +1,109 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{jozve}[2026/10/31 Automata lecture notes style]
+
+\RequirePackage[a4paper,top=2.5cm,bottom=2.4cm,left=2.3cm,right=2.3cm,headheight=16pt,headsep=0.8cm,footskip=1.1cm]{geometry}
+\RequirePackage{graphicx}
+\RequirePackage{jozve-base}
+\RequirePackage[most]{tcolorbox}
+\RequirePackage{enumitem}
+\RequirePackage{array,booktabs,multirow,tabularx}
+\RequirePackage{multicol}
+\RequirePackage{titlesec}
+\RequirePackage{fancyhdr}
+\RequirePackage[bookmarksnumbered,unicode]{hyperref}
+\RequirePackage{xepersian}
+
+\settextfont[Path=../fonts/,Extension=.ttf,UprightFont=*-Regular,BoldFont=*-Bold,ItalicFont=*-Regular,BoldItalicFont=*-Bold,Scale=0.93]{Vazirmatn}
+\setlatintextfont[Path=../fonts/,Extension=.ttf,UprightFont=*-Regular,BoldFont=*-Bold,ItalicFont=*-Regular,ItalicFeatures={FakeSlant=0.18},BoldItalicFont=*-Bold,Scale=0.93]{Vazirmatn}
+\defpersianfont\jzheavy[Path=../fonts/,Extension=.ttf,UprightFont=*-Black,BoldFont=*-Black]{Vazirmatn}
+\defpersianfont\jzsemi[Path=../fonts/,Extension=.ttf,UprightFont=*-SemiBold,BoldFont=*-ExtraBold]{Vazirmatn}
+\defpersianfont\jzlight[Path=../fonts/,Extension=.ttf,UprightFont=*-Light,BoldFont=*-Medium]{Vazirmatn}
+
+\linespread{1.32}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt plus 1pt}
+\frenchspacing
+
+
+\hypersetup{colorlinks=true,linkcolor=jzMain,urlcolor=defFrame,citecolor=jzMain,pdfauthor={},pdftitle={Automata Lecture Notes}}
+
+\newcounter{jzbox}[chapter]
+\renewcommand{\thejzbox}{\thechapter.\arabic{jzbox}}
+
+\newcommand{\jzopt}[1]{\if\relax\detokenize{#1}\relax\else\ \ \textmd{(#1)}\fi}
+
+\tcbset{
+  jzbase/.style={enhanced,breakable,arc=1.6mm,outer arc=1.6mm,boxrule=0.7pt,
+    left=3.2mm,right=3.2mm,top=1.6mm,bottom=1.8mm,toptitle=0.9mm,bottomtitle=0.9mm,
+    fonttitle=\bfseries,before skip=9pt plus 2pt,after skip=9pt plus 2pt,
+    before upper={\setlength{\parskip}{4pt}}},
+  jzframed/.style 2 args={jzbase,colframe=#1,colback=#2,coltitle=white,colbacktitle=#1,
+    borderline west={0pt}{0pt}{#1},drop fuzzy shadow=black!25},
+  jzbar/.style 2 args={jzbase,frame hidden,colback=#2,coltitle=#1,
+    borderline east={2.4pt}{0pt}{#1},sharp corners,
+    attach title to upper,after title={\ \ },fonttitle=\bfseries}
+}
+
+\newtcolorbox[use counter=jzbox,number within=chapter]{definition}[1][]{jzframed={defFrame}{defBack},title={تعریف~\thetcbcounter\jzopt{#1}}}
+\newtcolorbox[use counter=jzbox,number within=chapter]{theorem}[1][]{jzframed={thmFrame}{thmBack},title={قضیه~\thetcbcounter\jzopt{#1}}}
+\newtcolorbox[use counter=jzbox,number within=chapter]{lemma}[1][]{jzframed={lemFrame}{lemBack},title={لم~\thetcbcounter\jzopt{#1}}}
+\newtcolorbox[use counter=jzbox,number within=chapter]{corollary}[1][]{jzframed={corFrame}{corBack},title={نتیجه~\thetcbcounter\jzopt{#1}}}
+\newtcolorbox[use counter=jzbox,number within=chapter]{example}[1][]{jzbar={exFrame}{exBack},title={مثال~\thetcbcounter\jzopt{#1}.}}
+\newtcolorbox{note}[1][نکته]{jzbar={noteFrame}{noteBack},title={#1.}}
+\newtcolorbox{warning}[1][دقت کنید]{jzbar={warnFrame}{warnBack},title={#1!}}
+\newtcolorbox{proofidea}[1][]{jzbase,colback=ideaBack,colframe=ideaFrame,boxrule=0.5pt,
+  borderline={0.5pt}{0pt}{ideaFrame,dashed},frame hidden,sharp corners,
+  attach title to upper,coltitle=ideaFrame,title={ایده اثبات\jzopt{#1}.},after title={\ \ }}
+\newtcolorbox{proof}[1][]{jzbase,frame hidden,sharp corners,colback=proofBack,
+  borderline east={2.4pt}{0pt}{proofFrame},coltitle=proofFrame,
+  attach title to upper,title={اثبات\jzopt{#1}.},after title={\ \ },
+  after upper={\par\nobreak\hfill\textcolor{proofFrame}{$\blacksquare$}}}
+\newtcolorbox{algo}[2]{jzbase,colframe=algFrame!70,colback=algBack,boxrule=0.5pt,
+  coltitle=algFrame,colbacktitle=algFrame!10,title={#1 = «#2»}}
+\newtcolorbox{summary}{jzbase,colframe=jzMain,colback=jzSoft,coltitle=white,colbacktitle=jzMain,
+  title={جمع‌بندی فصل},drop fuzzy shadow=black!25}
+
+\setlist{itemsep=2pt,topsep=3pt,parsep=1pt}
+\setlist[itemize,1]{label=\textcolor{jzAccent}{\small$\bullet$}}
+\setlist[itemize,2]{label=\textcolor{jzMain}{\scriptsize$\blacktriangleleft$}}
+\setlist[enumerate,1]{label=\textcolor{jzMain}{\bfseries\arabic*.}}
+\setlist[enumerate,2]{label=\textcolor{jzMain}{(\alph*)}}
+
+\titleformat{\chapter}[display]
+  {\normalfont}
+  {\begin{tikzpicture}[baseline]\node[fill=jzAccent,text=white,rounded corners=1.5mm,inner xsep=9pt,inner ysep=5pt]{\jzsemi\large فصل\ \thechapter};\end{tikzpicture}}
+  {10pt}
+  {\color{jzMain}\jzheavy\fontsize{25}{36}\selectfont}
+  [\vspace{6pt}{\color{jzMain!25}\titlerule[1.2pt]}]
+\titlespacing*{\chapter}{0pt}{-12pt}{22pt}
+\titleformat{\section}{\color{jzMain}\Large\bfseries}{\textcolor{jzAccent}{\thesection}}{0.7em}{}
+\titlespacing*{\section}{0pt}{18pt plus 4pt}{8pt plus 2pt}
+\titleformat{\subsection}{\color{jzMain}\large\bfseries}{\textcolor{jzAccent!85}{\thesubsection}}{0.6em}{}
+\titlespacing*{\subsection}{0pt}{12pt plus 3pt}{5pt plus 2pt}
+\titleformat{\subsubsection}[runin]{\color{jzMain}\bfseries}{}{0pt}{}[.\ ]
+
+\titleformat{\part}[display]
+  {\centering\normalfont}
+  {\jzsemi\Large\textcolor{jzAccent}{\partname\ \thepart}}
+  {14pt}
+  {\color{jzMain}\jzheavy\fontsize{30}{44}\selectfont}
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\headrule}{{\color{jzMain!30}\hrule width\headwidth height\headrulewidth}}
+\renewcommand{\chaptermark}[1]{\markboth{#1}{}}
+\fancyhead[R]{\small\textcolor{jzMain}{فصل\ \thechapter: \leftmark}}
+\fancyhead[L]{\small\textcolor{jzMain!70}{نظریه زبان‌ها و ماشین‌ها}}
+\fancyfoot[C]{\small\textcolor{jzMain}{\thepage}}
+\fancypagestyle{plain}{\fancyhf{}\renewcommand{\headrulewidth}{0pt}\fancyfoot[C]{\small\textcolor{jzMain}{\thepage}}}
+
+\renewcommand{\emph}[1]{\textbf{#1}}
+\providecommand{\qedhere}{}
+\newcommand{\term}[2]{\textbf{\textcolor{jzMain}{#1}}\ {\small(\lr{#2})}}
+\newcommand{\en}[1]{\lr{#1}}
+
+\newenvironment{automaton}[1][]{\par\smallskip\begin{center}\begin{latin}\begin{tikzpicture}[jzaut,#1]}{\end{tikzpicture}\end{latin}\end{center}\par\smallskip}
+\newenvironment{ltrfig}{\par\smallskip\begin{center}\begin{latin}}{\end{latin}\end{center}\par\smallskip}
+
+\endinput
