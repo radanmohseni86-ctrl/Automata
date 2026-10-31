@@ -1,6 +1,6 @@
 SP ?= /tmp/jozve-build
 
-.PHONY: all pdf web clean
+.PHONY: all pdf web clean pages
 
 all: pdf web
 
@@ -15,3 +15,8 @@ web:
 clean:
 	rm -f src/*.aux src/*.log src/*.out src/*.toc src/main.pdf
 	rm -rf web/build
+
+pages: web
+	git subtree split --prefix docs -b gh-pages-tmp
+	git push -f origin gh-pages-tmp:gh-pages
+	git branch -D gh-pages-tmp
