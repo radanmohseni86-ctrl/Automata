@@ -103,6 +103,9 @@
 \newcommand{\term}[2]{\textbf{\textcolor{jzMain}{#1}}\ {\small(\lr{#2})}}
 \newcommand{\en}[1]{\lr{#1}}
 
+
+\newenvironment{jzglossary}{\begin{multicols}{2}\small\setlength{\parskip}{1.5pt}}{\end{multicols}}
+\newcommand{\gterm}[2]{\noindent\textbf{#1}\dotfill\lr{#2}\par}
 \newenvironment{automaton}[1][]{\par\smallskip\begin{center}\begin{latin}\begin{tikzpicture}[jzaut,#1]}{\end{tikzpicture}\end{latin}\end{center}\par\smallskip}
 \newenvironment{ltrfig}{\par\smallskip\begin{center}\begin{latin}}{\end{latin}\end{center}\par\smallskip}
 

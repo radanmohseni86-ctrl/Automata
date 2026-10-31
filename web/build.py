@@ -528,7 +528,7 @@ class Renderer:
             return self.display_math("\\begin{array}{" + args[0] + "}" + body + "\\end{array}")
         if env in ("latin", "LTR"):
             return '<div dir="ltr">' + self.blocks(body) + "</div>"
-        if env == "glossary":
+        if env in ("glossary", "jzglossary"):
             return self.glossary(body)
         if env in ("multicols", "minipage", "titlepage"):
             return self.blocks(body)
