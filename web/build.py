@@ -7,6 +7,9 @@ import subprocess
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from glossary_links import Linker
+
 ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / "src"
 WEB = ROOT / "web"
@@ -631,9 +634,12 @@ class Renderer:
         for x in body:
             if x[0] == "cmd" and x[1] == "gterm":
                 rows.append((self.inline(x[4][0]), self.inline(x[4][1], True)))
+        self.site.gl_calls = getattr(self.site, "gl_calls", 0) + 1
+        first = self.site.gl_calls == 1
         out = ['<div class="table-wrap"><table class="glossary"><tr><th>فارسی</th><th>English</th></tr>']
-        for a, b in rows:
-            out.append(f'<tr><td>{a}</td><td><bdi dir="ltr" lang="en">{b}</bdi></td></tr>')
+        for i, (a, b) in enumerate(rows, start=1):
+            rid = f' id="g{i}"' if first else ""
+            out.append(f'<tr{rid}><td>{a}</td><td><bdi dir="ltr" lang="en">{b}</bdi></td></tr>')
         out.append("</table></div>")
         return "".join(out)
 
@@ -1073,8 +1079,12 @@ def main():
 
         return re.sub("\x00F([\\w-]+)\x00", fig, h)
 
+    linker = Linker(SRC / "chapters" / "99-glossary.tex")
     for name, h in pages.items():
-        (out_dir / name).write_text(fill(h), encoding="utf-8")
+        h = fill(h)
+        if name not in ("index.html", "glossary.html"):
+            h = linker.annotate(h)
+        (out_dir / name).write_text(h, encoding="utf-8")
     full = (out_dir / "index.html").read_text(encoding="utf-8")
     head = full[full.index("<title>"):full.index("</head>")]
     bodyc = full[full.index("<body>") + len("<body>"):full.index("</body>")]
