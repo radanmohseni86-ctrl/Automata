@@ -1,13 +1,14 @@
 \chapter{ویژگی‌های بستاری زبان‌های مستقل از متن}
+\entitle{Closure Properties of Context-Free Languages}
 
 در فصل ۵ دیدیم زبان‌های منظم تحت تقریباً همه عملیات معمول بسته‌اند. زبان‌های مستقل از متن تحت بسیاری از عملیات بسته‌اند، اما نه همه. در این فصل هر دو طرف را بررسی می‌کنیم. در اثبات‌ها از گرامرها یا ماشین‌های پشته‌ای استفاده می‌کنیم، هر کدام که ساده‌تر باشد.
 
 در همه اثبات‌ها فرض می‌کنیم متغیرهای دو گرامر مختلف با هم مشترک نیستند (در صورت لزوم نامشان را عوض می‌کنیم).
 
-\section{اجتماع، الحاق و ستاره}
+\section{اجتماع، الحاق و ستاره (\lr{Union, Concatenation and Star})}
 
 \begin{theorem}
-زبان‌های مستقل از متن تحت \textbf{اجتماع} بسته‌اند.
+زبان‌های مستقل از متن تحت \term{اجتماع}{Union} بسته‌اند.
 \end{theorem}
 \begin{proof}
 فرض کنید $G_1=(V_1,\Sigma,R_1,S_1)$ زبان $A$ و $G_2=(V_2,\Sigma,R_2,S_2)$ زبان $B$ را تولید کنند. گرامر $G=(V,\Sigma,R,S)$ را با متغیر شروع جدید $S$ می‌سازیم:
@@ -16,23 +17,23 @@
 \end{proof}
 
 \begin{theorem}
-زبان‌های مستقل از متن تحت \textbf{الحاق} بسته‌اند.
+زبان‌های مستقل از متن تحت \term{الحاق}{Concatenation} بسته‌اند.
 \end{theorem}
 \begin{proof}
 با همان نمادها، $R=R_1\cup R_2\cup\{S\to S_1S_2\}$. هر رشته‌ای که $G$ تولید کند به شکل $xy$ است که $S_1\der x$ و $S_2\der y$ (چون $S_1$ و $S_2$ متغیرهای مشترکی ندارند و مستقل از هم جایگزین می‌شوند). برعکس، برای هر $x\in A$ و $y\in B$ داریم $S\Rightarrow S_1S_2\der xS_2\der xy$. پس $L(G)=A\circ B$.
 \end{proof}
 
 \begin{theorem}
-زبان‌های مستقل از متن تحت \textbf{ستاره} بسته‌اند.
+زبان‌های مستقل از متن تحت \term{ستاره}{Star} بسته‌اند.
 \end{theorem}
 \begin{proof}
 اگر $G_1=(V_1,\Sigma,R_1,S_1)$ زبان $A$ را تولید کند، قرار دهید $V=V_1\cup\{S\}$ و $R=R_1\cup\{S\to SS_1\mid\eps\}$. با $k$ بار استفاده از $S\to SS_1$ و یک بار $S\to\eps$ داریم $S\der S_1S_1\cdots S_1$ ($k$ بار) و هر $S_1$ مستقلاً یک رشته از $A$ تولید می‌کند. پس $L(G)=\{x_1\cdots x_k\st k\ge0,\ x_i\in A\}=A^*$.
 \end{proof}
 
-\section{پیشوند}
+\section{پیشوند (\lr{Prefix})}
 
 \begin{theorem}
-زبان‌های مستقل از متن تحت \textbf{پیشوند} بسته‌اند.
+زبان‌های مستقل از متن تحت \term{پیشوند}{Prefix} بسته‌اند.
 \end{theorem}
 
 \begin{proofidea}
@@ -46,7 +47,7 @@
 \end{proofidea}
 
 \begin{proof}
-اگر $L=\emptyset$ آنگاه $\pre(L)=\emptyset$ و حکم بدیهی است. فرض کنید $L\neq\emptyset$ و $G=(V,\Sigma,R,S)$ گرامری در \lr{CNF} و بدون متغیر بی‌فایده برای $L$ باشد. پس قاعده‌ها سه شکل دارند: $S\to\eps$، $A\to BC$ و $A\to t$. گرامر $G'=(V',\Sigma,R',S')$ را می‌سازیم:
+اگر $L=\emptyset$ آنگاه $\pre(L)=\emptyset$ و حکم بدیهی است. فرض کنید $L\neq\emptyset$ و $G=(V,\Sigma,R,S)$ گرامری در فرم نرمال چامسکی (\lr{CNF}) و بدون متغیر بی‌فایده برای $L$ باشد. پس قاعده‌ها سه شکل دارند: $S\to\eps$، $A\to BC$ و $A\to t$. گرامر $G'=(V',\Sigma,R',S')$ را می‌سازیم:
 \[V'=\{\langle A,D\rangle\st A\in V,\ D\in\{L,S,R\}\},\qquad S'=\langle S,S\rangle,\]
 و قاعده‌های $R'$:
 \begin{center}
@@ -72,10 +73,10 @@ $A\to t$ & $\langle A,L\rangle\to t,\quad\langle A,S\rangle\to t,\quad\langle A,
 \[\langle S,S\rangle\der\langle A_1,L\rangle\cdots\langle A_{i-1},L\rangle\langle A_i,S\rangle\langle A_{i+1},R\rangle\cdots\langle A_n,R\rangle\der w_1w_2\cdots w_i.\]
 \end{example}
 
-\section{معکوس و پسوند}
+\section{معکوس و پسوند (\lr{Reversal and Suffix})}
 
 \begin{theorem}
-زبان‌های مستقل از متن تحت \textbf{معکوس} بسته‌اند.
+زبان‌های مستقل از متن تحت \term{معکوس}{Reversal} بسته‌اند.
 \end{theorem}
 \begin{proof}
 فرض کنید $G=(V,\Sigma,R,S)$ زبان $B$ را تولید کند. گرامر $G'$ را با همان متغیرها و قاعده‌های
@@ -89,19 +90,19 @@ $A\to t$ & $\langle A,L\rangle\to t,\quad\langle A,S\rangle\to t,\quad\langle A,
 \end{proof}
 
 \begin{theorem}
-زبان‌های مستقل از متن تحت \textbf{پسوند} بسته‌اند.
+زبان‌های مستقل از متن تحت \term{پسوند}{Suffix} بسته‌اند.
 \end{theorem}
 \begin{proof}
 $w$ پسوند یک رشته از $A$ است اگر و تنها اگر $w^R$ پیشوند یک رشته از $A^R$ باشد. پس $\suf(A)=\big(\pre(A^R)\big)^R$ و از بستاری تحت معکوس و پیشوند نتیجه می‌گیریم $\suf(A)$ مستقل از متن است.
 \end{proof}
 
-\section{اشتراک با یک زبان منظم}
+\section{اشتراک با یک زبان منظم (\lr{Intersection with a Regular Language})}
 
 \begin{theorem}\label{thm:cfl-cap-reg}
 اگر $A$ مستقل از متن و $B$ منظم باشد، $A\cap B$ مستقل از متن است.
 \end{theorem}
 \begin{proofidea}
-یک \lr{PDA} برای $A$ و یک \lr{DFA} برای $B$ را \textbf{هم‌زمان} اجرا می‌کنیم (مثل ساخت ضربی فصل ۳). این کار ممکن است چون \lr{DFA} پشته‌ای ندارد و فقط یک پشته لازم داریم.
+یک ماشین پشته‌ای (\lr{PDA}) برای $A$ و یک ماشین متناهی قطعی (\lr{DFA}) برای $B$ را \textbf{هم‌زمان} اجرا می‌کنیم (مثل ساخت ضربی فصل ۳). این کار ممکن است چون \lr{DFA} پشته‌ای ندارد و فقط یک پشته لازم داریم.
 \end{proofidea}
 \begin{proof}
 فرض کنید \lr{PDA} $M_1=(Q_1,\Sigma,\Gamma,\delta_1,q_1,F_1)$ زبان $A$ و \lr{DFA} $M_2=(Q_2,\Sigma,\delta_2,q_2,F_2)$ زبان $B$ را تشخیص دهند. \lr{PDA} $M=(Q_1\times Q_2,\Sigma,\Gamma,\delta,(q_1,q_2),F_1\times F_2)$ را می‌سازیم که برای هر $a\in\Sigma_\eps$ و $b,c\in\Gamma_\eps$:
@@ -109,12 +110,12 @@ $w$ پسوند یک رشته از $A$ است اگر و تنها اگر $w^R$ پ�
 با این قرارداد که اگر $a=\eps$، $t=r$ (\lr{DFA} بدون خواندن ورودی حرکت نمی‌کند). وقتی $M$ روی $w$ اجرا می‌شود، پشته و مؤلفه اول حالتش دقیقاً مثل $M_1$ تغییر می‌کنند و مؤلفه دوم مثل $M_2$. پس $M$ رشته $w$ را می‌پذیرد اگر و تنها اگر یک شاخه $M_1$ آن را بپذیرد و $M_2$ هم آن را بپذیرد؛ یعنی $L(M)=A\cap B$.
 \end{proof}
 
-\section{عملیاتی که تحت آن‌ها بسته نیستند}
+\section{عملیاتی که تحت آن‌ها بسته نیستند (\lr{Operations Under Which CFLs Are Not Closed})}
 
 تا اینجا بستاری زبان‌های مستقل از متن را تحت اجتماع، الحاق، ستاره، پیشوند، معکوس، پسوند و اشتراک با زبان منظم دیدیم. اما:
 
 \begin{theorem}\label{thm:cfl-not-cap}
-زبان‌های مستقل از متن تحت \textbf{اشتراک} بسته نیستند.
+زبان‌های مستقل از متن تحت \term{اشتراک}{Intersection} بسته نیستند.
 \end{theorem}
 \begin{proof}
 دو زبان زیر مستقل از متن‌اند:
@@ -125,7 +126,7 @@ $w$ پسوند یک رشته از $A$ است اگر و تنها اگر $w^R$ پ�
 \end{proof}
 
 \begin{corollary}
-زبان‌های مستقل از متن تحت \textbf{متمم} بسته نیستند.
+زبان‌های مستقل از متن تحت \term{متمم}{Complement} بسته نیستند.
 \end{corollary}
 \begin{proof}
 اگر بسته بودند، چون تحت اجتماع بسته‌اند، طبق قانون دمورگان $A\cap B=\overline{\overline{A}\cup\overline{B}}$ تحت اشتراک هم بسته بودند، که با قضیه \ref{thm:cfl-not-cap} تناقض دارد.

@@ -35,7 +35,7 @@ CMD_ARGS = {
     "ref": 1, "label": 1, "chapter": 1, "section": 1, "subsection": 1, "subsubsection": 1,
     "textmd": 1, "addcontentsline": 3, "textsc": 1, "part": 1, "input": 1, "hspace": 1,
     "vspace": 1, "texttt": 1, "url": 1, "href": 2, "underline": 1, "textit": 1, "mbox": 1,
-    "gterm": 2, "fbox": 1, "renewcommand": 2, "setlength": 2, "newcommand": 2, "arraystretch": 0,
+    "gterm": 2, "fbox": 1, "entitle": 1, "renewcommand": 2, "setlength": 2, "newcommand": 2, "arraystretch": 0,
 }
 CMD_OPT = {"item", "chapter", "section"}
 ENV_ARGS = {"algo": 2, "tabular": 1, "minipage": 1, "multicols": 1}
@@ -455,6 +455,8 @@ class Renderer:
             return f'<a href="{html.escape(args[0])}" dir="ltr">{esc(args[0])}</a>'
         if name == "href":
             return f'<a href="{html.escape(self.inline(args[0], True))}">{self.inline(args[1], ltr)}</a>'
+        if name == "entitle":
+            return ""
         if name in IGNORED or name in ("addcontentsline", "hspace", "vspace", "input", "part", "par", "setlength", "renewcommand", "newcommand", "arraystretch"):
             return ""
         if name == "item":
@@ -657,6 +659,7 @@ def number_chapter(site, chap):
     chap["enum_start"] = {}
     chap["label_anchor"] = {}
     chap["toc"] = []
+    chap["entitle"] = None
     num = chap["num"]
     state = {"sec": 0, "sub": 0, "box": 0, "fig": 0, "last": None, "boxstack": [], "enum_last": 0}
 
@@ -698,6 +701,8 @@ def number_chapter(site, chap):
                     anchor = f"x{len(chap['toc'])}"
                     chap["headings"][id(n)] = (anchor, "")
                     chap["toc"].append((2, "", n[4][0], anchor))
+                elif name == "entitle":
+                    chap["entitle"] = n[4][0]
                 elif name == "label":
                     key = n[4][0]
                     if state["boxstack"]:
@@ -938,11 +943,14 @@ def build_pages(site, out_dir, for_artifact_index=False):
         else:
             kicker = '<div class="kicker"><span class="chip">پیوست</span></div>'
             crumb = "واژه‌نامه"
+        subtitle = ""
+        if chap.get("entitle"):
+            subtitle = '<p class="subtitle" dir="ltr" lang="en">' + r.inline(chap["entitle"], True).strip() + "</p>"
         body = f"""{topbar(crumb)}
 <div class="layout">
   {toc_side(r, chap) if chap["toc"] else '<div></div>'}
   <main class="content" id="top">
-    <header class="chapter-head">{kicker}<h1>{chap["title_html"]}</h1></header>
+    <header class="chapter-head">{kicker}<h1>{chap["title_html"]}</h1>{subtitle}</header>
 {content}
     {"".join(nav)}
   </main>
@@ -991,9 +999,13 @@ def index_page(site, r, preface, numbered, glossary):
         toc.append(f'<div class="toc-part"><div class="toc-part-head"><span class="toc-part-k">بخش {ORDINALS[pi]}</span><span class="toc-part-t">{part["title"]}</span></div><div class="toc-grid">')
         for chap in part["chapters"]:
             secs = [Renderer(site, chap).inline(t).strip() for lvl, lab, t, a in chap["toc"] if lvl == 2]
+            secs = [re.sub(r'\s*\(<bdi dir="ltr" lang="en">.*?</bdi>\)\s*$', "", x) for x in secs]
             sec_html = "".join(f"<li>{s}</li>" for s in secs[:6])
+            en_html = ""
+            if chap.get("entitle"):
+                en_html = '<small class="toc-en" dir="ltr" lang="en">' + Renderer(site, chap).inline(chap["entitle"], True).strip() + "</small>"
             more = f'<li class="more">و {fa(str(len(secs) - 6))} بخش دیگر</li>' if len(secs) > 6 else ""
-            toc.append(f'<a class="toc-card" href="{chap["page"]}"><span class="toc-n">{fa(str(chap["num"]))}</span><span class="toc-t">{chap["title_html"]}</span><ul>{sec_html}{more}</ul></a>')
+            toc.append(f'<a class="toc-card" href="{chap["page"]}"><span class="toc-n">{fa(str(chap["num"]))}</span><span class="toc-t">{chap["title_html"]}{en_html}</span><ul>{sec_html}{more}</ul></a>')
         toc.append("</div></div>")
     if glossary:
         toc.append(f'<div class="toc-part"><div class="toc-part-head"><span class="toc-part-k">پیوست</span><span class="toc-part-t">{glossary["title_html"]}</span></div><div class="toc-grid"><a class="toc-card" href="{glossary["page"]}"><span class="toc-n">ا</span><span class="toc-t">{glossary["title_html"]}</span><ul><li>معادل انگلیسی اصطلاحات درس</li></ul></a></div></div>')

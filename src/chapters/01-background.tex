@@ -1,20 +1,21 @@
 \chapter{مقدمات ریاضی: منطق، مجموعه، تابع و گراف}
+\entitle{Mathematical Background: Logic, Sets, Functions and Graphs}
 
 در این درس با «ماشین»هایی سروکار داریم که رشته‌ها را می‌خوانند و درباره آن‌ها تصمیم می‌گیرند. برای اینکه بتوانیم درباره این ماشین‌ها دقیق حرف بزنیم و قضیه ثابت کنیم، به چند ابزار ساده ریاضی نیاز داریم. این فصل همین ابزارها را مرور می‌کند. اگر این مطالب را از درس ریاضیات گسسته به خاطر دارید، می‌توانید سریع از آن عبور کنید.
 
-\section{منطق بولی}
+\section{منطق بولی (\lr{Boolean Logic})}
 
 منطق بولی یک دستگاه ریاضی است که فقط دو مقدار دارد: \textbf{درست} (\lr{True}) و \textbf{نادرست} (\lr{False}). معمولاً درست را با $1$ و نادرست را با $0$ نشان می‌دهیم. این دو مقدار می‌توانند هر دوگانه‌ای را مدل کنند: ولتاژ بالا و پایین، گزاره درست و غلط، یا جواب «بله» و «نه». منطق بولی پایه طراحی مدارهای دیجیتال و کامپیوترهاست.
 
-\subsection{عملگرهای بولی}
-با عملگرهای بولی گزاره‌های ساده را به هم وصل می‌کنیم و گزاره‌های پیچیده‌تر می‌سازیم. اگر $P$ و $Q$ دو گزاره باشند (به آن‌ها \textbf{عملوند} می‌گوییم)، عملگرهای اصلی این‌ها هستند:
+\subsection{عملگرهای بولی (\lr{Boolean Operations})}
+با عملگرهای بولی گزاره‌های ساده را به هم وصل می‌کنیم و گزاره‌های پیچیده‌تر می‌سازیم. اگر $P$ و $Q$ دو گزاره باشند (به آن‌ها \term{عملوند}{Operand} می‌گوییم)، عملگرهای اصلی این‌ها هستند:
 \begin{itemize}
-\item \textbf{نقیض} (\lr{NOT}) با نماد $\neg$: مقدار را برعکس می‌کند.
-\item \textbf{عطف} (\lr{AND}) با نماد $\wedge$: فقط وقتی درست است که هر دو عملوند درست باشند.
-\item \textbf{فصل} (\lr{OR}) با نماد $\vee$: وقتی درست است که دست‌کم یکی از عملوندها درست باشد.
-\item \textbf{یای انحصاری} (\lr{XOR}) با نماد $\oplus$: وقتی درست است که دقیقاً یکی از عملوندها درست باشد.
-\item \textbf{هم‌ارزی} با نماد $\leftrightarrow$: وقتی درست است که دو عملوند هم‌مقدار باشند.
-\item \textbf{استلزام} با نماد $\rightarrow$: «اگر $P$ آنگاه $Q$». فقط در یک حالت نادرست است: وقتی $P$ درست و $Q$ نادرست باشد.
+\item \term{نقیض}{Negation} با نماد $\neg$: مقدار را برعکس می‌کند.
+\item \term{عطف}{Conjunction} با نماد $\wedge$: فقط وقتی درست است که هر دو عملوند درست باشند.
+\item \term{فصل}{Disjunction} با نماد $\vee$: وقتی درست است که دست‌کم یکی از عملوندها درست باشد.
+\item \term{یای انحصاری}{Exclusive OR, XOR} با نماد $\oplus$: وقتی درست است که دقیقاً یکی از عملوندها درست باشد.
+\item \term{هم‌ارزی}{Equivalence} با نماد $\leftrightarrow$: وقتی درست است که دو عملوند هم‌مقدار باشند.
+\item \term{استلزام}{Implication} با نماد $\rightarrow$: «اگر $P$ آنگاه $Q$». فقط در یک حالت نادرست است: وقتی $P$ درست و $Q$ نادرست باشد.
 \end{itemize}
 
 \begin{ltrfig}
@@ -36,28 +37,28 @@ $1$ & $1$ & $0$ & $1$ & $1$ & $0$ & $1$ & $1$\\
 P\vee Q&\equiv\neg(\neg P\wedge\neg Q), & P\rightarrow Q&\equiv\neg P\vee Q,\\
 P\leftrightarrow Q&\equiv(P\rightarrow Q)\wedge(Q\rightarrow P), & P\oplus Q&\equiv\neg(P\leftrightarrow Q).
 \end{align*}
-\textbf{قوانین پخش‌پذیری} هم مثل ضرب و جمع در حساب کار می‌کنند، با این تفاوت که هر دو جهت برقرارند:
+\term{قوانین پخش‌پذیری}{Distributive laws} هم مثل ضرب و جمع در حساب کار می‌کنند، با این تفاوت که هر دو جهت برقرارند:
 \[
 P\wedge(Q\vee R)\equiv(P\wedge Q)\vee(P\wedge R),\qquad
 P\vee(Q\wedge R)\equiv(P\vee Q)\wedge(P\vee R).
 \]
 
-\subsection{سورها}
+\subsection{سورها (\lr{Quantifiers})}
 گاهی می‌خواهیم بگوییم یک ویژگی «برای همه» برقرار است یا «دست‌کم برای یکی». برای این کار از \textbf{سورها} استفاده می‌کنیم:
 \begin{itemize}
-\item \textbf{سور عمومی} $\forall$ («برای هر»): مثلاً $\forall x\; \big(P(x)\rightarrow Q(x)\big)$ یعنی هر $x$ که ویژگی $P$ را دارد، ویژگی $Q$ را هم دارد.
-\item \textbf{سور وجودی} $\exists$ («وجود دارد»): مثلاً $\exists x\; \big(P(x)\rightarrow Q(x)\big)$.
+\item \term{سور عمومی}{Universal quantifier} $\forall$ («برای هر»): مثلاً $\forall x\; \big(P(x)\rightarrow Q(x)\big)$ یعنی هر $x$ که ویژگی $P$ را دارد، ویژگی $Q$ را هم دارد.
+\item \term{سور وجودی}{Existential quantifier} $\exists$ («وجود دارد»): مثلاً $\exists x\; \big(P(x)\rightarrow Q(x)\big)$.
 \item سورها را می‌توان ترکیب کرد: $\forall x\,\exists y\; P(y)>Q(x)$ یعنی برای هر $x$ یک $y$ پیدا می‌شود که $P(y)>Q(x)$.
 \end{itemize}
 
-\textbf{نقیض سورها} قاعده ساده‌ای دارد: $\forall$ به $\exists$ تبدیل می‌شود و برعکس، و نقیض به داخل می‌رود. این قاعده در فصل‌های بعد (مثلاً در لم تزریق) بارها به کار می‌آید:
+\term{نقیض سورها}{Negation of quantifiers} قاعده ساده‌ای دارد: $\forall$ به $\exists$ تبدیل می‌شود و برعکس، و نقیض به داخل می‌رود. این قاعده در فصل‌های بعد (مثلاً در لم تزریق) بارها به کار می‌آید:
 \begin{align*}
 \neg\big(\forall x\; P(x)\rightarrow Q(x)\big) &\equiv \exists x\; \neg\big(P(x)\rightarrow Q(x)\big) \equiv \exists x\; \neg\big(\neg P(x)\vee Q(x)\big)\equiv \exists x\;\big(P(x)\wedge\neg Q(x)\big),\\
 \neg\big(\exists x\; P(x)\rightarrow Q(x)\big) &\equiv \forall x\; \neg\big(P(x)\rightarrow Q(x)\big)\equiv \forall x\;\big(P(x)\wedge\neg Q(x)\big),\\
 \neg\big(\forall x\,\exists y\; P(y)>Q(x)\big) &\equiv \exists x\,\forall y\; \neg\big(P(y)>Q(x)\big)\equiv \exists x\,\forall y\; P(y)\le Q(x).
 \end{align*}
 
-\section{مجموعه‌ها}
+\section{مجموعه‌ها (\lr{Sets})}
 
 \begin{definition}[مجموعه]
 \term{مجموعه}{Set} گروهی از اشیاء است. به این اشیاء \textbf{عضو} یا \textbf{عنصر} مجموعه می‌گوییم. ترتیب و تکرار عضوها در مجموعه مهم نیست.
@@ -72,23 +73,23 @@ P\vee(Q\wedge R)\equiv(P\vee Q)\wedge(P\vee R).
 
 چند مفهوم پایه:
 \begin{itemize}
-\item \textbf{عضویت:} $1\in\{1,2,3\}$ و $4\notin\{1,2,3\}$.
-\item \textbf{اندازه} (\lr{Cardinality}): تعداد عضوهای مجموعه، مثلاً $\abs{A}=3$.
-\item \textbf{زیرمجموعه:} $A\subseteq B$ یعنی هر عضو $A$ عضو $B$ هم هست: $a\in A\rightarrow a\in B$.
-\item \textbf{زیرمجموعه سره:} $A\subsetneq B$ یعنی $A\subseteq B$ و $A\neq B$.
-\item \textbf{چندمجموعه} (\lr{Multiset}): مجموعه‌ای که در آن تعداد تکرار مهم است؛ مثلاً $\{5\}$ و $\{5,5\}$ به عنوان چندمجموعه با هم فرق دارند، ولی به عنوان مجموعه یکی‌اند.
-\item \textbf{مجموعه تهی} $\emptyset$ یا $\{\}$ هیچ عضوی ندارد. مجموعه \textbf{تک‌عضوی} مثل $\{10\}$ و \textbf{زوج نامرتب} مثل $\{10,30\}$.
+\item \term{عضویت}{Membership}: $1\in\{1,2,3\}$ و $4\notin\{1,2,3\}$.
+\item \term{اندازه}{Cardinality}: تعداد عضوهای مجموعه، مثلاً $\abs{A}=3$.
+\item \term{زیرمجموعه}{Subset}: $A\subseteq B$ یعنی هر عضو $A$ عضو $B$ هم هست: $a\in A\rightarrow a\in B$.
+\item \term{زیرمجموعه سره}{Proper subset}: $A\subsetneq B$ یعنی $A\subseteq B$ و $A\neq B$.
+\item \term{چندمجموعه}{Multiset}: مجموعه‌ای که در آن تعداد تکرار مهم است؛ مثلاً $\{5\}$ و $\{5,5\}$ به عنوان چندمجموعه با هم فرق دارند، ولی به عنوان مجموعه یکی‌اند.
+\item \term{مجموعه تهی}{Empty set} $\emptyset$ یا $\{\}$ هیچ عضوی ندارد. مجموعه \term{تک‌عضوی}{Singleton set} مثل $\{10\}$ و \term{زوج نامرتب}{Unordered pair} مثل $\{10,30\}$.
 \end{itemize}
 
-\subsection{عملیات روی مجموعه‌ها}
-فرض کنید همه مجموعه‌ها زیرمجموعه یک \textbf{مجموعه مرجع} $U$ باشند.
+\subsection{عملیات روی مجموعه‌ها (\lr{Set Operations})}
+فرض کنید همه مجموعه‌ها زیرمجموعه یک \term{مجموعه مرجع}{Universal set} $U$ باشند.
 \begin{itemize}
-\item \textbf{اجتماع:} $A\cup B=\{x\st x\in A \text{ یا } x\in B\}$.
-\item \textbf{اشتراک:} $A\cap B=\{x\st x\in A \text{ و } x\in B\}$.
-\item \textbf{تفاضل:} $B-A=\{x\st x\in B \text{ و } x\notin A\}$.
-\item \textbf{متمم:} $\overline{A}=U-A$.
+\item \term{اجتماع}{Union}: $A\cup B=\{x\st x\in A \text{ یا } x\in B\}$.
+\item \term{اشتراک}{Intersection}: $A\cap B=\{x\st x\in A \text{ و } x\in B\}$.
+\item \term{تفاضل}{Difference}: $B-A=\{x\st x\in B \text{ و } x\notin A\}$.
+\item \term{متمم}{Complement}: $\overline{A}=U-A$.
 \end{itemize}
-دو مجموعه را \textbf{مجزا} می‌گوییم اگر $A\cap B=\emptyset$. برای نمایش این عملیات از \textbf{نمودار ون} استفاده می‌شود:
+دو مجموعه را \term{مجزا}{Disjoint} می‌گوییم اگر $A\cap B=\emptyset$. برای نمایش این عملیات از \term{نمودار ون}{Venn diagram} استفاده می‌شود:
 
 \begin{ltrfig}
 \begin{tikzpicture}[scale=0.85]
@@ -116,13 +117,13 @@ P\vee(Q\wedge R)\equiv(P\vee Q)\wedge(P\vee R).
 \[
 A\cup\emptyset=A,\quad A\cap\emptyset=\emptyset,\quad A-\emptyset=A,\quad \emptyset-A=\emptyset,\quad \overline{\emptyset}=U.
 \]
-و \textbf{قوانین دمورگان}:
+و \term{قوانین دمورگان}{De Morgan's laws}:
 \[
 \overline{A\cup B}=\overline{A}\cap\overline{B},\qquad \overline{A\cap B}=\overline{A}\cup\overline{B}.
 \]
 (اثبات قانون اول را در فصل بعد به عنوان نمونه‌ای از یک اثبات کامل می‌بینیم.)
 
-\subsection{مجموعه توانی و قضیه کانتور}
+\subsection{مجموعه توانی و قضیه کانتور (\lr{Power Set and Cantor's Theorem})}
 
 \begin{definition}[مجموعه توانی]
 \term{مجموعه توانی}{Power Set} مجموعه $A$، که با $\mathcal{P}(A)$ یا $2^A$ نشان داده می‌شود، مجموعه همه زیرمجموعه‌های $A$ است. پس عضوهای آن خودشان مجموعه‌اند.
@@ -161,9 +162,9 @@ A\cup\emptyset=A,\quad A\cap\emptyset=\emptyset,\quad A-\emptyset=A,\quad \empty
 این روش اثبات «قطری‌سازی» نام دارد: $D$ طوری ساخته شده که با هر $f(a)$ دست‌کم در یک نقطه (خود $a$) فرق داشته باشد. در فصل ۱۹ همین ایده را برای اثبات وجود مسائل حل‌نشدنی به کار می‌بریم.
 \end{note}
 
-\section{دنباله‌ها، چندتایی‌ها و ضرب دکارتی}
+\section{دنباله‌ها، چندتایی‌ها و ضرب دکارتی (\lr{Sequences, Tuples and Cartesian Product})}
 
-\textbf{دنباله} فهرستی از اشیاء با ترتیب مشخص است، مثل $D=(5,3,13)$. برخلاف مجموعه، در دنباله ترتیب و تکرار مهم است: $(5,3)\neq(3,5)$. دنباله متناهی را \textbf{چندتایی} (\lr{Tuple}) می‌نامیم. دنباله‌ای با $k$ عضو یک \textbf{$k$-تایی} است و به $2$-تایی \textbf{زوج مرتب} می‌گوییم.
+\term{دنباله}{Sequence} فهرستی از اشیاء با ترتیب مشخص است، مثل $D=(5,3,13)$. برخلاف مجموعه، در دنباله ترتیب و تکرار مهم است: $(5,3)\neq(3,5)$. دنباله متناهی را \term{چندتایی}{Tuple} می‌نامیم. دنباله‌ای با $k$ عضو یک \textbf{$k$-تایی} است و به $2$-تایی \term{زوج مرتب}{Ordered pair} می‌گوییم.
 
 \begin{definition}[ضرب دکارتی]
 \term{ضرب دکارتی}{Cartesian Product} دو مجموعه $A$ و $B$ مجموعه همه زوج‌های مرتب $(a,b)$ است که $a\in A$ و $b\in B$:
@@ -180,10 +181,10 @@ A\times B\times A&=\{(1,x,1),(1,x,2),(1,y,1),(1,y,2),(1,z,1),(1,z,2),\\
 \end{align*}
 \end{example}
 
-\section{توابع و روابط}
+\section{توابع و روابط (\lr{Functions and Relations})}
 
 \begin{definition}[تابع]
-\term{تابع}{Function} شیئی است که یک رابطه ورودی–خروجی برقرار می‌کند: به هر ورودی $a$ دقیقاً یک خروجی $f(a)=b$ نسبت می‌دهد. می‌گوییم $f$، $a$ را به $b$ \textbf{می‌نگارد}. مجموعه ورودی‌های ممکن \textbf{دامنه} و مجموعه خروجی‌های ممکن \textbf{برد} نام دارد و می‌نویسیم $f:D\to R$.
+\term{تابع}{Function} شیئی است که یک رابطه ورودی–خروجی برقرار می‌کند: به هر ورودی $a$ دقیقاً یک خروجی $f(a)=b$ نسبت می‌دهد. می‌گوییم $f$، $a$ را به $b$ \term{می‌نگارد}{maps}. مجموعه ورودی‌های ممکن \term{دامنه}{Domain} و مجموعه خروجی‌های ممکن \term{برد}{Range} نام دارد و می‌نویسیم $f:D\to R$.
 \end{definition}
 
 مثلاً تابع جمع $\mathit{add}:\mathbb{Z}\times\mathbb{Z}\to\mathbb{Z}$ و تابع قدرمطلق $\mathit{abs}:\mathbb{Z}\to\mathbb{Z}$. به عنوان مثالی دیگر، اگر $\mathbb{Z}_m=\{0,1,\dots,m-1\}$ باشد، تابع $f:\mathbb{Z}_5\to\mathbb{Z}_5$ با ضابطه $f(n)=(n+1)\bmod 5$ همان جدول زیر است:
@@ -197,9 +198,9 @@ $f(n)$ & $1$ & $2$ & $3$ & $4$ & $0$
 \begin{definition}[انواع تابع]
 تابع $f:A\to B$ را
 \begin{itemize}
-\item \textbf{یک‌به‌یک} (\lr{Injective}) می‌گوییم اگر ورودی‌های متفاوت را به خروجی‌های متفاوت ببرد: $a_1\neq a_2\rightarrow f(a_1)\neq f(a_2)$.
-\item \textbf{پوشا} (\lr{Onto}) می‌گوییم اگر همه عضوهای برد را بپوشاند: برای هر $b\in B$ عضوی مثل $a$ باشد که $f(a)=b$.
-\item \textbf{تناظر یک‌به‌یک} یا \textbf{دوسویی} (\lr{Bijection}) می‌گوییم اگر هم یک‌به‌یک و هم پوشا باشد. چنین تابعی وارون‌پذیر است.
+\item \term{یک‌به‌یک}{Injective, one-to-one} می‌گوییم اگر ورودی‌های متفاوت را به خروجی‌های متفاوت ببرد: $a_1\neq a_2\rightarrow f(a_1)\neq f(a_2)$.
+\item \term{پوشا}{Onto, surjective} می‌گوییم اگر همه عضوهای برد را بپوشاند: برای هر $b\in B$ عضوی مثل $a$ باشد که $f(a)=b$.
+\item \term{تناظر یک‌به‌یک}{One-to-one correspondence} یا \term{دوسویی}{Bijection} می‌گوییم اگر هم یک‌به‌یک و هم پوشا باشد. چنین تابعی وارون‌پذیر است.
 \end{itemize}
 \end{definition}
 
@@ -207,7 +208,7 @@ $f(n)$ & $1$ & $2$ & $3$ & $4$ & $0$
 تابع $f(n)=(n+1)\bmod 5$ بالا دوسویی است. اما تابع $g:\mathbb{Z}_5\to\mathbb{Z}_5$ با جدول $g(0)=1,\ g(1)=2,\ g(2)=1,\ g(3)=2,\ g(4)=1$ نه یک‌به‌یک است (چون $g(0)=g(2)$) و نه پوشا (هیچ ورودی‌ای به $0$ نمی‌رود). اگر اندازه دامنه و برد متناهی و متفاوت باشد، مثل $f:\{0,1,2,3\}\to\{0,1,2,3,4\}$، تابع هرگز نمی‌تواند دوسویی باشد.
 \end{example}
 
-\subsection{مقایسه اندازه مجموعه‌ها}\label{sec:cardinality}
+\subsection{مقایسه اندازه مجموعه‌ها (\lr{Comparing the Size of Sets})}\label{sec:cardinality}
 برای مجموعه‌های متناهی، مقایسه اندازه یعنی شمردن. اما مجموعه‌های نامتناهی را نمی‌توان شمرد. ایده کانتور این بود که اندازه‌ها را با \textbf{جفت کردن عضوها} مقایسه کنیم.
 
 \begin{definition}[هم‌اندازگی]
@@ -220,9 +221,9 @@ $f(n)$ & $1$ & $2$ & $3$ & $4$ & $0$
 
 \begin{definition}[متناهی و شمارا]
 \begin{itemize}
-\item $A$ \textbf{متناهی} است اگر عدد صحیح $n\ge0$ باشد که $\abs{A}=\abs{\{1,2,\dots,n\}}$. در غیر این صورت \textbf{نامتناهی} است.
-\item $A$ \textbf{شمارای نامتناهی} (\lr{Denumerable}) است اگر با $\mathbb{N}$ تناظر یک‌به‌یک داشته باشد.
-\item $A$ \textbf{شمارا} (\lr{Countable}) است اگر متناهی یا شمارای نامتناهی باشد، و \textbf{ناشمارا} است اگر شمارا نباشد.
+\item $A$ \term{متناهی}{Finite} است اگر عدد صحیح $n\ge0$ باشد که $\abs{A}=\abs{\{1,2,\dots,n\}}$. در غیر این صورت \term{نامتناهی}{Infinite} است.
+\item $A$ \term{شمارای نامتناهی}{Denumerable} است اگر با $\mathbb{N}$ تناظر یک‌به‌یک داشته باشد.
+\item $A$ \term{شمارا}{Countable} است اگر متناهی یا شمارای نامتناهی باشد، و \term{ناشمارا}{Uncountable} است اگر شمارا نباشد.
 \end{itemize}
 \end{definition}
 
@@ -239,15 +240,15 @@ $f(n)$ & $1$ & $2$ & $3$ & $4$ & $0$
 \end{example}
 
 \begin{note}[کمی تاریخ]
-اندازه یک مجموعه متناهی همان تعداد عضوهای آن است. برای مجموعه‌های نامتناهی از \textbf{اعداد اصلی ترامتناهی} استفاده می‌شود. اولین آن‌ها $\aleph_0:=\abs{\mathbb{N}}$ است. کانتور در سال ۱۸۷۴ نشان داد $c=\abs{\mathbb{R}}=2^{\aleph_0}>\aleph_0$. \textbf{فرضیه پیوستار} می‌گوید هیچ مجموعه‌ای با اندازه‌ای بین $\aleph_0$ و $c$ وجود ندارد. این اولین مسئله از ۲۳ مسئله هیلبرت (سال ۱۹۰۰) بود. گودل و کوهن نشان دادند این فرضیه در دستگاه اصول موضوعه \lr{ZFC} نه قابل اثبات است و نه قابل رد.
+اندازه یک مجموعه متناهی همان تعداد عضوهای آن است. برای مجموعه‌های نامتناهی از \term{اعداد اصلی ترامتناهی}{Transfinite cardinal numbers} استفاده می‌شود. اولین آن‌ها $\aleph_0:=\abs{\mathbb{N}}$ است. کانتور در سال ۱۸۷۴ نشان داد $c=\abs{\mathbb{R}}=2^{\aleph_0}>\aleph_0$. \term{فرضیه پیوستار}{Continuum hypothesis} می‌گوید هیچ مجموعه‌ای با اندازه‌ای بین $\aleph_0$ و $c$ وجود ندارد. این اولین مسئله از ۲۳ مسئله هیلبرت (سال ۱۹۰۰) بود. گودل و کوهن نشان دادند این فرضیه در دستگاه اصول موضوعه \lr{ZFC} نه قابل اثبات است و نه قابل رد.
 \end{note}
 
-\subsection{توابع چندمتغیره، گزاره‌نما و رابطه}
-تابعی که دامنه‌اش $A_1\times\cdots\times A_k$ باشد، یک $k$-تایی $(a_1,\dots,a_k)$ می‌گیرد. به $k$ \textbf{آریتی} و به هر $a_i$ یک \textbf{آرگومان} می‌گوییم. تابع با $k=1$ \textbf{یکانی} و با $k=2$ \textbf{دوتایی} است. تابع دوتایی را می‌توان به شکل پیشوندی ($\mathit{add}(a,b)$) یا میانوندی ($a+b$) نوشت.
+\subsection{توابع چندمتغیره، گزاره‌نما و رابطه (\lr{k-ary Functions, Predicates and Relations})}
+تابعی که دامنه‌اش $A_1\times\cdots\times A_k$ باشد، یک $k$-تایی $(a_1,\dots,a_k)$ می‌گیرد. به $k$ \term{آریتی}{Arity} و به هر $a_i$ یک \term{آرگومان}{Argument} می‌گوییم. تابع با $k=1$ \term{یکانی}{Unary} و با $k=2$ \term{دوتایی}{Binary} است. تابع دوتایی را می‌توان به شکل پیشوندی ($\mathit{add}(a,b)$) یا میانوندی ($a+b$) نوشت.
 
 \begin{definition}[گزاره‌نما و رابطه]
 \begin{itemize}
-\item \textbf{گزاره‌نما} یا \textbf{ویژگی} (\lr{Predicate}) تابعی است که بردش $\{\text{\lr{True}},\text{\lr{False}}\}$ است. مثلاً $\mathit{even}(3)=\text{\lr{False}}$ و $\mathit{even}(6)=\text{\lr{True}}$.
+\item \term{گزاره‌نما}{Predicate} یا \textbf{ویژگی} (\lr{Predicate}) تابعی است که بردش $\{\text{\lr{True}},\text{\lr{False}}\}$ است. مثلاً $\mathit{even}(3)=\text{\lr{False}}$ و $\mathit{even}(6)=\text{\lr{True}}$.
 \item \textbf{رابطه $k$-تایی} روی $A$ یک گزاره‌نماست که دامنه‌اش $A^k$ باشد. رابطه دوتایی را معمولاً میانوندی می‌نویسیم، مثل $a<b$ یا $x=y$.
 \end{itemize}
 وقتی می‌نویسیم $aRb$ منظور این است که $aRb=\text{\lr{True}}$.
@@ -268,13 +269,13 @@ Stone & True & False & False
 که معادل مجموعه $\{(\text{\lr{Scissors}},\text{\lr{Paper}}),(\text{\lr{Paper}},\text{\lr{Stone}}),(\text{\lr{Stone}},\text{\lr{Scissors}})\}$ است.
 \end{example}
 
-\subsection{انواع رابطه دوتایی}
+\subsection{انواع رابطه دوتایی (\lr{Types of Binary Relations})}
 رابطه دوتایی $R$ روی مجموعه $A$ را
 \begin{enumerate}
-\item \textbf{بازتابی} می‌گوییم اگر $\forall x\in A:\ xRx$،
-\item \textbf{متقارن} می‌گوییم اگر $\forall x,y\in A:\ xRy\rightarrow yRx$،
-\item \textbf{پادمتقارن} می‌گوییم اگر $\forall x,y\in A:\ (xRy \wedge yRx)\rightarrow x=y$،
-\item \textbf{متعدی} می‌گوییم اگر $\forall x,y,z\in A:\ (xRy\wedge yRz)\rightarrow xRz$.
+\item \term{بازتابی}{Reflexive} می‌گوییم اگر $\forall x\in A:\ xRx$،
+\item \term{متقارن}{Symmetric} می‌گوییم اگر $\forall x,y\in A:\ xRy\rightarrow yRx$،
+\item \term{پادمتقارن}{Antisymmetric} می‌گوییم اگر $\forall x,y\in A:\ (xRy \wedge yRx)\rightarrow x=y$،
+\item \term{متعدی}{Transitive} می‌گوییم اگر $\forall x,y,z\in A:\ (xRy\wedge yRz)\rightarrow xRz$.
 \end{enumerate}
 
 \begin{definition}[رابطه هم‌ارزی و ترتیب جزئی]
@@ -303,13 +304,13 @@ Stone & True & False & False
 \end{ltrfig}
 \end{example}
 
-\section{گراف‌ها}
+\section{گراف‌ها (\lr{Graphs})}
 
 \begin{definition}[گراف]
-\term{گراف}{Graph} بی‌جهت $G=(V,E)$ مجموعه‌ای از نقطه‌ها (\textbf{رأس‌ها}، $V$) است که بعضی از آن‌ها با خط (\textbf{یال‌ها}، $E$) به هم وصل شده‌اند. در گراف بی‌جهت، $(i,j)$ و $(j,i)$ یک یال‌اند، پس یال را با زوج نامرتب $\{i,j\}$ هم نشان می‌دهیم. \textbf{درجه} یک رأس تعداد یال‌های متصل به آن است.
+\term{گراف}{Graph} بی‌جهت $G=(V,E)$ مجموعه‌ای از نقطه‌هاست که \term{رأس‌ها}{Vertices, nodes} نام دارند و با $V$ نشان داده می‌شوند. بعضی از این نقطه‌ها با خط به هم وصل شده‌اند و این خط‌ها \term{یال‌ها}{Edges} نام دارند و با $E$ نشان داده می‌شوند. در گراف بی‌جهت، $(i,j)$ و $(j,i)$ یک یال‌اند، پس یال را با زوج نامرتب $\{i,j\}$ هم نشان می‌دهیم. \term{درجه}{Degree} یک رأس تعداد یال‌های متصل به آن است.
 \end{definition}
 
-در حالت عادی بین هر دو رأس حداکثر یک یال داریم. یالی که یک رأس را به خودش وصل کند \textbf{طوقه} نام دارد. برای مثال گراف زیر $\big(\{1,2,3,4,5\},\{(1,2),(2,3),(3,4),(4,5),(5,1)\}\big)$ است:
+در حالت عادی بین هر دو رأس حداکثر یک یال داریم. یالی که یک رأس را به خودش وصل کند \term{طوقه}{Self-loop} نام دارد. برای مثال گراف زیر $\big(\{1,2,3,4,5\},\{(1,2),(2,3),(3,4),(4,5),(5,1)\}\big)$ است:
 
 \begin{ltrfig}
 \begin{tikzpicture}[every node/.style={circle,draw=jzMain,fill=jzMain!7,minimum size=6mm,inner sep=0pt,font=\small}]
@@ -318,20 +319,20 @@ Stone & True & False & False
 \end{tikzpicture}
 \end{ltrfig}
 
-مثال‌های واقعی: رأس‌ها شهرها و یال‌ها جاده‌های بین آن‌ها؛ یا رأس‌ها افراد و یال‌ها دوستی‌ها. اگر روی رأس‌ها یا یال‌ها برچسب (مثلاً طول جاده) بگذاریم، \textbf{گراف برچسب‌دار} داریم.
+مثال‌های واقعی: رأس‌ها شهرها و یال‌ها جاده‌های بین آن‌ها؛ یا رأس‌ها افراد و یال‌ها دوستی‌ها. اگر روی رأس‌ها یا یال‌ها برچسب (مثلاً طول جاده) بگذاریم، \term{گراف برچسب‌دار}{Labeled graph} داریم.
 
 \begin{definition}[مفاهیم پایه گراف]
 \begin{itemize}
-\item \textbf{زیرگراف:} $G$ زیرگراف $H$ است اگر رأس‌های $G$ زیرمجموعه رأس‌های $H$ باشند و یال‌های $G$ همان یال‌های $H$ روی آن رأس‌ها باشند.
-\item \textbf{مسیر:} دنباله‌ای از رأس‌ها که رأس‌های متوالی با یال به هم وصل‌اند. \textbf{مسیر ساده} رأس تکراری ندارد.
-\item \textbf{همبند:} گرافی که بین هر دو رأس آن مسیری وجود دارد.
-\item \textbf{دور:} مسیری که از یک رأس شروع و به همان رأس ختم می‌شود. \textbf{دور ساده} دست‌کم سه رأس دارد و فقط رأس اول و آخرش تکراری است.
-\item \textbf{درخت:} گراف همبندی که دور ساده ندارد. رأس با درجه یک \textbf{برگ} است و گاهی یک رأس را به عنوان \textbf{ریشه} انتخاب می‌کنیم.
+\item \term{زیرگراف}{Subgraph}: $G$ زیرگراف $H$ است اگر رأس‌های $G$ زیرمجموعه رأس‌های $H$ باشند و یال‌های $G$ همان یال‌های $H$ روی آن رأس‌ها باشند.
+\item \term{مسیر}{Path}: دنباله‌ای از رأس‌ها که رأس‌های متوالی با یال به هم وصل‌اند. \term{مسیر ساده}{Simple path} رأس تکراری ندارد.
+\item \term{همبند}{Connected}: گرافی که بین هر دو رأس آن مسیری وجود دارد.
+\item \term{دور}{Cycle}: مسیری که از یک رأس شروع و به همان رأس ختم می‌شود. \term{دور ساده}{Simple cycle} دست‌کم سه رأس دارد و فقط رأس اول و آخرش تکراری است.
+\item \term{درخت}{Tree}: گراف همبندی که دور ساده ندارد. رأس با درجه یک \term{برگ}{Leaf} است و گاهی یک رأس را به عنوان \term{ریشه}{Root} انتخاب می‌کنیم.
 \end{itemize}
 \end{definition}
 
 \begin{definition}[گراف جهت‌دار]
-در \textbf{گراف جهت‌دار} به جای خط، پیکان داریم و یال از $i$ به $j$ با زوج مرتب $(i,j)$ نشان داده می‌شود. تعداد پیکان‌های خارج‌شونده از یک رأس \textbf{درجه خروجی} و تعداد پیکان‌های واردشونده \textbf{درجه ورودی} آن است. \textbf{مسیر جهت‌دار} مسیری است که همه پیکان‌هایش در جهت حرکت باشند. گراف جهت‌دار \textbf{قویاً همبند} است اگر از هر رأس به هر رأس دیگر مسیر جهت‌دار وجود داشته باشد.
+در \term{گراف جهت‌دار}{Directed graph} به جای خط، پیکان داریم و یال از $i$ به $j$ با زوج مرتب $(i,j)$ نشان داده می‌شود. تعداد پیکان‌های خارج‌شونده از یک رأس \term{درجه خروجی}{Outdegree} و تعداد پیکان‌های واردشونده \term{درجه ورودی}{Indegree} آن است. \term{مسیر جهت‌دار}{Directed path} مسیری است که همه پیکان‌هایش در جهت حرکت باشند. گراف جهت‌دار \term{قویاً همبند}{Strongly connected} است اگر از هر رأس به هر رأس دیگر مسیر جهت‌دار وجود داشته باشد.
 \end{definition}
 
 \begin{example}
