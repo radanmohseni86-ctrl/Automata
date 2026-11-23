@@ -141,6 +141,7 @@ bdi[dir="ltr"] { unicode-bidi: isolate; }
 .chip { background: var(--accent); color: #fff; border-radius: 6px; padding: .05rem .7rem; font-weight: 700; font-size: .9rem; }
 .part-name { color: var(--muted); font-size: .92rem; }
 h1 { font-size: var(--step-3); line-height: 1.45; margin: .2rem 0 0; color: var(--main-ink); font-weight: 900; text-wrap: balance; }
+.subtitle { margin: .2rem 0 0; color: var(--muted); font-size: 1.05rem; line-height: 1.5; font-weight: 500; text-align: left; }
 h2 { font-size: var(--step-2); line-height: 1.5; margin: 2.4rem 0 .7rem; color: var(--main-ink); font-weight: 800; text-wrap: balance; }
 h3 { font-size: var(--step-1); line-height: 1.5; margin: 1.8rem 0 .5rem; color: var(--main-ink); font-weight: 800; text-wrap: balance; }
 h4 { font-size: var(--step-0); margin: 1.3rem 0 .3rem; color: var(--main-ink); font-weight: 800; }
@@ -235,6 +236,7 @@ table.glossary td:last-child { text-align: left; }
 .toc-card:hover { border-color: var(--main); }
 .toc-n { grid-row: 1 / span 2; display: grid; place-items: center; width: 2.2rem; height: 2.2rem; border-radius: 8px; background: var(--main); color: var(--surface); font-weight: 800; }
 .toc-t { font-weight: 800; color: var(--main-ink); line-height: 1.6; }
+.toc-en { display: block; font-weight: 500; font-size: .8rem; color: var(--muted); line-height: 1.5; text-align: left; }
 .toc-card ul { list-style: none; padding: 0; margin: .3rem 0 0; font-size: .84rem; color: var(--muted); line-height: 1.7; }
 .toc-card li { margin: 0; }
 .toc-card li.more { opacity: .8; }
